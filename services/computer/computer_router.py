@@ -37,6 +37,7 @@ class ComputerRouter:
         self.media = MediaControl()
         self.camera = CameraService()
         self.screenshot = ScreenshotService()
+        self.ai_service = None
 
         # SystemControl uses pycaw — may fail on some setups
         try:
@@ -44,6 +45,10 @@ class ComputerRouter:
         except Exception as e:
             print(f"[ComputerRouter] SystemControl init failed: {e}")
             self.system = None
+
+    def set_ai_service(self, ai_service) -> None:
+        """Inject AI service for smart generative file writing."""
+        self.ai_service = ai_service
 
     def handle(self, text: str) -> str | None:
         """Try to handle the text as a computer control command."""
@@ -55,7 +60,8 @@ class ComputerRouter:
 
         # Try each category in order
         result = (
-            self._handle_open(lowered, text)
+            self._handle_write_to_file(lowered, text)
+            or self._handle_open(lowered, text)
             or self._handle_volume(lowered)
             or self._handle_system(lowered)
             or self._handle_media(lowered)
@@ -244,61 +250,154 @@ class ComputerRouter:
 
         return None
 
+    # ─── File Writing & Generative Document Creation ─────────────────────────
+
+    def _handle_write_to_file(self, lowered: str, original: str) -> str | None:
+        """
+        Handle writing, appending, creating, or generating content into a file in MakiSync Storage.
+        Handles:
+          "Write a .txt file story about me inside C:\MakiSync Storage\test"
+          "Write a story about me in C:\MakiSync Storage\test\story.txt"
+          "can you write some example paragraphs there a story about maki"
+          "create a txt file called notes.txt in test folder and write: hello"
+          "add notes to the file"
+        """
+        import os
+        from pathlib import Path
+        from services.storage.maki_sync import MAKI_SYNC_ROOT, get_dated_folder
+
+        # Check for file action verbs
+        has_file_verb = bool(re.search(r"\b(write|create|make|generate|save|put|append|type|add)\b", lowered))
+        if not has_file_verb:
+            return None
+
+        # Check for file indicators
+        is_file_op = (
+            bool(re.search(r"\b(\.txt|\.docx|\.doc|\.md|\.py|\.js|\.html|\.json|\.csv|txt|docx|word|pdf|markdown|python|file|document|folder|there)\b", lowered))
+            or bool(re.search(r"[a-zA-Z]:[\\/]", original))
+        )
+        if not is_file_op:
+            return None
+
+        # 1. Extract explicit Windows path if present (e.g. C:\MakiSync Storage\test or C:\MakiSync Storage\test\notes.txt)
+        explicit_path = None
+        path_match = re.search(r'([a-zA-Z]:\\[^\r\n"\'<>]+|[a-zA-Z]:/[^\r\n"\'<>]+)', original)
+        if path_match:
+            raw_p = path_match.group(1).rstrip(".,;")
+            explicit_path = Path(raw_p)
+
+        target_file = None
+        dest_folder = None
+        filename = None
+
+        # 2. Extract extension (.txt, .docx, .md, etc.)
+        ext = ".txt"
+        ext_match = re.search(r'\.(txt|docx|doc|pdf|md|csv|py|js|html|json|yaml|yml)\b', lowered)
+        if ext_match:
+            ext = f".{ext_match.group(1)}"
+        elif re.search(r'\bword\b|\bdoc\b', lowered):
+            ext = ".docx"
+        elif re.search(r'\bmarkdown\b', lowered):
+            ext = ".md"
+        elif re.search(r'\bpython\b', lowered):
+            ext = ".py"
+
+        # 3. Handle explicit path
+        if explicit_path:
+            if explicit_path.suffix:
+                target_file = explicit_path
+                dest_folder = explicit_path.parent
+                filename = explicit_path.name
+            else:
+                dest_folder = explicit_path
+                dest_folder.mkdir(parents=True, exist_ok=True)
+
+        # 4. Extract specific filename if named (e.g. called X, named X, or X.ext)
+        if not filename:
+            named_match = re.search(r'(?:called|named)\s+["\']?([^\s"\']+\.[a-z0-9]+)["\']?', lowered)
+            if named_match:
+                filename = named_match.group(1)
+            else:
+                bare_ext_match = re.search(r'\b([a-zA-Z0-9_\-]+\.(txt|docx|doc|pdf|md|csv|py|js|html|json))\b', lowered)
+                if bare_ext_match:
+                    filename = bare_ext_match.group(1)
+
+        # 5. Extract destination folder if not explicit path
+        if not dest_folder:
+            folder_match = re.search(r'(?:in|inside|into)\s+(?:the\s+)?["\']?([^\s"\']+(?:\s+folder)?)["\']?', lowered)
+            if folder_match:
+                folder_hint = folder_match.group(1).replace(" folder", "").strip()
+                if folder_hint and folder_hint not in ("that file", "the file", "my file", "there"):
+                    found_f = self.files.find_folder(folder_hint)
+                    if found_f:
+                        dest_folder = found_f
+                    else:
+                        dest_folder = MAKI_SYNC_ROOT / folder_hint
+                        dest_folder.mkdir(parents=True, exist_ok=True)
+
+        # 6. If user references "there" or "that file" or "the file", use active last file
+        if not target_file and not filename and re.search(r"\b(there|that\s+file|the\s+file|this\s+file)\b", lowered):
+            last_f = self.files.get_last_file()
+            if last_f and last_f.exists():
+                target_file = last_f
+
+        # 7. Construct target_file if not set
+        if not target_file:
+            if not dest_folder:
+                dest_folder = get_dated_folder("Notes", "School")
+            dest_folder.mkdir(parents=True, exist_ok=True)
+
+            if not filename:
+                # Generate slug from topic
+                if "story" in lowered:
+                    filename = f"story{ext}"
+                elif "note" in lowered or "meeting" in lowered:
+                    filename = f"notes{ext}"
+                elif "code" in lowered or "script" in lowered:
+                    filename = f"script{ext}"
+                else:
+                    filename = f"document{ext}"
+
+            target_file = dest_folder / filename
+
+        # 8. Check for explicit inline content vs generative content
+        content = ""
+        inline_match = re.search(r'(?:with\s+content|that\s+says?|write:)\s+["\']?(.+?)(?:["\']|$)', original, flags=re.IGNORECASE)
+        if inline_match:
+            content = inline_match.group(1).strip()
+        else:
+            # Generative AI content
+            prompt_cleaned = re.sub(r"^(can you|could you|please|just|hey maki|maki)[,\s]+", "", original, flags=re.IGNORECASE).strip()
+            if self.ai_service:
+                system_instruction = (
+                    f"You are MakiAI — personal assistant for Mark Vencent Juntilla. "
+                    f"The user wants you to generate content to be written inside the file '{target_file.name}'. "
+                    f"Generate the full, creative, high-quality content requested (story, essay, code, notes, paragraphs). "
+                    f"Output ONLY the text to be placed inside the file. Do not include conversational greetings or conversational wrapper."
+                )
+                try:
+                    content = self.ai_service.send(prompt_cleaned, system_instruction)
+                except Exception as e:
+                    print(f"[ComputerRouter] Generative file write error: {e}")
+                    content = prompt_cleaned
+            else:
+                content = prompt_cleaned
+
+        if not content:
+            content = "Document generated by MakiAI."
+
+        # 9. Write and open file
+        target_file.parent.mkdir(parents=True, exist_ok=True)
+        self.files.write_to_file(target_file, content, mode="append")
+        self.files._open_file(target_file)
+
+        return f"Done, sir. I've created and saved your document in {target_file.name} inside {target_file.parent.name} and opened it for you."
+
     # ─── File Creation ───────────────────────────────────────────────────────
 
     def _handle_file_creation(self, lowered: str, original: str) -> str | None:
-        """
-        Handle file creation commands.
-        Examples:
-          "create a hello world txt file in the test folder"
-          "make a new file called notes.txt"
-          "create file report.docx in school/activities"
-        """
-        if not re.search(r"\bcreate\b|\bmake\b|\bnew\s+file\b|\bwrite\s+(a\s+)?file\b", lowered):
-            return None
-
-        # Extract filename — look for "called X", "named X", or "X.ext"
-        filename = None
-        folder_hint = None
-
-        # Match "called/named filename.ext"
-        name_match = re.search(r'(?:called|named)\s+["\']?([^\s"\']+\.[a-z]{2,5})["\']?', lowered)
-        if name_match:
-            filename = name_match.group(1)
-
-        # Match bare "filename.ext" pattern
-        if not filename:
-            ext_match = re.search(r'\b([\w\-]+\.(txt|docx|doc|pdf|md|csv|py|js|html|json))\b', lowered)
-            if ext_match:
-                filename = ext_match.group(1)
-
-        # Match "hello world txt file" → hello_world.txt
-        if not filename:
-            type_match = re.search(r'(?:a\s+)?([\w\s]+?)\s+(txt|docx|md|csv|py|js|html)\s+file', lowered)
-            if type_match:
-                name_part = type_match.group(1).strip().replace(" ", "_")
-                ext = type_match.group(2)
-                filename = f"{name_part}.{ext}"
-
-        if not filename:
-            return None
-
-        # Extract folder — look for "in/inside the X folder" or "in X"
-        folder_match = re.search(r'(?:in|inside|into)\s+(?:the\s+)?["\']?([^\s"\']+(?:\s+folder)?)["\']?', lowered)
-        if folder_match:
-            folder_hint_raw = folder_match.group(1).replace(" folder", "").strip()
-            # Search for this folder in MakiSync Storage
-            found = self.files.find_folder(folder_hint_raw)
-            if found:
-                folder_hint = str(found)
-
-        # Extract content — look for "contains/with content X"
-        content = ""
-        content_match = re.search(r'(?:contains?|with\s+content|that\s+says?)\s+["\']?(.+?)(?:["\']|$)', lowered)
-        if content_match:
-            content = content_match.group(1).strip()
-
-        return self.files.create_file(filename, content, folder_hint or "")
+        """Handled directly by _handle_write_to_file."""
+        return None
 
     # ─── Smart MakiSync Search ────────────────────────────────────────────────
 

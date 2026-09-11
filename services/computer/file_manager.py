@@ -101,14 +101,40 @@ FOLDER_ALIASES = {
 
 class FileManager:
     """
-    File organization and search service for MakiAI.
+    File organization, creation, writing, and search service for MakiAI.
 
     Usage:
         fm = FileManager()
-        result = fm.organize(folder_path)
-        results = fm.search(query, search_dir)
-        result = fm.move_file(src, dest)
+        result = fm.create_file("notes.txt", "content")
+        result = fm.write_to_file(path, "more content")
     """
+
+    def __init__(self):
+        self.last_created_file: Path | None = None
+        self.last_accessed_file: Path | None = None
+
+    def get_last_file(self) -> Path | None:
+        """Return the most recently created or accessed text/document file."""
+        DOC_EXTENSIONS = {".txt", ".md", ".docx", ".doc", ".py", ".js", ".html", ".css", ".json", ".csv", ".yaml", ".yml"}
+        if self.last_created_file and self.last_created_file.exists() and self.last_created_file.suffix.lower() in DOC_EXTENSIONS:
+            return self.last_created_file
+        if self.last_accessed_file and self.last_accessed_file.exists() and self.last_accessed_file.suffix.lower() in DOC_EXTENSIONS:
+            return self.last_accessed_file
+
+        # Fallback: Find the newest document/text file in MakiSync Storage
+        from services.storage.maki_sync import MAKI_SYNC_ROOT
+        try:
+            if MAKI_SYNC_ROOT.exists():
+                files = [
+                    f for f in MAKI_SYNC_ROOT.rglob("*")
+                    if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in DOC_EXTENSIONS
+                ]
+                if files:
+                    files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+                    return files[0]
+        except Exception:
+            pass
+        return None
 
     def create_file(self, filename: str, content: str = "", folder_path: str = "") -> str:
         """
@@ -140,6 +166,9 @@ class FileManager:
                 # Generic — write as text
                 filepath.write_text(content, encoding="utf-8")
 
+            self.last_created_file = filepath
+            self.last_accessed_file = filepath
+
             print(f"[FileManager] Created: {filepath}")
             self._open_file(filepath)
             return f"Done, sir. I've created {filename} in {dest.name} and opened it for you."
@@ -147,6 +176,54 @@ class FileManager:
         except Exception as e:
             print(f"[FileManager] Create file error: {e}")
             return f"I couldn't create that file, sir: {e}"
+
+    def write_to_file(self, filepath: Path | str, content: str, mode: str = "append") -> str:
+        """
+        Write or append text content to a file in MakiSync Storage.
+        """
+        path = Path(filepath) if isinstance(filepath, str) else filepath
+        if not path.exists():
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.touch()
+
+        ext = path.suffix.lower()
+        try:
+            if ext == ".docx":
+                try:
+                    from docx import Document
+                    if path.exists() and path.stat().st_size > 0:
+                        doc = Document(str(path))
+                    else:
+                        doc = Document()
+                    if content:
+                        doc.add_paragraph(content)
+                    doc.save(str(path))
+                except ImportError:
+                    with open(path, "a" if mode == "append" else "w", encoding="utf-8") as f:
+                        prefix = "\n\n" if mode == "append" and path.stat().st_size > 0 else ""
+                        f.write(prefix + content)
+            else:
+                existing = ""
+                if path.exists() and mode == "append":
+                    try:
+                        existing = path.read_text(encoding="utf-8")
+                    except Exception:
+                        existing = ""
+
+                if mode == "append" and existing.strip():
+                    new_content = existing.rstrip() + "\n\n" + content.strip()
+                else:
+                    new_content = content.strip()
+
+                path.write_text(new_content, encoding="utf-8")
+
+            self.last_accessed_file = path
+            print(f"[FileManager] Successfully wrote {len(content)} chars to {path}")
+            return f"Done, sir. I've written your content into {path.name}."
+
+        except Exception as e:
+            print(f"[FileManager] Write error on {path}: {e}")
+            return f"I couldn't write to {path.name}, sir: {e}"
 
     def _create_docx(self, filepath: Path, content: str = "") -> None:
         """Create a proper .docx file using python-docx if available."""
@@ -178,18 +255,28 @@ class FileManager:
             if match.is_dir():
                 return match
 
-        # Also check common system folders
+    def search_file_path(self, filename: str) -> Path | None:
+        """Search for a specific file by name in MakiSync Storage and common locations."""
+        from services.storage.maki_sync import MAKI_SYNC_ROOT
+        try:
+            if MAKI_SYNC_ROOT.exists():
+                for match in MAKI_SYNC_ROOT.rglob(filename):
+                    if match.is_file():
+                        return match
+        except Exception:
+            pass
+
         common = [
-            Path.home() / "Desktop" / folder_name,
-            Path.home() / "Documents" / folder_name,
-            Path.home() / "Downloads" / folder_name,
-            MAKI_SYNC_ROOT / folder_name,
+            Path.home() / "Desktop" / filename,
+            Path.home() / "Documents" / filename,
+            Path.home() / "Downloads" / filename,
         ]
         for p in common:
-            if p.exists() and p.is_dir():
+            if p.exists() and p.is_file():
                 return p
-
         return None
+
+    def organize(self, folder_path: str = "downloads") -> str:
         """
         Organize all files in a folder by type into subfolders.
         Creates subfolders automatically. Skips folders and hidden files.
@@ -471,9 +558,9 @@ class FileManager:
 
     def _open_file(self, path: Path) -> None:
         """Open a file with its default Windows application."""
-        import subprocess
+        import os
         try:
-            subprocess.Popen(f'start "" "{path}"', shell=True)
+            os.startfile(str(path))
         except Exception as e:
             print(f"[FileManager] Could not open file: {e}")
 

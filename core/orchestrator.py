@@ -19,7 +19,7 @@ CRITICAL: Never invent, guess, or construct URLs, social media links, or usernam
 You have full access to:
 - C:\\Knowledge Base\\ — sir's schedule, deadlines, projects, preferences
 - C:\\MakiSync Storage\\ — organized file storage (School, Work, Personal, Freelance, MakiAI with Screenshots/Photos/Recordings in date folders)
-You CAN search, open, and manage files in these locations."""
+You CAN create, edit, append to, search, open, and manage files in these locations."""
 
 
 class Orchestrator:
@@ -64,6 +64,9 @@ class Orchestrator:
         self.skill_router = services.get("skill_router")
         self.kb_reader = services.get("kb_reader")
         self.context_builder = services.get("context_builder")
+
+        if self.gemini_service and self.computer_router:
+            self.computer_router.set_ai_service(self.gemini_service)
 
     def handle_command(self, text: str) -> str:
         """
