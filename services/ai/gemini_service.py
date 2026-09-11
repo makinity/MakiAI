@@ -27,11 +27,11 @@ class GeminiService:
 
     # Models to try in order — first available wins
     GROQ_MODELS = [
-        "llama-3.1-8b-instant",       # Free tier, fastest
-        "llama-3.3-70b-versatile",    # Free tier, best quality
-        "llama3-8b-8192",             # Legacy free tier
-        "llama3-groq-8b-8192-tool-use-preview",  # Tool-use preview
-        "openai/gpt-oss-20b",         # Paid fallback
+        "qwen/qwen3.8-27b",
+        "openai/gpt-oss-20b",
+        "openai/gpt-oss-120b",
+        "groq/compound",
+        "qwen/qwen3.6-27b",
     ]
 
     def __init__(self, api_key: str = "", groq_api_key: str = ""):
@@ -57,18 +57,28 @@ class GeminiService:
     # ─── Init ────────────────────────────────────────────────────────────────
 
     def _initialize(self) -> None:
-        """Try Groq first, fall back to Gemini."""
-        # Try Groq
-        if self._groq_key and self._groq_key not in ("", "your_groq_api_key_here"):
-            if self._init_groq(self._groq_key):
-                return
+        """Initialize available providers (Groq and Gemini fallback)."""
+        gemini_ok = False
+        groq_ok = False
 
-        # Try Gemini
+        # Init Gemini
         if self._gemini_key and self._gemini_key not in ("", "your_gemini_api_key_here"):
-            if self._init_gemini(self._gemini_key):
-                return
+            gemini_ok = self._init_gemini(self._gemini_key)
 
-        print("[AIService] No valid API key found. Running in stub mode.")
+        # Init Groq
+        if self._groq_key and self._groq_key not in ("", "your_groq_api_key_here"):
+            groq_ok = self._init_groq(self._groq_key)
+
+        if groq_ok:
+            self._provider = "groq"
+            self._initialized = True
+        elif gemini_ok:
+            self._provider = "gemini"
+            self._initialized = True
+        else:
+            self._provider = None
+            self._initialized = False
+            print("[AIService] No valid API key found. Running in stub mode.")
 
     def _init_groq(self, api_key: str) -> bool:
         try:
@@ -190,8 +200,15 @@ You CAN search, open, and manage files in these locations."""
                     answer += delta
 
             answer = answer.strip()
+            # Strip reasoning tags if present
+            import re
+            answer = re.sub(r"<think>.*?</think>", "", answer, flags=re.DOTALL).strip()
+
             if not answer:
                 print(f"[AIService] Groq returned empty response for: {user_text[:50]}")
+                if self._gemini_client:
+                    print("[AIService] Trying Gemini fallback for empty response.")
+                    return self._send_gemini(user_text, system_context)
                 return ""
             self._add_to_history("user", user_text)
             self._add_to_history("model", answer)
@@ -200,13 +217,13 @@ You CAN search, open, and manage files in these locations."""
         except Exception as e:
             error_str = str(e).lower()
             print(f"[AIService] Groq error: {e}")
+            if self._gemini_client:
+                print("[AIService] Groq failed — trying Gemini fallback.")
+                return self._send_gemini(user_text, system_context)
             if "rate" in error_str or "429" in error_str:
                 return "I'm being rate limited. Give me a moment and try again."
             if "auth" in error_str or "invalid" in error_str or "401" in error_str:
                 return "My Groq API key seems invalid. Please check your settings."
-            if self._gemini_client:
-                print("[AIService] Groq failed — trying Gemini fallback.")
-                return self._send_gemini(user_text, system_context)
             return "I had trouble thinking. Please try again."
 
     def _send_gemini(self, user_text: str, system_context: str) -> str:

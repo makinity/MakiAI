@@ -42,7 +42,7 @@ class StateManager:
 
         previous = self._state
         self._state = new_state
-        print(f"[StateManager] {previous.value} → {new_state.value}")
+        print(f"[StateManager] {previous.value} -> {new_state.value}")
         self._notify(new_state)
 
     def on_state_change(self, callback: Callable[[AppState], None]) -> None:

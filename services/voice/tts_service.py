@@ -167,7 +167,8 @@ class TTSService:
             if success and tmp_path:
                 self._play_audio(tmp_path)
             else:
-                print(f"[TTSService] Both TTS engines failed. Text: {text[:60]}")
+                # Both TTS failed — print to console so conversation continues
+                print(f"\n[Maki speaks]: {text}\n")
 
         except Exception as e:
             self.on_error(f"TTS error: {e}")
