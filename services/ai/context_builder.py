@@ -66,9 +66,14 @@ class ContextBuilder:
     Caches the general context so it's only built once per session.
     """
 
-    def __init__(self, kb_reader: KBReader):
+    def __init__(self, kb_reader: KBReader, kb_index=None):
         self.kb_reader = kb_reader
+        self.kb_index = kb_index
         self._general_context_cache: str = ""
+
+    def set_index(self, kb_index) -> None:
+        """Inject or update the SQLite FTS5 search index instance."""
+        self.kb_index = kb_index
 
     def build_general_context(self) -> str:
         """
@@ -149,56 +154,73 @@ class ContextBuilder:
                 loaded_files.add(norm_p)
                 loaded_files.add(file_path.replace("/", "\\"))
 
-        # 2. QUERY-AWARE RELEVANCE SEARCH
+        # 2. QUERY-AWARE RELEVANCE SEARCH (FTS5 Index or RAM Scan)
         query_text = (topic or "").strip()
         if query_text and query_text.lower() != "all":
-            words = [re.sub(r"[^a-zA-Z0-9_-]", "", w.lower()) for w in query_text.split()]
-            STOPWORDS = {
-                "what", "when", "where", "which", "who", "whom", "this", "that", "these", "those",
-                "have", "has", "had", "does", "is", "are", "was", "were", "my", "your", "the", "a",
-                "an", "in", "on", "at", "to", "for", "of", "with", "about", "and", "or", "tell",
-                "me", "show", "current", "you", "sir", "maki", "please", "know", "how",
-            }
-            keywords = [w for w in words if len(w) > 2 and w not in STOPWORDS]
+            relevant_docs = []
 
-            if keywords:
-                scores = []
-                all_kb_files = self.kb_reader.list_files("", "*.md")
-                for f in all_kb_files:
-                    norm_f = f.replace("\\", "/")
-                    if norm_f in loaded_files or any(skip in norm_f for skip in ["node_modules", ".git", "voice.md"]):
-                        continue
-                    content = self.kb_reader.read(f)
-                    if not content or len(content.strip()) < 10:
-                        continue
-                    c_lower = content.lower()
-                    f_lower = norm_f.lower()
+            # Method A: High-speed SQLite FTS5 index search
+            if self.kb_index:
+                hits = self.kb_index.search(query_text, limit=6)
+                for h in hits:
+                    norm_p = h["filepath"].replace("\\", "/")
+                    if norm_p not in loaded_files:
+                        relevant_docs.append((norm_p, h.get("content", "")))
+            else:
+                # Method B: In-memory RAM keyword scanner fallback
+                words = [re.sub(r"[^a-zA-Z0-9_-]", "", w.lower()) for w in query_text.split()]
+                STOPWORDS = {
+                    "what", "when", "where", "which", "who", "whom", "this", "that", "these", "those",
+                    "have", "has", "had", "does", "is", "are", "was", "were", "my", "your", "the", "a",
+                    "an", "in", "on", "at", "to", "for", "of", "with", "about", "and", "or", "tell",
+                    "me", "show", "current", "you", "sir", "maki", "please", "know", "how",
+                }
+                keywords = [w for w in words if len(w) > 2 and w not in STOPWORDS]
 
-                    score = 0
-                    for kw in keywords:
-                        if kw in f_lower:
-                            score += 35
-                        score += min(c_lower.count(kw) * 2, 30)
-
-                    if score > 0:
-                        scores.append((score, f))
-
-                scores.sort(reverse=True, key=lambda x: x[0])
-                if scores:
-                    parts.append("## Highly Relevant Knowledge Base Documents:")
-                    parts.append("")
-                    for score, f in scores[:6]:
-                        if total_chars >= MAX_TOTAL:
-                            break
+                if keywords:
+                    scores = []
+                    all_kb_files = self.kb_reader.list_files("", "*.md")
+                    for f in all_kb_files:
+                        norm_f = f.replace("\\", "/")
+                        if norm_f in loaded_files or any(skip in norm_f for skip in ["node_modules", ".git", "voice.md"]):
+                            continue
                         content = self.kb_reader.read(f)
-                        if content:
-                            truncated = content[:2000]
-                            norm_f = f.replace("\\", "/")
-                            parts.append(f"### {norm_f}")
-                            parts.append(truncated)
-                            parts.append("")
-                            total_chars += len(truncated)
-                            loaded_files.add(norm_f)
+                        if not content or len(content.strip()) < 10:
+                            continue
+                        c_lower = content.lower()
+                        f_lower = norm_f.lower()
+
+                        score = 0
+                        for kw in keywords:
+                            if kw in f_lower:
+                                score += 35
+                            score += min(c_lower.count(kw) * 2, 30)
+
+                        if score > 0:
+                            scores.append((score, f))
+
+                    scores.sort(reverse=True, key=lambda x: x[0])
+                    for score, f in scores[:6]:
+                        norm_f = f.replace("\\", "/")
+                        c = self.kb_reader.read(f)
+                        if c:
+                            relevant_docs.append((norm_f, c))
+
+            if relevant_docs:
+                parts.append("## Highly Relevant Knowledge Base Documents:")
+                parts.append("")
+                for norm_f, content in relevant_docs[:6]:
+                    if total_chars >= MAX_TOTAL:
+                        break
+                    if not content:
+                        content = self.kb_reader.read(norm_f)
+                    if content:
+                        truncated = content[:2000]
+                        parts.append(f"### {norm_f}")
+                        parts.append(truncated)
+                        parts.append("")
+                        total_chars += len(truncated)
+                        loaded_files.add(norm_f)
 
         # 3. PROJECT & SCHOOL SUMMARIES (fill remaining budget)
         if total_chars < MAX_TOTAL:

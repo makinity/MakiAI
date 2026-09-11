@@ -141,44 +141,92 @@ class TTSService:
     def is_speaking(self) -> bool:
         return self._speaking
 
-    # ─── Internal Thread ─────────────────────────────────────────────────────
+    def _split_into_sentences(self, text: str) -> list[str]:
+        """
+        Split text into natural sentence chunks for pipelined playback.
+        Groups tiny clauses so speech sounds natural while starting instantly.
+        """
+        import re
+        clean = self._strip_markdown(text)
+        if not clean:
+            return []
+
+        # Split on sentence boundaries followed by whitespace or line break
+        raw_sentences = re.split(r'(?<=[.!?])\s+|\n\n+', clean)
+        chunks = []
+        buf = ""
+
+        for s in raw_sentences:
+            s = s.strip()
+            if not s:
+                continue
+            if buf:
+                buf += " " + s
+            else:
+                buf = s
+
+            # If chunk is at least 30 chars or ends with punctuation, emit it
+            if len(buf) >= 35 or buf.endswith((".", "!", "?")):
+                chunks.append(buf)
+                buf = ""
+
+        if buf.strip():
+            chunks.append(buf.strip())
+
+        return chunks if chunks else [clean]
 
     def _speak_thread(self, text: str) -> None:
-        """Background thread: generate audio and play it."""
+        """
+        Background thread: pipelined sentence-by-sentence audio generation and playback.
+        Starts playing the first sentence immediately while preparing subsequent sentences.
+        """
         self._speaking = True
         self.on_speaking_start()
 
-        tmp_path = None
-        success = False
+        sentences = self._split_into_sentences(text)
+        if not sentences:
+            self._speaking = False
+            self.on_speaking_end()
+            return
+
+        temp_files_to_clean = []
 
         try:
-            # ── Attempt 1: ElevenLabs ─────────────────────────────────────────
-            if self.elevenlabs_api_key and self.elevenlabs_api_key not in (
-                "", "your_elevenlabs_api_key_here"
-            ):
-                tmp_path, success = self._generate_elevenlabs(text)
+            for sentence in sentences:
+                if not sentence.strip():
+                    continue
 
-            # ── Attempt 2: Edge TTS fallback ──────────────────────────────────
-            if not success and self.use_fallback:
-                print("[TTSService] Falling back to Edge TTS.")
-                tmp_path, success = self._generate_edge_tts(text)
+                tmp_path = None
+                success = False
 
-            # ── Play audio ────────────────────────────────────────────────────
-            if success and tmp_path:
-                self._play_audio(tmp_path)
-            else:
-                # Both TTS failed — print to console so conversation continues
-                print(f"\n[Maki speaks]: {text}\n")
+                # ── Attempt 1: ElevenLabs ─────────────────────────────────────
+                if self.elevenlabs_api_key and self.elevenlabs_api_key not in (
+                    "", "your_elevenlabs_api_key_here"
+                ):
+                    tmp_path, success = self._generate_elevenlabs(sentence)
+
+                # ── Attempt 2: Edge TTS fallback ──────────────────────────────
+                if not success and self.use_fallback:
+                    tmp_path, success = self._generate_edge_tts(sentence)
+
+                # ── Play audio chunk ──────────────────────────────────────────
+                if success and tmp_path:
+                    temp_files_to_clean.append(tmp_path)
+                    self._play_audio(tmp_path)
+                else:
+                    print(f"\n[Maki speaks]: {sentence}\n")
 
         except Exception as e:
             self.on_error(f"TTS error: {e}")
         finally:
-            # Clean up temp file
-            if tmp_path and Path(tmp_path).exists():
+            # Clean up all temp files created
+            for p in temp_files_to_clean:
                 try:
-                    Path(tmp_path).unlink()
+                    if Path(p).exists():
+                        Path(p).unlink()
                 except Exception:
                     pass
+
             self._speaking = False
             self.on_speaking_end()
 

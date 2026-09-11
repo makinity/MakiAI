@@ -23,6 +23,7 @@ from services.ai.gemini_service import GeminiService
 from services.ai.context_builder import ContextBuilder
 from services.kb.kb_reader import KBReader
 from services.kb.kb_writer import KBWriter
+from services.kb.kb_index import KBIndex
 from services.kb.skill_router import SkillRouter
 from services.reminder.reminder_service import ReminderService
 from services.memory.memory_service import MemoryService
@@ -70,6 +71,7 @@ class MainWindow(QMainWindow):
         # ── KB services ───────────────────────────────────────────────────────
         self.kb_reader = KBReader(kb_path=self.settings.get_kb_path())
         self.kb_writer = KBWriter(kb_path=self.settings.get_kb_path())
+        self.kb_index = KBIndex(kb_reader=self.kb_reader)
 
         # ── Reminder & Memory services ────────────────────────────────────────
         self.memory_service = MemoryService()
@@ -82,16 +84,28 @@ class MainWindow(QMainWindow):
             api_key=self.settings.get_gemini_api_key(),
             groq_api_key=self.settings.get_groq_api_key(),
         )
-        self.context_builder = ContextBuilder(kb_reader=self.kb_reader)
+        self.context_builder = ContextBuilder(
+            kb_reader=self.kb_reader,
+            kb_index=self.kb_index,
+        )
         self.context_builder.invalidate_cache()
 
-        # Auto-invalidate context cache whenever KB is written
-        # This means any KB file update is reflected in Maki's next response
+        # Auto-update index and invalidate context cache whenever KB is written
         _orig_write = self.kb_writer.write
         _orig_append = self.kb_writer.append
         _ctx = self.context_builder
-        def _write_and_invalidate(p, c): r = _orig_write(p, c); _ctx.invalidate_cache(); return r
-        def _append_and_invalidate(p, c): r = _orig_append(p, c); _ctx.invalidate_cache(); return r
+        _idx = self.kb_index
+        def _write_and_invalidate(p, c):
+            r = _orig_write(p, c)
+            _idx.index_file(p, c)
+            _ctx.invalidate_cache()
+            return r
+        def _append_and_invalidate(p, c):
+            r = _orig_append(p, c)
+            updated_c = self.kb_reader.read(p)
+            _idx.index_file(p, updated_c)
+            _ctx.invalidate_cache()
+            return r
         self.kb_writer.write = _write_and_invalidate
         self.kb_writer.append = _append_and_invalidate
 
