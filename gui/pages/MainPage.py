@@ -1,16 +1,13 @@
 """
 MakiAI — Main Page
 The heart of the MakiAI interface.
+Modern UI/UX aligned with MakiSync brand identity and dark glassmorphic styling.
 
-This is the interactive HUD that Mark sees after logging in.
 Contains:
-  - Center: Animation widget (idle/listening/thinking/speaking states)
-  - Bottom: Transcription bar (real-time STT text)
-  - Right: Chat log (conversation history)
-  - Top bar: Status indicator + window controls
-
-Phase 1: Shell layout with placeholder animation states.
-Phase 5: Lottie animations will replace the placeholder.
+  - Top bar: MakiSync branding, status pill badge, settings/logout, window controls
+  - Center: Animation HUD (idle/listening/thinking/speaking states) with wake hint
+  - Right: Chat log (conversation history with sleek cards)
+  - Bottom: Transcription bar (real-time STT text + manual text input)
 """
 
 from typing import Callable
@@ -31,12 +28,12 @@ from gui.components.AnimationWidget import AnimationWidget
 from gui.components.StatusIndicator import StatusIndicator
 
 
-# Animation placeholder colors per state (replaced by Lottie in Phase 5)
+# State brand colors
 STATE_COLORS = {
-    AppState.IDLE:      "#1a1a2e",
-    AppState.LISTENING: "#0d2b1e",
-    AppState.THINKING:  "#1e1a0d",
-    AppState.SPEAKING:  "#0d1a2e",
+    AppState.IDLE:      "#0a0f1a",
+    AppState.LISTENING: "#0d2238",
+    AppState.THINKING:  "#241d0e",
+    AppState.SPEAKING:  "#0d1d36",
 }
 
 STATE_LABELS = {
@@ -47,10 +44,10 @@ STATE_LABELS = {
 }
 
 STATE_COLORS_TEXT = {
-    AppState.IDLE:      "#4a4a6a",
-    AppState.LISTENING: "#00ff88",
-    AppState.THINKING:  "#ffcc00",
-    AppState.SPEAKING:  "#00d4ff",
+    AppState.IDLE:      "#64748b",
+    AppState.LISTENING: "#38bdf8",
+    AppState.THINKING:  "#fbbf24",
+    AppState.SPEAKING:  "#3b82f6",
 }
 
 
@@ -106,12 +103,12 @@ class MainPage(QWidget):
     def _build_top_bar(self) -> QFrame:
         """Top bar: logo, app name, status badge, window controls."""
         bar = QFrame()
-        bar.setFixedHeight(52)
+        bar.setFixedHeight(54)
         bar.setObjectName("topBar")
         bar.setStyleSheet("""
             QFrame#topBar {
-                background-color: #0d0d1a;
-                border-bottom: 1px solid #1e1e3a;
+                background-color: #0d1527;
+                border-bottom: 1px solid rgba(140, 171, 214, 0.12);
             }
         """)
 
@@ -121,14 +118,14 @@ class MainPage(QWidget):
 
         # Logo + name
         logo = QLabel("◈")
-        logo.setStyleSheet("color: #00d4ff; font-size: 18px;")
+        logo.setStyleSheet("color: #3b82f6; font-size: 20px; font-weight: bold;")
 
         name = QLabel("MakiAI")
         name.setStyleSheet("""
-            color: #ffffff;
+            color: #f8fafc;
             font-size: 15px;
-            font-weight: bold;
-            letter-spacing: 3px;
+            font-weight: 700;
+            letter-spacing: 2px;
         """)
 
         # Status indicator badge
@@ -143,28 +140,34 @@ class MainPage(QWidget):
         close_btn = QPushButton("✕")
 
         for btn in [minimize_btn, maximize_btn, close_btn]:
-            btn.setFixedSize(32, 32)
+            btn.setFixedSize(30, 30)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
             btn.setStyleSheet("""
                 QPushButton {
                     background: transparent;
-                    color: #6b7280;
+                    color: #94a3b8;
                     border: none;
-                    font-size: 13px;
-                    border-radius: 4px;
+                    font-size: 12px;
+                    border-radius: 6px;
                 }
-                QPushButton:hover { background: #1e1e3a; color: #ffffff; }
+                QPushButton:hover {
+                    background: rgba(140, 171, 214, 0.12);
+                    color: #f8fafc;
+                }
             """)
 
         close_btn.setStyleSheet("""
             QPushButton {
                 background: transparent;
-                color: #6b7280;
+                color: #94a3b8;
                 border: none;
-                font-size: 13px;
-                border-radius: 4px;
+                font-size: 12px;
+                border-radius: 6px;
             }
-            QPushButton:hover { background: #ef4444; color: #ffffff; }
+            QPushButton:hover {
+                background: #ef4444;
+                color: #ffffff;
+            }
         """)
 
         minimize_btn.clicked.connect(self.window().showMinimized)
@@ -172,22 +175,27 @@ class MainPage(QWidget):
         close_btn.clicked.connect(self.window().close)
 
         # Settings + logout buttons
-        settings_btn = QPushButton("⚙")
-        logout_btn = QPushButton("↩ Logout")
+        settings_btn = QPushButton("⚙  Settings")
+        logout_btn = QPushButton("↩  Logout")
 
         for btn in [settings_btn, logout_btn]:
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
             btn.setFixedHeight(30)
             btn.setStyleSheet("""
                 QPushButton {
-                    background: transparent;
-                    color: #6b7280;
-                    border: 1px solid #2a2a4a;
+                    background: rgba(16, 23, 38, 0.7);
+                    color: #94a3b8;
+                    border: 1px solid rgba(140, 171, 214, 0.18);
                     border-radius: 6px;
-                    padding: 0 10px;
+                    padding: 0 12px;
                     font-size: 12px;
+                    font-weight: 500;
                 }
-                QPushButton:hover { color: #ffffff; border-color: #00d4ff; }
+                QPushButton:hover {
+                    color: #f8fafc;
+                    border-color: #3b82f6;
+                    background: rgba(59, 130, 246, 0.12);
+                }
             """)
 
         logout_btn.clicked.connect(self._handle_logout)
@@ -195,7 +203,7 @@ class MainPage(QWidget):
 
         layout.addWidget(logo)
         layout.addWidget(name)
-        layout.addSpacing(16)
+        layout.addSpacing(12)
         layout.addWidget(self.status_badge)
         layout.addItem(spacer)
         layout.addWidget(settings_btn)
@@ -223,33 +231,53 @@ class MainPage(QWidget):
     def _build_animation_area(self) -> QFrame:
         """
         Center stage — AnimationWidget with Lottie animations.
-        Animation is centered with generous padding.
         """
         frame = QFrame()
         frame.setObjectName("animationArea")
-        frame.setStyleSheet("QFrame#animationArea { background-color: #08080f; }")
+        frame.setStyleSheet("QFrame#animationArea { background-color: #0a0f1a; }")
 
         layout = QVBoxLayout(frame)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.setContentsMargins(40, 40, 40, 40)
-        layout.setSpacing(12)
+        layout.setSpacing(16)
 
-        # AnimationWidget — full Lottie rendering
+        # AnimationWidget
         self.animation_widget = AnimationWidget()
         self.animation_widget.setFixedSize(320, 320)
 
-        # Hint text
-        hint = QLabel('Say  "Hey Maki"  to wake me up')
-        hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        hint.setStyleSheet("""
-            color: #1e1e3a;
-            font-size: 11px;
-            letter-spacing: 2px;
+        # Hint pill
+        hint_pill = QFrame()
+        hint_pill.setStyleSheet("""
+            QFrame {
+                background-color: rgba(15, 23, 42, 0.6);
+                border: 1px solid rgba(140, 171, 214, 0.12);
+                border-radius: 14px;
+                padding: 4px 14px;
+            }
         """)
+        hint_layout = QHBoxLayout(hint_pill)
+        hint_layout.setContentsMargins(12, 4, 12, 4)
+        hint_layout.setSpacing(6)
+
+        hint_sparkle = QLabel("✦")
+        hint_sparkle.setStyleSheet("color: #3b82f6; font-size: 11px; border: none; background: transparent;")
+
+        hint_text = QLabel('Say  "Hey Maki"  to wake me up')
+        hint_text.setStyleSheet("""
+            color: #64748b;
+            font-size: 12px;
+            letter-spacing: 1px;
+            border: none;
+            background: transparent;
+            font-weight: 500;
+        """)
+
+        hint_layout.addWidget(hint_sparkle)
+        hint_layout.addWidget(hint_text)
 
         layout.addStretch()
         layout.addWidget(self.animation_widget, alignment=Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(hint, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(hint_pill, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addStretch()
 
         return frame
@@ -258,7 +286,7 @@ class MainPage(QWidget):
         """Thin vertical divider between animation and chat log."""
         divider = QFrame()
         divider.setFixedWidth(1)
-        divider.setStyleSheet("background-color: #1e1e3a;")
+        divider.setStyleSheet("background-color: rgba(140, 171, 214, 0.12);")
         return divider
 
     def _build_chat_log(self) -> QFrame:
@@ -267,7 +295,7 @@ class MainPage(QWidget):
         panel.setObjectName("chatPanel")
         panel.setStyleSheet("""
             QFrame#chatPanel {
-                background-color: #0a0a12;
+                background-color: #0c1322;
             }
         """)
 
@@ -277,13 +305,13 @@ class MainPage(QWidget):
 
         # Header
         header = QLabel("  CONVERSATION")
-        header.setFixedHeight(44)
+        header.setFixedHeight(46)
         header.setStyleSheet("""
-            color: #2a2a5a;
-            font-size: 10px;
-            letter-spacing: 3px;
-            font-weight: bold;
-            border-bottom: 1px solid #12122a;
+            color: #64748b;
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(140, 171, 214, 0.10);
             padding-left: 20px;
         """)
 
@@ -295,13 +323,16 @@ class MainPage(QWidget):
             QScrollArea { border: none; background: transparent; }
             QWidget { background: transparent; }
             QScrollBar:vertical {
-                background: #0a0a12;
-                width: 4px;
+                background: #0c1322;
+                width: 5px;
                 border-radius: 2px;
             }
             QScrollBar::handle:vertical {
-                background: #1e1e3a;
+                background: #1e293b;
                 border-radius: 2px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #3b82f6;
             }
             QScrollBar::add-line:vertical,
             QScrollBar::sub-line:vertical { height: 0px; }
@@ -310,15 +341,15 @@ class MainPage(QWidget):
         self.chat_container = QWidget()
         self.chat_layout = QVBoxLayout(self.chat_container)
         self.chat_layout.setContentsMargins(16, 16, 16, 24)
-        self.chat_layout.setSpacing(10)
+        self.chat_layout.setSpacing(12)
         self.chat_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         # Empty state
         self.empty_chat_label = QLabel("No conversation yet.\nSay 'Hey Maki' to begin.")
         self.empty_chat_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.empty_chat_label.setStyleSheet("""
-            color: #1e1e3a;
-            font-size: 12px;
+            color: #475569;
+            font-size: 13px;
             line-height: 1.8;
             margin-top: 40px;
         """)
@@ -335,12 +366,12 @@ class MainPage(QWidget):
     def _build_transcription_bar(self) -> QFrame:
         """Bottom bar — real-time transcription + manual text input."""
         bar = QFrame()
-        bar.setFixedHeight(68)
+        bar.setFixedHeight(72)
         bar.setObjectName("transcriptionBar")
         bar.setStyleSheet("""
             QFrame#transcriptionBar {
-                background-color: #08080f;
-                border-top: 1px solid #12122a;
+                background-color: #0d1527;
+                border-top: 1px solid rgba(140, 171, 214, 0.12);
             }
         """)
 
@@ -348,57 +379,73 @@ class MainPage(QWidget):
         layout.setContentsMargins(24, 0, 24, 0)
         layout.setSpacing(12)
 
-        # Mic icon
+        # Mic indicator pill
+        mic_pill = QFrame()
+        mic_pill.setFixedSize(38, 38)
+        mic_pill.setStyleSheet("""
+            QFrame {
+                background-color: rgba(59, 130, 246, 0.12);
+                border: 1px solid rgba(59, 130, 246, 0.25);
+                border-radius: 19px;
+            }
+        """)
+        mic_layout = QVBoxLayout(mic_pill)
+        mic_layout.setContentsMargins(0, 0, 0, 0)
+        mic_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         mic_icon = QLabel("🎙")
-        mic_icon.setFixedSize(28, 28)
-        mic_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        mic_icon.setStyleSheet("font-size: 16px;")
+        mic_icon.setStyleSheet("font-size: 16px; border: none; background: transparent;")
+        mic_layout.addWidget(mic_icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Text input
         self.transcription_input = QLineEdit()
         self.transcription_input.setPlaceholderText(
             'Type a command or say "Hey Maki" ...'
         )
-        self.transcription_input.setFixedHeight(42)
+        self.transcription_input.setFixedHeight(44)
         self.transcription_input.setStyleSheet("""
             QLineEdit {
-                background-color: #10101e;
-                color: #c0c0d0;
-                border: 1px solid #1a1a32;
-                border-radius: 21px;
+                background-color: #101726;
+                color: #f8fafc;
+                border: 1px solid rgba(140, 171, 214, 0.18);
+                border-radius: 22px;
                 padding: 0 20px;
                 font-size: 13px;
             }
             QLineEdit:focus {
-                border: 1px solid #00d4ff;
-                background-color: #12122a;
-                color: #e0e0f0;
+                border: 1px solid #3b82f6;
+                background-color: #0f172a;
+                color: #ffffff;
             }
             QLineEdit::placeholder {
-                color: #2a2a4a;
+                color: #475569;
             }
         """)
         self.transcription_input.returnPressed.connect(self._handle_text_command)
 
         # Send button
         send_btn = QPushButton("➤")
-        send_btn.setFixedSize(42, 42)
+        send_btn.setFixedSize(44, 44)
         send_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         send_btn.setStyleSheet("""
             QPushButton {
-                background-color: #00d4ff;
-                color: #08080f;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #2563eb, stop:1 #3b82f6);
+                color: #ffffff;
                 border: none;
-                border-radius: 21px;
+                border-radius: 22px;
                 font-size: 14px;
                 font-weight: bold;
             }
-            QPushButton:hover { background-color: #00bcee; }
-            QPushButton:pressed { background-color: #00a0cc; }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #3b82f6, stop:1 #60a5fa);
+            }
+            QPushButton:pressed {
+                background: #1d4ed8;
+            }
         """)
         send_btn.clicked.connect(self._handle_text_command)
 
-        layout.addWidget(mic_icon)
+        layout.addWidget(mic_pill)
         layout.addWidget(self.transcription_input, stretch=1)
         layout.addWidget(send_btn)
 
@@ -408,35 +455,17 @@ class MainPage(QWidget):
 
     @pyqtSlot(object)
     def _on_state_change(self, new_state: AppState) -> None:
-        """
-        Called by StateManager whenever the app state changes.
-        AnimationWidget handles its own rendering.
-        StatusIndicator handles its own badge update.
-        This hook is kept for any future MainPage-level state reactions.
-        """
-        pass  # AnimationWidget and StatusIndicator handle their own updates
+        """Hook for future MainPage-level state reactions."""
+        pass
 
     def update_transcription(self, text: str) -> None:
-        """
-        Display live transcription text in the input bar.
-        Called by the STT service during Phase 2.
-
-        Args:
-            text: The transcribed text string.
-        """
+        """Display live transcription text in the input bar."""
         self.transcription_input.setText(text)
 
     # ─── Chat Log ─────────────────────────────────────────────────────────────
 
     def add_message(self, role: str, text: str) -> None:
-        """
-        Append a message to the conversation log.
-
-        Args:
-            role: 'user' or 'maki'
-            text: The message content.
-        """
-        # Remove empty state label on first message
+        """Append a message to the conversation log."""
         if self.empty_chat_label.isVisible():
             self.empty_chat_label.setVisible(False)
 
@@ -449,40 +478,51 @@ class MainPage(QWidget):
         )
 
     def _make_bubble(self, role: str, text: str) -> QFrame:
-        """Create a chat bubble widget for user or Maki messages."""
+        """Create a chat bubble card for user or Maki messages."""
         import re
-        # Clean markdown for display too
         display_text = re.sub(r'\*{1,3}(.*?)\*{1,3}', r'\1', text)
         display_text = re.sub(r'`([^`]+)`', r'\1', display_text)
 
         bubble = QFrame()
         layout = QVBoxLayout(bubble)
-        layout.setContentsMargins(12, 10, 12, 10)
-        layout.setSpacing(4)
+        layout.setContentsMargins(14, 12, 14, 12)
+        layout.setSpacing(6)
+
+        is_maki = (role == "maki")
 
         role_label = QLabel("You" if role == "user" else "Maki")
         role_label.setStyleSheet(
-            f"color: {'#00d4ff' if role == 'maki' else '#6b7280'}; "
-            f"font-size: 11px; font-weight: bold; letter-spacing: 1px;"
+            f"color: {'#38bdf8' if is_maki else '#94a3b8'}; "
+            f"font-size: 11px; font-weight: 700; letter-spacing: 0.5px; border: none;"
         )
 
         msg_label = QLabel(display_text)
         msg_label.setWordWrap(True)
         msg_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        msg_label.setStyleSheet("color: #e0e0e0; font-size: 13px; line-height: 1.6; border: none;")
+        msg_label.setStyleSheet("color: #f1f5f9; font-size: 13px; line-height: 1.6; border: none;")
         msg_label.setMinimumWidth(200)
         msg_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         layout.addWidget(role_label)
         layout.addWidget(msg_label)
 
-        bubble.setStyleSheet(f"""
-            QFrame {{
-                background-color: {'#0d1a2e' if role == 'maki' else '#1a1a2e'};
-                border-radius: 10px;
-                border-left: 2px solid {'#00d4ff' if role == 'maki' else '#2a2a4a'};
-            }}
-        """)
+        if is_maki:
+            bubble.setStyleSheet("""
+                QFrame {
+                    background-color: #0f172a;
+                    border-radius: 10px;
+                    border: 1px solid rgba(59, 130, 246, 0.25);
+                    border-left: 3px solid #3b82f6;
+                }
+            """)
+        else:
+            bubble.setStyleSheet("""
+                QFrame {
+                    background-color: #1e293b;
+                    border-radius: 10px;
+                    border: 1px solid rgba(140, 171, 214, 0.14);
+                }
+            """)
 
         return bubble
 
@@ -497,12 +537,10 @@ class MainPage(QWidget):
         self.transcription_input.clear()
         self.add_message("user", text)
 
-        # Run in a thread so the GUI doesn't freeze during Gemini call
         import threading
         def run():
             response = self.orchestrator.handle_command(text)
             if response:
-                # Update chat log on main thread
                 from PyQt6.QtCore import QMetaObject, Qt, Q_ARG
                 QMetaObject.invokeMethod(
                     self, "_add_maki_message",
@@ -530,13 +568,7 @@ class MainPage(QWidget):
             win.showMaximized()
 
     def show_confirmation(self, text: str) -> None:
-        """
-        Show a low-confidence transcription confirmation prompt.
-        Displays the heard text and asks Mark to confirm or correct it.
-
-        Args:
-            text: The low-confidence transcription to confirm.
-        """
+        """Show a low-confidence transcription confirmation prompt."""
         self.state_manager.set_state(AppState.IDLE)
         self.add_message(
             "maki",
@@ -549,9 +581,6 @@ class MainPage(QWidget):
     # ─── Lifecycle ────────────────────────────────────────────────────────────
 
     def on_enter(self) -> None:
-        """
-        Called when MainPage becomes the active page.
-        Greet the user and set focus to the input bar.
-        """
-        self.add_message("maki", f"Hello sir. I'm online and ready. Say \"Hey Maki\" or type a command below.")
+        """Called when MainPage becomes the active page."""
+        self.add_message("maki", "Hello sir. I'm online and ready. Say \"Hey Maki\" or type a command below.")
         self.transcription_input.setFocus()

@@ -447,28 +447,42 @@ class MainWindow(QMainWindow):
     # ─── Styling ─────────────────────────────────────────────────────────────
 
     def _apply_base_style(self) -> None:
-        """Apply base dark theme to the main window."""
+        """Apply MakiSync sleek dark theme to the main window."""
         self.setStyleSheet("""
             QMainWindow {
-                background-color: #0a0a0f;
+                background-color: #0a0f1a;
+                border: 1px solid rgba(140, 171, 214, 0.15);
+                border-radius: 12px;
             }
             QWidget {
-                background-color: #0a0a0f;
-                color: #e0e0e0;
-                font-family: 'Segoe UI', Arial, sans-serif;
+                background-color: #0a0f1a;
+                color: #f1f5f9;
+                font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Inter', Roboto, sans-serif;
                 font-size: 13px;
             }
+            QStackedWidget {
+                background-color: #0a0f1a;
+            }
             QScrollBar:vertical {
-                background: #1a1a2e;
+                background: #0a0f1a;
                 width: 6px;
                 border-radius: 3px;
+                margin: 0px;
             }
             QScrollBar::handle:vertical {
-                background: #00d4ff;
+                background: #1e293b;
                 border-radius: 3px;
+                min-height: 20px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #3b82f6;
             }
             QScrollBar::add-line:vertical,
             QScrollBar::sub-line:vertical {
                 height: 0px;
+            }
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {
+                background: none;
             }
         """)

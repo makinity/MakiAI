@@ -5,6 +5,7 @@ Handles two scenarios:
   2. Returning launch — user enters existing password (login mode)
 
 On successful auth, calls the on_success callback to navigate to MainPage.
+Follows MakiSync brand colors and modern glassmorphic card design.
 """
 
 from typing import Callable
@@ -13,7 +14,7 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QLineEdit, QPushButton, QFrame, QSizePolicy,
 )
-from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QColor
 
 from services.auth.auth_service import AuthService
@@ -52,14 +53,13 @@ class LoginPage(QWidget):
 
         # ── Card container ────────────────────────────────────────────────────
         card = QFrame()
-        card.setFixedWidth(420)
+        card.setFixedWidth(440)
         card.setObjectName("loginCard")
         card.setStyleSheet("""
             QFrame#loginCard {
-                background-color: #10101a;
-                border: 1px solid #1e1e3a;
+                background-color: #0d1527;
+                border: 1px solid rgba(140, 171, 214, 0.18);
                 border-radius: 16px;
-                padding: 0px;
             }
         """)
 
@@ -71,22 +71,22 @@ class LoginPage(QWidget):
         # ── Logo / Name ───────────────────────────────────────────────────────
         logo_label = QLabel("◈")
         logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        logo_label.setStyleSheet("color: #00d4ff; font-size: 42px; margin-bottom: 4px;")
+        logo_label.setStyleSheet("color: #3b82f6; font-size: 42px; font-weight: bold; margin-bottom: 2px;")
 
         app_name_label = QLabel("MakiAI")
         app_name_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         app_name_label.setStyleSheet("""
             color: #ffffff;
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: 4px;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 3px;
         """)
 
         # ── Subtitle (changes per mode) ───────────────────────────────────────
         self.subtitle_label = QLabel()
         self.subtitle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.subtitle_label.setWordWrap(True)
-        self.subtitle_label.setStyleSheet("color: #6b7280; font-size: 13px; margin-bottom: 8px;")
+        self.subtitle_label.setStyleSheet("color: #94a3b8; font-size: 13px; margin-bottom: 6px;")
 
         # ── Confirm password field (setup mode only) ──────────────────────────
         self.confirm_field = QLineEdit()
@@ -106,7 +106,7 @@ class LoginPage(QWidget):
         # ── Error message ─────────────────────────────────────────────────────
         self.error_label = QLabel("")
         self.error_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.error_label.setStyleSheet("color: #ef4444; font-size: 12px;")
+        self.error_label.setStyleSheet("color: #ef4444; font-size: 12px; font-weight: 500;")
         self.error_label.setVisible(False)
 
         # ── Submit button ─────────────────────────────────────────────────────
@@ -216,7 +216,6 @@ class LoginPage(QWidget):
     def reset(self) -> None:
         """
         Reset the page state for when the user returns after logout.
-        Re-detect mode since this won't be first launch anymore.
         """
         self.password_field.clear()
         self.confirm_field.clear()
@@ -229,37 +228,38 @@ class LoginPage(QWidget):
     def _input_style(self) -> str:
         return """
             QLineEdit {
-                background-color: #1a1a2e;
-                color: #e0e0e0;
-                border: 1px solid #2a2a4a;
-                border-radius: 8px;
+                background-color: #101726;
+                color: #f8fafc;
+                border: 1px solid rgba(140, 171, 214, 0.18);
+                border-radius: 10px;
                 padding: 0 16px;
                 font-size: 14px;
             }
             QLineEdit:focus {
-                border: 1px solid #00d4ff;
-                background-color: #1e1e38;
+                border: 1px solid #3b82f6;
+                background-color: #0f172a;
+                color: #ffffff;
             }
             QLineEdit::placeholder {
-                color: #4a4a6a;
+                color: #475569;
             }
         """
 
     def _button_style(self) -> str:
         return """
             QPushButton {
-                background-color: #00d4ff;
-                color: #0a0a0f;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #2563eb, stop:1 #3b82f6);
+                color: #ffffff;
                 border: none;
-                border-radius: 8px;
+                border-radius: 10px;
                 font-size: 14px;
-                font-weight: bold;
-                letter-spacing: 1px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
             }
             QPushButton:hover {
-                background-color: #00b8e6;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #3b82f6, stop:1 #60a5fa);
             }
             QPushButton:pressed {
-                background-color: #009cbf;
+                background: #1d4ed8;
             }
         """

@@ -1,16 +1,12 @@
 """
 MakiAI — Animation Widget
 State-driven Lottie animation display for the MainPage center stage.
+Follows MakiSync brand colors and aesthetic glow effects.
 
 Renders Lottie JSON animations using rlottie-python.
-Falls back to the painted pulsing circles if:
+Falls back to high-fidelity painted pulsing circles if:
   - rlottie-python is not installed
   - The Lottie JSON file is missing or invalid
-
-To swap in a real animation from 21st.dev:
-  1. Download the Lottie JSON file
-  2. Replace the matching file in gui/assets/animations/
-  3. Restart — no code changes needed
 
 Animation files:
   gui/assets/animations/idle.json      → IDLE state
@@ -38,43 +34,43 @@ ANIMATION_FILES = {
     AppState.SPEAKING:  ANIMATION_DIR / "speaking.json",
 }
 
-# Fallback painted circle config per state (used when Lottie unavailable)
+# Fallback painted circle config per state with MakiSync brand colors
 FALLBACK_CONFIG = {
     AppState.IDLE: {
-        "color":       QColor(0, 212, 255, 40),
-        "ring_color":  QColor(0, 212, 255, 80),
-        "pulse_speed": 2000,
-        "label":       "IDLE",
-        "label_color": "#2a2a5a",
-        "symbol":      "◈",
-        "symbol_color":"#1e3a4a",
+        "color":        QColor(59, 130, 246, 25),    # subtle #3b82f6 core
+        "ring_color":   QColor(59, 130, 246, 60),
+        "pulse_speed":  2200,
+        "label":        "READY",
+        "label_color":  "#64748b",
+        "symbol":       "◈",
+        "symbol_color": "#3b82f6",
     },
     AppState.LISTENING: {
-        "color":       QColor(0, 255, 136, 60),
-        "ring_color":  QColor(0, 255, 136, 120),
-        "pulse_speed": 600,
-        "label":       "LISTENING",
-        "label_color": "#00ff88",
-        "symbol":      "◉",
-        "symbol_color":"#00ff88",
+        "color":        QColor(56, 189, 248, 45),    # vibrant cyan #38bdf8
+        "ring_color":   QColor(56, 189, 248, 120),
+        "pulse_speed":  700,
+        "label":        "LISTENING",
+        "label_color":  "#38bdf8",
+        "symbol":       "◉",
+        "symbol_color": "#38bdf8",
     },
     AppState.THINKING: {
-        "color":       QColor(255, 204, 0, 50),
-        "ring_color":  QColor(255, 204, 0, 100),
-        "pulse_speed": 1000,
-        "label":       "THINKING",
-        "label_color": "#ffcc00",
-        "symbol":      "⟳",
-        "symbol_color":"#ffcc00",
+        "color":        QColor(251, 191, 36, 40),    # warm amber #fbbf24
+        "ring_color":   QColor(251, 191, 36, 110),
+        "pulse_speed":  1100,
+        "label":        "PROCESSING",
+        "label_color":  "#fbbf24",
+        "symbol":       "⟳",
+        "symbol_color": "#fbbf24",
     },
     AppState.SPEAKING: {
-        "color":       QColor(0, 212, 255, 70),
-        "ring_color":  QColor(0, 212, 255, 150),
-        "pulse_speed": 400,
-        "label":       "SPEAKING",
-        "label_color": "#00d4ff",
-        "symbol":      "◈",
-        "symbol_color":"#00d4ff",
+        "color":        QColor(59, 130, 246, 65),    # electric blue #3b82f6
+        "ring_color":   QColor(96, 165, 250, 160),   # #60a5fa glow
+        "pulse_speed":  450,
+        "label":        "SPEAKING",
+        "label_color":  "#60a5fa",
+        "symbol":       "◈",
+        "symbol_color": "#93c5fd",
     },
 }
 
@@ -85,12 +81,6 @@ class AnimationWidget(QWidget):
 
     Renders Lottie JSON animations via rlottie-python.
     Gracefully falls back to painted circles if rlottie is unavailable.
-
-    Swapping animations: just replace the JSON files in gui/assets/animations/.
-
-    Usage:
-        widget = AnimationWidget()
-        state_manager.on_state_change(widget.set_state)
     """
 
     def __init__(self, parent=None):
@@ -122,9 +112,6 @@ class AnimationWidget(QWidget):
     def _init_lottie(self) -> bool:
         """
         Try to initialize rlottie-python and pre-load all animation files.
-
-        Returns:
-            True if rlottie is available and at least one animation loaded.
         """
         try:
             import rlottie_python as rlottie
@@ -136,25 +123,19 @@ class AnimationWidget(QWidget):
                         player = rlottie.LottieAnimation.from_file(str(path))
                         self._lottie_players[state] = player
                         loaded += 1
-                        print(f"[AnimationWidget] Loaded Lottie: {path.name}")
                     except Exception as e:
                         print(f"[AnimationWidget] Failed to load {path.name}: {e}")
-                else:
-                    print(f"[AnimationWidget] Animation file not found: {path}")
 
             if loaded > 0:
                 self._load_lottie_state(AppState.IDLE)
                 print(f"[AnimationWidget] rlottie ready — {loaded}/4 animations loaded.")
                 return True
             else:
-                print("[AnimationWidget] No Lottie files loaded — using fallback.")
                 return False
 
         except ImportError:
-            print("[AnimationWidget] rlottie-python not installed — using fallback painter.")
             return False
-        except Exception as e:
-            print(f"[AnimationWidget] rlottie init error: {e} — using fallback.")
+        except Exception:
             return False
 
     def _load_lottie_state(self, state: AppState) -> None:
@@ -172,12 +153,7 @@ class AnimationWidget(QWidget):
 
     @pyqtSlot(object)
     def set_state(self, state: AppState) -> None:
-        """
-        Transition to a new animation state.
-
-        Args:
-            state: The new AppState to display.
-        """
+        """Transition to a new animation state."""
         if state == self._state:
             return
         self._state = state
@@ -216,24 +192,20 @@ class AnimationWidget(QWidget):
             if w <= 0 or h <= 0:
                 return
 
-            # Render current frame to RGBA buffer
             buffer = player.lottie_animation_render(
                 self._current_frame, w, h
             )
 
-            # Convert buffer to QPixmap
             image = QImage(
                 bytes(buffer), w, h,
                 QImage.Format.Format_RGBA8888
             )
             self._current_pixmap = QPixmap.fromImage(image)
 
-            # Advance frame (loop)
             self._current_frame = (self._current_frame + 1) % self._total_frames
             self.update()
 
         except Exception as e:
-            # Lottie render failed — switch to fallback
             print(f"[AnimationWidget] Lottie render error: {e} — switching to fallback.")
             self._lottie_available = False
             self.update()
@@ -271,22 +243,29 @@ class AnimationWidget(QWidget):
             painter.drawPixmap(0, 0, self._current_pixmap)
 
     def _paint_fallback(self, painter: QPainter) -> None:
-        """Draw the fallback pulsing circle."""
+        """Draw the fallback pulsing circle with MakiSync glow styling."""
         config = FALLBACK_CONFIG.get(self._state, FALLBACK_CONFIG[AppState.IDLE])
         w, h = self.width(), self.height()
         cx, cy = w // 2, h // 2
         base_radius = min(w, h) // 3
         radius = int(base_radius * self._pulse_scale)
 
-        # Outer ring
+        # Outer ambient ring
         ring_color = QColor(config["ring_color"])
-        ring_color.setAlpha(int(80 * self._pulse_scale))
+        ring_color.setAlpha(int(60 * self._pulse_scale))
         painter.setPen(QPen(ring_color, 2))
         painter.setBrush(Qt.BrushStyle.NoBrush)
-        outer_r = int(radius * 1.4)
+        outer_r = int(radius * 1.35)
         painter.drawEllipse(cx - outer_r, cy - outer_r, outer_r * 2, outer_r * 2)
 
-        # Radial fill
+        # Secondary micro ring
+        mid_r = int(radius * 1.15)
+        mid_color = QColor(config["ring_color"])
+        mid_color.setAlpha(int(40 * self._pulse_scale))
+        painter.setPen(QPen(mid_color, 1))
+        painter.drawEllipse(cx - mid_r, cy - mid_r, mid_r * 2, mid_r * 2)
+
+        # Radial core gradient
         gradient = QRadialGradient(cx, cy, radius)
         fill_color = QColor(config["color"])
         gradient.setColorAt(0.0, fill_color)
@@ -297,10 +276,10 @@ class AnimationWidget(QWidget):
         painter.setBrush(QBrush(gradient))
         painter.drawEllipse(cx - radius, cy - radius, radius * 2, radius * 2)
 
-        # Symbol
+        # Center Symbol / Icon
         painter.setPen(QColor(config["symbol_color"]))
         f = painter.font()
-        f.setPointSize(int(base_radius * 0.55))
+        f.setPointSize(int(base_radius * 0.50))
         painter.setFont(f)
         painter.drawText(
             cx - base_radius, cy - base_radius,
@@ -309,14 +288,14 @@ class AnimationWidget(QWidget):
             config["symbol"],
         )
 
-        # State label
+        # State label pill
         painter.setPen(QColor(config["label_color"]))
         lf = painter.font()
         lf.setPointSize(9)
+        lf.setBold(True)
         painter.setFont(lf)
         painter.drawText(
-            0, cy + base_radius + 16, w, 30,
+            0, cy + base_radius + 18, w, 30,
             Qt.AlignmentFlag.AlignCenter,
             config["label"],
         )
-
