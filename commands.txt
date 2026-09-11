@@ -1,0 +1,120 @@
+# ============================================================
+#  MakiAI — Command Reference
+#  Project Path: C:\development\Python\MakiAI\
+# ============================================================
+
+
+# ─── FIRST TIME SETUP ────────────────────────────────────────────────────────
+
+# 1. Navigate to project
+cd C:\development\Python\MakiAI
+
+# 2. Create virtual environment
+python -m venv venv
+
+# 3. Activate virtual environment
+venv\Scripts\activate
+
+# 4. Install all dependencies
+pip install -r requirements.txt
+
+# 5. Copy environment config
+copy .env.example .env
+
+# 6. Open .env and fill in your API keys:
+#    GEMINI_API_KEY         → https://aistudio.google.com/
+#    ELEVENLABS_API_KEY     → https://elevenlabs.io/
+#    ELEVENLABS_VOICE_ID    → Your chosen voice ID from ElevenLabs dashboard
+#    PORCUPINE_ACCESS_KEY   → https://console.picovoice.ai/
+#    KB_PATH                → C:\Knowledge-Base  (already set by default)
+
+
+# ─── DAILY USE ───────────────────────────────────────────────────────────────
+
+# Activate venv (run this every time before starting the app)
+venv\Scripts\activate
+
+# Run the app
+python main.py
+
+
+# ─── DEVELOPMENT ─────────────────────────────────────────────────────────────
+
+# Install a new package and save to requirements
+pip install <package-name>
+pip freeze > requirements.txt
+
+# Format code with Black
+black .
+
+# Lint code with Flake8
+flake8 . --max-line-length=120 --exclude=venv,__pycache__
+
+# Deactivate virtual environment
+deactivate
+
+
+# ─── BUILD (PACKAGE AS .EXE) ─────────────────────────────────────────────────
+
+# Build standalone Windows executable (Phase 10)
+pyinstaller --noconfirm --onefile --windowed ^
+  --name MakiAI ^
+  --add-data "gui/assets;gui/assets" ^
+  --add-data "data;data" ^
+  main.py
+
+# Output will be in: dist\MakiAI.exe
+
+
+# ─── VOICE COMMANDS (say after "Hey Maki" or type in the app) ────────────────
+
+#  SCHEDULE & PRODUCTIVITY
+#    good morning                          → Morning briefing from KB
+#    good night                            → Night wrap-up
+#    hello / what's next                   → Quick time-aware check-in
+
+#  DEADLINES
+#    add deadline [task] by [date]         → Add to KB deadlines
+#    show my deadlines                     → List all deadlines
+#    deadline done [task]                  → Mark deadline complete
+
+#  REMINDERS
+#    remind me at [time] to [task]         → Set a reminder
+#    show my reminders                     → List pending reminders
+#    cancel reminder [task]                → Cancel a reminder
+
+#  MEMORY
+#    remember that [info]                  → Store a memory
+#    what do you remember about [topic]    → Recall a memory
+#    forget about [topic]                  → Delete a memory
+
+#  COMPUTER CONTROL
+#    open [app name]                       → Launch desktop app
+#    open [website]                        → Open in browser
+#    volume up / down / mute               → System volume
+#    take a screenshot                     → Save screenshot
+#    take a photo                          → Capture from webcam
+#    start recording / stop recording      → Video recording
+#    shutdown / sleep / lock               → System control
+
+#  MEDIA
+#    play / pause / next / previous        → Media playback
+#    open Spotify                          → Launch Spotify
+
+#  PROJECTS
+#    new project / I have a project idea   → Start KB project planning
+
+#  SYSTEM
+#    log out                               → Log out of MakiAI
+
+
+# ─── USEFUL FILE LOCATIONS ────────────────────────────────────────────────────
+
+#  Source code:        C:\development\Python\MakiAI\
+#  KB documentation:   C:\Knowledge-Base\projects\MakiAI\
+#  Environment config: C:\development\Python\MakiAI\.env
+#  App settings:       C:\development\Python\MakiAI\data\settings.json
+#  Reminders:          C:\development\Python\MakiAI\data\reminders.json
+#  Memory:             C:\development\Python\MakiAI\data\memory.json
+#  Conversation log:   C:\development\Python\MakiAI\data\logs\conversation_log.json
+#  Knowledge Base:     C:\Knowledge-Base\

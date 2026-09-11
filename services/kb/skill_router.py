@@ -1,0 +1,149 @@
+"""
+MakiAI — Skill Router
+Maps voice/text commands to the correct KB skill.
+
+Uses keyword matching — same trigger words defined in the KB
+skill manifests (.agent/skills/user/*.skill.json).
+
+Returns a skill instance ready to execute, or None if no skill matched.
+"""
+
+import re
+from typing import Optional
+
+
+class SkillRouter:
+    """
+    Detects which KB skill to execute based on the user's input.
+
+    Skills are registered with their trigger keywords.
+    The router checks each trigger against the input and returns
+    the first matching skill instance.
+
+    Usage:
+        router = SkillRouter(skills_dict)
+        skill = router.detect("good morning")
+        if skill:
+            response = skill.execute(text)
+    """
+
+    def __init__(self, skills: dict):
+        """
+        Args:
+            skills: Dict mapping skill_id → skill instance.
+                    e.g. {"goodmorning": GoodMorningSkill(...), ...}
+        """
+        self._skills = skills
+
+        # Trigger map: list of (pattern, skill_id) tuples
+        # Checked in order — more specific patterns first
+        self._triggers: list[tuple[re.Pattern, str]] = []
+        self._build_trigger_map()
+
+    # ─── Trigger Map ──────────────────────────────────────────────────────────
+
+    def _build_trigger_map(self) -> None:
+        """Build regex patterns from skill trigger keywords."""
+        trigger_definitions = [
+            # (skill_id, [keyword patterns])
+            ("goodmorning", [
+                r"\bgood\s*morning\b",
+                r"\bwhat'?s?\s+my\s+schedule\b",
+                r"\bmorning\s+briefing\b",
+                r"\bshow\s+(me\s+)?my\s+schedule\b",
+            ]),
+            ("goodnight", [
+                r"\bgood\s*night\b",
+                r"\bwrap\s+up\s+my\s+day\b",
+                r"\bend\s+of\s+(the\s+)?day\b",
+                r"\bday\s+wrap\s*up\b",
+            ]),
+            ("hello", [
+                r"^(hey\s+maki[,.]?\s*)?(hello|hey|hi)\b",
+                r"\bwhat\s+should\s+i\s+do\s+(now|next)\b",
+                r"\bwhat'?s?\s+next\b",
+                r"\bcheck.?in\b",
+            ]),
+            ("deadline", [
+                r"\badd\s+(a\s+)?deadline\b",
+                r"\b(show|list|view)\s+(my\s+)?deadlines?\b",
+                r"\bdeadline\s+done\b",
+                r"\bmark\s+deadline\b",
+                r"\bcomplete\s+deadline\b",
+                r"\bdeadlines?\b",
+            ]),
+            ("reminder", [
+                r"\bremind\s+(me\s+)?(at|to|about|in)\b",
+                r"\bset\s+(a\s+)?reminder\b",
+                r"\b(show|list)\s+(my\s+)?reminders?\b",
+                r"\bcancel\s+reminder\b",
+            ]),
+            ("memory", [
+                r"\bremember\s+that\b",
+                r"\bremember\s+(this|my)\b",
+                r"\bdon'?t\s+forget\b",
+                r"\bwhat\s+do\s+you\s+remember\b",
+                r"\brecall\b",
+                r"\bforget\s+(about\s+)?(that|this|my)\b",
+            ]),
+            ("new_project", [
+                r"\bnew\s+project\b",
+                r"\bi\s+have\s+(a\s+)?project\s+idea\b",
+                r"\bi\s+(want|wanna)\s+to\s+build\b",
+                r"\bwe\s+have\s+a\s+new\s+project\b",
+                r"\blet'?s\s+build\b",
+                r"\bnew\s+(app|website|system|tool)\b",
+            ]),
+        ]
+
+        for skill_id, patterns in trigger_definitions:
+            for pattern in patterns:
+                compiled = re.compile(pattern, re.IGNORECASE)
+                self._triggers.append((compiled, skill_id))
+
+    # ─── Public API ──────────────────────────────────────────────────────────
+
+    def detect(self, text: str) -> Optional[object]:
+        """
+        Check if the input matches any registered skill trigger.
+
+        Args:
+            text: The transcribed or typed user input.
+                  Wake word "Hey Maki" prefix is stripped before matching.
+
+        Returns:
+            A skill instance if matched, None otherwise.
+        """
+        # Strip wake word prefix before matching
+        cleaned = re.sub(
+            r"^(hey\s+maki[,.]?\s*)",
+            "",
+            text.strip(),
+            flags=re.IGNORECASE,
+        ).strip()
+
+        for pattern, skill_id in self._triggers:
+            if pattern.search(cleaned):
+                skill = self._skills.get(skill_id)
+                if skill:
+                    print(f"[SkillRouter] Matched skill: {skill_id}")
+                    return skill
+                else:
+                    print(f"[SkillRouter] Skill '{skill_id}' matched but not registered.")
+
+        return None
+
+    def register(self, skill_id: str, skill_instance: object) -> None:
+        """
+        Register a new skill instance.
+
+        Args:
+            skill_id:       Unique skill identifier.
+            skill_instance: The skill object with an execute() method.
+        """
+        self._skills[skill_id] = skill_instance
+        print(f"[SkillRouter] Registered skill: {skill_id}")
+
+    def list_skills(self) -> list[str]:
+        """Return a list of all registered skill IDs."""
+        return list(self._skills.keys())
