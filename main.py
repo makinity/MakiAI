@@ -41,6 +41,13 @@ def main() -> None:
     # Suppress HuggingFace symlink warning on Windows
     os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 
+    # Initialize MakiSync Storage folder structure
+    try:
+        from services.storage.maki_sync import initialize_storage
+        initialize_storage()
+    except Exception as e:
+        print(f"[MakiAI] Storage init warning: {e}")
+
     app = QApplication(sys.argv)
     app.setApplicationName("MakiAI")
     app.setApplicationVersion("1.0.0")

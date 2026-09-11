@@ -24,6 +24,8 @@ from services.ai.context_builder import ContextBuilder
 from services.kb.kb_reader import KBReader
 from services.kb.kb_writer import KBWriter
 from services.kb.skill_router import SkillRouter
+from services.reminder.reminder_service import ReminderService
+from services.memory.memory_service import MemoryService
 from skills.goodmorning_skill import GoodMorningSkill
 from skills.goodnight_skill import GoodNightSkill
 from skills.hello_skill import HelloSkill
@@ -31,13 +33,16 @@ from skills.deadline_skill import DeadlineSkill
 from skills.reminder_skill import ReminderSkill
 from skills.memory_skill import MemorySkill
 from skills.new_project_skill import NewProjectSkill
+from skills.homework_skill import HomeworkSkill
 from gui.pages.LoginPage import LoginPage
 from gui.pages.MainPage import MainPage
+from gui.pages.SettingsPage import SettingsPage
 
 
 # Page indices in the QStackedWidget
-PAGE_LOGIN = 0
-PAGE_MAIN = 1
+PAGE_LOGIN    = 0
+PAGE_MAIN     = 1
+PAGE_SETTINGS = 2
 
 
 class MainWindow(QMainWindow):
@@ -66,12 +71,29 @@ class MainWindow(QMainWindow):
         self.kb_reader = KBReader(kb_path=self.settings.get_kb_path())
         self.kb_writer = KBWriter(kb_path=self.settings.get_kb_path())
 
+        # ── Reminder & Memory services ────────────────────────────────────────
+        self.memory_service = MemoryService()
+        self.reminder_service = ReminderService(
+            on_fire=self._on_reminder_fire
+        )
+
         # ── AI services ───────────────────────────────────────────────────────
         self.gemini = GeminiService(
             api_key=self.settings.get_gemini_api_key(),
             groq_api_key=self.settings.get_groq_api_key(),
         )
         self.context_builder = ContextBuilder(kb_reader=self.kb_reader)
+        self.context_builder.invalidate_cache()
+
+        # Auto-invalidate context cache whenever KB is written
+        # This means any KB file update is reflected in Maki's next response
+        _orig_write = self.kb_writer.write
+        _orig_append = self.kb_writer.append
+        _ctx = self.context_builder
+        def _write_and_invalidate(p, c): r = _orig_write(p, c); _ctx.invalidate_cache(); return r
+        def _append_and_invalidate(p, c): r = _orig_append(p, c); _ctx.invalidate_cache(); return r
+        self.kb_writer.write = _write_and_invalidate
+        self.kb_writer.append = _append_and_invalidate
 
         # ── Skills ────────────────────────────────────────────────────────────
         skill_deps = (self.gemini, self.context_builder, self.kb_reader, self.kb_writer)
@@ -80,9 +102,10 @@ class MainWindow(QMainWindow):
             "goodnight":    GoodNightSkill(*skill_deps),
             "hello":        HelloSkill(*skill_deps),
             "deadline":     DeadlineSkill(*skill_deps),
-            "reminder":     ReminderSkill(*skill_deps),
+            "reminder":     ReminderSkill(*skill_deps, reminder_service=self.reminder_service),
             "memory":       MemorySkill(*skill_deps),
             "new_project":  NewProjectSkill(*skill_deps),
+            "homework":     HomeworkSkill(*skill_deps),
         }
         self.skill_router = SkillRouter(skills)
 
@@ -134,10 +157,18 @@ class MainWindow(QMainWindow):
             self.settings,
             self.auth,
             self._on_logout,
+            self._on_open_settings,
         )
+        self.settings_page = SettingsPage(
+            settings=self.settings,
+            on_back=self._on_settings_back,
+            on_logout=self._on_logout,
+        )
+        self.settings_page.settings_saved.connect(self._on_settings_saved)
 
-        self.stack.addWidget(self.login_page)   # index 0
-        self.stack.addWidget(self.main_page)    # index 1
+        self.stack.addWidget(self.login_page)    # index 0
+        self.stack.addWidget(self.main_page)     # index 1
+        self.stack.addWidget(self.settings_page) # index 2
 
         # ── Initial navigation ────────────────────────────────────────────────
         self._navigate_on_startup()
@@ -153,6 +184,7 @@ class MainWindow(QMainWindow):
             print("[MainWindow] Session active — auto-login.")
             self.stack.setCurrentIndex(PAGE_MAIN)
             self.main_page.on_enter()
+            self.reminder_service.start()
             self._start_voice_engine()  # ← start voice on auto-login too
         else:
             print("[MainWindow] No active session — showing login.")
@@ -163,15 +195,68 @@ class MainWindow(QMainWindow):
         print("[MainWindow] Login success — navigating to MainPage.")
         self.stack.setCurrentIndex(PAGE_MAIN)
         self.main_page.on_enter()
+        self.reminder_service.start()
         self._start_voice_engine()
 
     def _on_logout(self) -> None:
-        """Called by MainPage when the user logs out."""
+        """Called by MainPage or SettingsPage when the user logs out."""
         print("[MainWindow] Logout — returning to LoginPage.")
         self._stop_voice_engine()
+        self.reminder_service.stop()
         self.auth.logout()
         self.login_page.reset()
         self.stack.setCurrentIndex(PAGE_LOGIN)
+
+    def _on_open_settings(self) -> None:
+        """Navigate to SettingsPage."""
+        self.settings_page._load_current_values()
+        self.stack.setCurrentIndex(PAGE_SETTINGS)
+
+    def _on_settings_back(self) -> None:
+        """Return to MainPage from SettingsPage."""
+        self.stack.setCurrentIndex(PAGE_MAIN)
+
+    def _on_settings_saved(self, changed: dict) -> None:
+        """
+        Hot-swap services when settings are saved.
+        Called by SettingsPage.settings_saved signal.
+        """
+        print(f"[MainWindow] Settings saved — updating services.")
+
+        # Update Groq/Gemini API keys
+        if "GROQ_API_KEY" in changed or "GEMINI_API_KEY" in changed:
+            self.gemini.update_api_key(
+                new_key=self.settings.get_gemini_api_key(),
+                provider="gemini"
+            )
+            if changed.get("GROQ_API_KEY"):
+                self.gemini.update_api_key(
+                    new_key=self.settings.get_groq_api_key(),
+                    provider="groq"
+                )
+
+        # Update ElevenLabs credentials
+        if "ELEVENLABS_API_KEY" in changed or "ELEVENLABS_VOICE_ID" in changed:
+            self.tts_service.update_credentials(
+                api_key=self.settings.get_elevenlabs_api_key(),
+                voice_id=self.settings.get_elevenlabs_voice_id(),
+            )
+
+        # Update wake word — restart voice engine
+        if "WAKE_WORD" in changed:
+            self._stop_voice_engine()
+            import time
+            time.sleep(0.5)
+            self._start_voice_engine()
+
+    def _on_reminder_fire(self, text: str) -> None:
+        """
+        Called by ReminderService when a reminder triggers.
+        Shows in chat log and speaks aloud.
+        """
+        print(f"[MainWindow] Reminder fired: '{text}'")
+        self.main_page.add_message_signal.emit("maki", f"Reminder: {text}")
+        self.tts_service.speak(text)
 
     # ─── Voice Engine ─────────────────────────────────────────────────────────
 
@@ -237,7 +322,7 @@ class MainWindow(QMainWindow):
             self._handle_voice_command_sync("hello")
 
         # Conversation loop
-        INACTIVITY_TIMEOUT = 30
+        INACTIVITY_TIMEOUT = 120  # 2 minutes of silence before sleeping
         last_activity = time.time()
         print("[ConversationLoop] Active — listening continuously.")
 
@@ -328,6 +413,7 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event) -> None:
         """Clean up background threads before closing the app."""
         self._stop_voice_engine()
+        self.reminder_service.stop()
         event.accept()
 
     # ─── Window dragging (frameless) ─────────────────────────────────────────

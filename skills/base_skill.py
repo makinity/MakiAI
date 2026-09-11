@@ -53,16 +53,18 @@ class BaseSkill(ABC):
 
     def _ask_gemini(self, prompt: str) -> str:
         """
-        Helper: send a prompt with this skill's KB context to Gemini.
-
-        Args:
-            prompt: The task prompt to send.
-
-        Returns:
-            Gemini's response string.
+        Helper: send a prompt with this skill's KB context to Gemini/Groq.
+        Returns a fallback message if response is empty.
         """
         context = self.context_builder.build_skill_context(
             self.SKILL_ID,
             self.REQUIRED_FILES,
         )
-        return self.gemini.send(prompt, context)
+        response = self.gemini.send(prompt, context)
+        if not response or not response.strip():
+            print(f"[{self.SKILL_ID}] Empty response from AI — using fallback.")
+            # Try without KB context (lighter prompt)
+            response = self.gemini.send(prompt, "")
+        if not response or not response.strip():
+            return "I'm having trouble thinking right now. Please try again in a moment."
+        return response

@@ -28,23 +28,21 @@ class GoodMorningSkill(BaseSkill):
         prompt = f"""
 Today is {day}. The current time is {time_str}.
 
-Generate Mark's morning briefing following this exact format:
+Generate a warm, natural spoken morning briefing for sir. Speak like a trusted personal assistant, not a robot.
+Do not use bullet points, markdown, emoji labels, or formatted lists.
+Speak in natural flowing sentences as if you are talking to him directly.
 
-1. 🌅 Good Morning, Mark! — today's date
-2. 📋 Today's Priority Order — from time-management.md
-3. ⏰ Right Now — detect the current time block from the weekly schedule:
-   - 🟢 Now ({time_str}) — what Mark should be doing right now
-   - ⏭️ Up next — the next block
-   - 🔜 Later — the block after that
-4. 🕐 Today's Full Schedule — all blocks for today with 👉 marking the current one
-5. 📌 Carry-over from Yesterday — from carryover.md (✅ if clean)
-6. 📅 Upcoming Deadlines — from deadlines.md (🔴 overdue, 🚨 today, 🟠 tomorrow, 🟡 within 3 days, ⚪ within 7 days)
-7. 💡 Day Highlight — 1–2 sentence summary
-8. ⚡ Daily Minimum — quick reminder
+Cover these topics naturally in your speech:
+1. A warm good morning greeting with today's date
+2. What sir should be doing right now and what is coming up next in his schedule
+3. His full schedule for today, described naturally in a sentence or two
+4. Any carry-over tasks from yesterday if there are any, or confirm everything is clean
+5. Any upcoming deadlines — mention urgent ones warmly, skip if none
+6. A brief encouraging closing thought about his day
 
-End with: "Do you have any additional tasks or activities to add for today?"
+End by asking: "Is there anything you would like to add to your day, sir?"
 
-Keep the spoken version concise — this will be read aloud.
+Keep the total response under 120 words. Speak warmly and naturally.
 """.strip()
 
         return self._ask_gemini(prompt)

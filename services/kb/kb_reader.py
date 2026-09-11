@@ -77,22 +77,30 @@ class KBReader:
 
     def list_files(self, relative_dir: str = "", pattern: str = "*.md") -> list[str]:
         """
-        List all matching files in a KB directory.
-
-        Args:
-            relative_dir: Directory relative to KB root. Empty = root.
-            pattern:      Glob pattern. Default: "*.md"
-
-        Returns:
-            List of relative file paths (as strings).
+        List matching files in a KB directory.
+        Uses non-recursive glob by default to avoid node_modules etc.
+        Use rglob only when explicitly needed.
         """
+        SKIP_DIRS = {"node_modules", "dist", "build", ".next", "__pycache__", ".git", "out"}
+
         target = self.kb_path / relative_dir if relative_dir else self.kb_path
         if not target.exists():
             return []
-        return [
-            str(p.relative_to(self.kb_path))
-            for p in target.rglob(pattern)
-        ]
+
+        results = []
+        try:
+            for p in target.rglob(pattern):
+                # Skip any path that contains a blocked directory name
+                if any(skip in p.parts for skip in SKIP_DIRS):
+                    continue
+                try:
+                    results.append(str(p.relative_to(self.kb_path)))
+                except Exception:
+                    continue
+        except Exception as e:
+            print(f"[KBReader] list_files error in {relative_dir}: {e}")
+
+        return results
 
     def resolve(self, relative_path: str) -> Path:
         """

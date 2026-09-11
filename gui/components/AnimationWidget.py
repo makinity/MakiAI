@@ -201,8 +201,9 @@ class AnimationWidget(QWidget):
             else:
                 self._tick_fallback()
         except RuntimeError:
-            # Widget has been deleted — stop the timer
             self._timer.stop()
+        except Exception:
+            pass
 
     def _tick_lottie(self) -> None:
         """Advance Lottie frame and render to pixmap."""

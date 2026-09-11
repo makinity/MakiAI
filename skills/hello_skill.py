@@ -28,16 +28,17 @@ class HelloSkill(BaseSkill):
         prompt = f"""
 It is currently {time_str} on {day}.
 
-Generate a quick check-in for Mark. Keep it very short — 3 to 5 sentences max.
-This will be spoken aloud, so be concise.
+Generate a quick, natural spoken check-in for sir. Speak like a warm, helpful assistant — not a robot.
+Keep it to 3 to 4 sentences maximum, spoken naturally.
 
-Include only:
-- 🟢 What Mark should be doing RIGHT NOW based on his schedule
-- ⏭️ What's coming up next
-- 🔴 Any overdue or urgent deadlines (if any — skip if none)
-- One carry-over item if present (skip if clean)
+Tell sir:
+- What he should be doing right now based on his schedule
+- What is coming up next
+- Any urgent deadlines if there are any (skip if none)
+- Any carry-over tasks if present (skip if clean)
 
-Do NOT give the full schedule. Keep it quick and actionable.
+Do not use bullet points, lists, or formatting. Just speak naturally as if talking to him.
+Do not say "Certainly" or "Of course". Just respond directly and warmly.
 """.strip()
 
         return self._ask_gemini(prompt)

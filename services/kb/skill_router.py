@@ -88,11 +88,26 @@ class SkillRouter:
             ]),
             ("new_project", [
                 r"\bnew\s+project\b",
+                r"\bstart\s+project\b",
+                r"\bstart\s+a\s+project\b",
                 r"\bi\s+have\s+(a\s+)?project\s+idea\b",
                 r"\bi\s+(want|wanna)\s+to\s+build\b",
                 r"\bwe\s+have\s+a\s+new\s+project\b",
                 r"\blet'?s\s+build\b",
                 r"\bnew\s+(app|website|system|tool)\b",
+            ]),
+            ("homework", [
+                r"\bcreate\s+(my\s+)?homework\b",
+                r"\bdo\s+(my\s+)?homework\b",
+                r"\bmake\s+(my\s+)?homework\b",
+                r"\bwrite\s+(my\s+)?homework\b",
+                r"\bhelp\s+(me\s+with\s+)?(my\s+)?homework\b",
+                r"\bcreate\s+(my\s+)?assignment\b",
+                r"\bdo\s+(my\s+)?assignment\b",
+                r"\bmake\s+(my\s+)?assignment\b",
+                r"\bwrite\s+(my\s+)?assignment\b",
+                r"\bfinish\s+(my\s+)?homework\b",
+                r"\bhomework\s+help\b",
             ]),
         ]
 

@@ -160,7 +160,12 @@ class GeminiService:
         """Send via Groq API with streaming for faster response."""
         try:
             messages = []
-            system_prompt = system_context if system_context else "You are MakiAI, a Jarvis-inspired AI assistant for Mark Vencent Juntilla. Be concise, calm, and helpful. Address the user as Mark. Keep responses short — spoken aloud."
+            system_prompt = system_context if system_context else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise. No markdown or bullet points. Just clear natural English.
+
+You have full access to:
+- C:\\Knowledge Base\\ — sir's schedule, deadlines, projects, preferences
+- C:\\MakiSync Storage\\ — organized file storage (School, Work, Personal, Freelance, MakiAI with Screenshots/Photos/Recordings in date folders)
+You CAN search, open, and manage files in these locations."""
             messages.append({"role": "system", "content": system_prompt})
 
             for turn in self._history[-(MAX_HISTORY_TURNS * 2):]:
@@ -173,7 +178,7 @@ class GeminiService:
             stream = self._groq_client.chat.completions.create(
                 model=self._groq_model,
                 messages=messages,
-                max_tokens=512,       # Shorter = faster for voice
+                max_tokens=800,       # Increased for KB-heavy responses
                 temperature=0.7,
                 stream=True,
             )
@@ -185,6 +190,9 @@ class GeminiService:
                     answer += delta
 
             answer = answer.strip()
+            if not answer:
+                print(f"[AIService] Groq returned empty response for: {user_text[:50]}")
+                return ""
             self._add_to_history("user", user_text)
             self._add_to_history("model", answer)
             return answer

@@ -78,26 +78,53 @@ class TTSService:
 
     def speak(self, text: str) -> None:
         """
-        Speak the given text aloud. Non-blocking — runs in background thread.
-
-        Tries ElevenLabs first. Falls back to Edge TTS on failure.
-
-        Args:
-            text: The text string to speak aloud.
+        Speak the given text aloud. Strips markdown formatting before speaking.
+        Non-blocking — runs in background thread.
         """
         if not text or not text.strip():
             return
 
         if self._speaking:
-            return  # Don't interrupt ongoing speech
+            return
+
+        # Strip markdown so it isn't read aloud literally
+        clean = self._strip_markdown(text)
+        if not clean.strip():
+            return
 
         thread = threading.Thread(
             target=self._speak_thread,
-            args=(text,),
+            args=(clean,),
             name="TTSThread",
             daemon=True,
         )
         thread.start()
+
+    @staticmethod
+    def _strip_markdown(text: str) -> str:
+        """
+        Remove markdown formatting so TTS doesn't read symbols aloud.
+        Strips: **bold**, *italic*, `code`, # headers, - bullets, numbered lists symbols.
+        """
+        import re
+        # Bold and italic
+        text = re.sub(r'\*{1,3}(.*?)\*{1,3}', r'\1', text)
+        # Code blocks and inline code
+        text = re.sub(r'```[\s\S]*?```', '', text)
+        text = re.sub(r'`([^`]+)`', r'\1', text)
+        # Headers
+        text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)
+        # Bullet points — replace with pause
+        text = re.sub(r'^\s*[-*•]\s+', '', text, flags=re.MULTILINE)
+        # Numbered list markers — keep the text
+        text = re.sub(r'^\s*\d+\.\s+', '', text, flags=re.MULTILINE)
+        # Horizontal rules
+        text = re.sub(r'^[-_*]{3,}$', '', text, flags=re.MULTILINE)
+        # Links [text](url) → text
+        text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+        # Extra blank lines
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        return text.strip()
 
     def update_credentials(self, api_key: str, voice_id: str) -> None:
         """

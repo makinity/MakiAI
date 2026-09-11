@@ -70,6 +70,7 @@ class MainPage(QWidget):
         settings: SettingsService,
         auth: AuthService,
         on_logout: Callable[[], None],
+        on_open_settings: Callable[[], None] | None = None,
     ):
         super().__init__()
         self.orchestrator = orchestrator
@@ -77,6 +78,7 @@ class MainPage(QWidget):
         self.settings = settings
         self.auth = auth
         self.on_logout = on_logout
+        self.on_open_settings = on_open_settings or (lambda: None)
 
         self._build_ui()
 
@@ -189,6 +191,7 @@ class MainPage(QWidget):
             """)
 
         logout_btn.clicked.connect(self._handle_logout)
+        settings_btn.clicked.connect(self.on_open_settings)
 
         layout.addWidget(logo)
         layout.addWidget(name)
@@ -447,22 +450,28 @@ class MainPage(QWidget):
 
     def _make_bubble(self, role: str, text: str) -> QFrame:
         """Create a chat bubble widget for user or Maki messages."""
+        import re
+        # Clean markdown for display too
+        display_text = re.sub(r'\*{1,3}(.*?)\*{1,3}', r'\1', text)
+        display_text = re.sub(r'`([^`]+)`', r'\1', display_text)
+
         bubble = QFrame()
         layout = QVBoxLayout(bubble)
         layout.setContentsMargins(12, 10, 12, 10)
         layout.setSpacing(4)
 
-        # Role label
         role_label = QLabel("You" if role == "user" else "Maki")
         role_label.setStyleSheet(
             f"color: {'#00d4ff' if role == 'maki' else '#6b7280'}; "
             f"font-size: 11px; font-weight: bold; letter-spacing: 1px;"
         )
 
-        # Message text
-        msg_label = QLabel(text)
+        msg_label = QLabel(display_text)
         msg_label.setWordWrap(True)
-        msg_label.setStyleSheet("color: #e0e0e0; font-size: 13px; line-height: 1.5;")
+        msg_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        msg_label.setStyleSheet("color: #e0e0e0; font-size: 13px; line-height: 1.6; border: none;")
+        msg_label.setMinimumWidth(200)
+        msg_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         layout.addWidget(role_label)
         layout.addWidget(msg_label)
@@ -544,5 +553,5 @@ class MainPage(QWidget):
         Called when MainPage becomes the active page.
         Greet the user and set focus to the input bar.
         """
-        self.add_message("maki", f"Hello Mark. I'm online and ready. Say \"Hey Maki\" or type a command below.")
+        self.add_message("maki", f"Hello sir. I'm online and ready. Say \"Hey Maki\" or type a command below.")
         self.transcription_input.setFocus()
