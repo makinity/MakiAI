@@ -108,101 +108,99 @@ class ContextBuilder:
         self._general_context_cache = "\n".join(parts).strip()
         return self._general_context_cache
 
-    def build_topic_context(self, topic: str) -> str:
+    def build_topic_context(self, topic: str = "") -> str:
         """
-        Build context by reading ALL relevant KB directories.
-        Prioritizes critical workflow and personal info first,
-        and evenly balances content across all directories.
+        Build context with core personal/workflow files + dynamic query-aware relevance search.
+        Ensures Maki knows exact URLs, social media, capstone/school projects, active codebases,
+        and current schedules on every query.
         """
-        ALL_KB_DIRS = [
-            "workflows",
-            "about",
-            "preferences",
-            "school",
-            "career",
-            "projects",
-            "business",
-            "config",
-            "learning",
-            "va",
-            "web-development",
-            "faq",
-            "decisions",
-            "resources",
-        ]
-
-        DIRECT_FILES = [
-            "preferences/preferences.md",
-        ]
-
-        SKIP_FILES = {"voice.md"}  # Skip 11.5k audio transcript dumps
+        import re
 
         parts = [MAKI_PERSONALITY, ""]
-        parts.append("## Mark's Full Knowledge Base")
+        parts.append("## Mark's Core Knowledge Base")
         parts.append("")
 
+        loaded_files = set()
         total_chars = len(MAKI_PERSONALITY)
-        MAX_TOTAL = 20000
-        loaded_files = []
+        MAX_TOTAL = 22000
 
-        FULL_FILES_NAMES = {
-            "time-management.md",
-            "deadlines.md",
-            "carryover.md",
-            "social-media.md",
-            "profile.md",
-            "goals.md",
-            "biodata.md",
-            "coding-standards.md",
-            "preferences.md",
-        }
+        # 1. ALWAYS INJECTED CORE FILES
+        CORE_FILES = [
+            "about/social-media.md",
+            "about/profile.md",
+            "about/goals.md",
+            "about/biodata.md",
+            "workflows/time-management.md",
+            "workflows/deadlines.md",
+            "workflows/carryover.md",
+            "preferences/preferences.md",
+            "config/coding-standards.md",
+        ]
 
-        # Direct files first
-        for file_path in DIRECT_FILES:
-            if total_chars >= MAX_TOTAL:
-                break
-            try:
-                content = self.kb_reader.read(file_path)
-                if content and len(content.strip()) > 20:
-                    truncated = content[:1500]
-                    parts.append(f"### {file_path}")
-                    parts.append(truncated)
+        for file_path in CORE_FILES:
+            content = self.kb_reader.read(file_path)
+            if content and len(content.strip()) > 20:
+                truncated = content[:2000]
+                norm_p = file_path.replace("\\", "/")
+                parts.append(f"### {norm_p}")
+                parts.append(truncated)
+                parts.append("")
+                total_chars += len(truncated)
+                loaded_files.add(norm_p)
+                loaded_files.add(file_path.replace("/", "\\"))
+
+        # 2. QUERY-AWARE RELEVANCE SEARCH
+        query_text = (topic or "").strip()
+        if query_text and query_text.lower() != "all":
+            words = [re.sub(r"[^a-zA-Z0-9_-]", "", w.lower()) for w in query_text.split()]
+            STOPWORDS = {
+                "what", "when", "where", "which", "who", "whom", "this", "that", "these", "those",
+                "have", "has", "had", "does", "is", "are", "was", "were", "my", "your", "the", "a",
+                "an", "in", "on", "at", "to", "for", "of", "with", "about", "and", "or", "tell",
+                "me", "show", "current", "you", "sir", "maki", "please", "know", "how",
+            }
+            keywords = [w for w in words if len(w) > 2 and w not in STOPWORDS]
+
+            if keywords:
+                scores = []
+                all_kb_files = self.kb_reader.list_files("", "*.md")
+                for f in all_kb_files:
+                    norm_f = f.replace("\\", "/")
+                    if norm_f in loaded_files or any(skip in norm_f for skip in ["node_modules", ".git", "voice.md"]):
+                        continue
+                    content = self.kb_reader.read(f)
+                    if not content or len(content.strip()) < 10:
+                        continue
+                    c_lower = content.lower()
+                    f_lower = norm_f.lower()
+
+                    score = 0
+                    for kw in keywords:
+                        if kw in f_lower:
+                            score += 35
+                        score += min(c_lower.count(kw) * 2, 30)
+
+                    if score > 0:
+                        scores.append((score, f))
+
+                scores.sort(reverse=True, key=lambda x: x[0])
+                if scores:
+                    parts.append("## Highly Relevant Knowledge Base Documents:")
                     parts.append("")
-                    total_chars += len(truncated)
-                    loaded_files.append(file_path)
-            except Exception as e:
-                print(f"[ContextBuilder] Skipping {file_path}: {e}")
+                    for score, f in scores[:6]:
+                        if total_chars >= MAX_TOTAL:
+                            break
+                        content = self.kb_reader.read(f)
+                        if content:
+                            truncated = content[:2000]
+                            norm_f = f.replace("\\", "/")
+                            parts.append(f"### {norm_f}")
+                            parts.append(truncated)
+                            parts.append("")
+                            total_chars += len(truncated)
+                            loaded_files.add(norm_f)
 
-        # Read across all directories
-        for source in ALL_KB_DIRS:
-            if total_chars >= MAX_TOTAL:
-                break
-            try:
-                files = self.kb_reader.list_files(source, "*.md")
-                for file_path in sorted(files):
-                    if total_chars >= MAX_TOTAL:
-                        break
-                    norm_path = file_path.replace("\\", "/")
-                    filename = norm_path.split("/")[-1]
-                    if filename in SKIP_FILES:
-                        continue
-                    if norm_path in [d.replace("\\", "/") for d in loaded_files]:
-                        continue
-
-                    content = self.kb_reader.read(file_path)
-                    if content and len(content.strip()) > 20:
-                        is_full = filename in FULL_FILES_NAMES
-                        truncated = content if is_full else content[:800]
-                        parts.append(f"### {file_path}")
-                        parts.append(truncated)
-                        parts.append("")
-                        total_chars += len(truncated)
-                        loaded_files.append(file_path)
-            except Exception as e:
-                print(f"[ContextBuilder] Skipping {source}: {e}")
-                continue
-
-        # Read project files — overview.md, README.md, or plan.md
+        # 3. PROJECT & SCHOOL SUMMARIES (fill remaining budget)
         if total_chars < MAX_TOTAL:
             try:
                 for pattern in ["overview.md", "README.md", "PLAN.md"]:
@@ -211,9 +209,9 @@ class ContextBuilder:
                     for file_path in sorted(project_files):
                         if total_chars >= MAX_TOTAL:
                             break
-                        if any(skip in file_path for skip in ["node_modules", "dist", "build", ".next", "src"]):
-                            continue
                         norm_p = file_path.replace("\\", "/")
+                        if norm_p in loaded_files or any(skip in norm_p for skip in ["node_modules", "dist", "build"]):
+                            continue
                         parts_split = norm_p.split("/")
                         project_name = parts_split[1] if len(parts_split) > 1 else norm_p
                         if project_name in seen_projects:
@@ -221,17 +219,16 @@ class ContextBuilder:
                         seen_projects.add(project_name)
                         content = self.kb_reader.read(file_path)
                         if content and len(content.strip()) > 20:
-                            truncated = content[:800]
-                            parts.append(f"### {file_path}")
+                            truncated = content[:600]
+                            parts.append(f"### {norm_p}")
                             parts.append(truncated)
                             parts.append("")
                             total_chars += len(truncated)
-                            loaded_files.append(file_path)
+                            loaded_files.add(norm_p)
             except Exception as e:
                 print(f"[ContextBuilder] Skipping projects: {e}")
 
         result = "\n".join(parts).strip()
-        print(f"[ContextBuilder] Loaded {len(loaded_files)} KB files, {total_chars} chars: {loaded_files[:10]}")
         return result
 
     def invalidate_cache(self) -> None:

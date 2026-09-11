@@ -142,12 +142,10 @@ class Orchestrator:
 
     def _build_context(self, text: str) -> str:
         """
-        Always inject the full KB context.
-        build_topic_context reads ALL KB directories dynamically.
-        Any KB update is reflected immediately.
+        Inject KB context into the system prompt with query-aware relevance search.
         """
         if self.context_builder:
-            return self.context_builder.build_topic_context("all")
+            return self.context_builder.build_topic_context(text)
         return LIGHT_SYSTEM_PROMPT
 
     def _speak(self, text: str) -> None:
