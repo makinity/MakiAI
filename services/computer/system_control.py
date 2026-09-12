@@ -64,7 +64,7 @@ class SystemControl:
 
     def set_volume(self, level: int) -> str:
         """
-        Set system volume to a specific level.
+        Set system volume to a specific level and unmute.
 
         Args:
             level: 0–100 integer.
@@ -76,6 +76,18 @@ class SystemControl:
 
         if self._volume_interface:
             try:
+                # Automatically unmute if setting positive volume
+                if level > 0:
+                    try:
+                        self._volume_interface.SetMute(0, None)
+                    except Exception:
+                        pass
+                elif level == 0:
+                    try:
+                        self._volume_interface.SetMute(1, None)
+                    except Exception:
+                        pass
+
                 self._volume_interface.SetMasterVolumeLevelScalar(
                     level / 100.0, None
                 )
@@ -87,11 +99,12 @@ class SystemControl:
         return self._nircmd_volume(level)
 
     def volume_up(self, step: int = 10) -> str:
-        """Increase volume by step amount."""
+        """Increase volume by step amount and ensure unmuted."""
         current = self.get_volume()
         if current >= 0:
             return self.set_volume(current + step)
         # Fallback
+        self.unmute()
         self._send_volume_key(0xAF)  # VK_VOLUME_UP
         return "Volume increased."
 
@@ -104,13 +117,24 @@ class SystemControl:
         self._send_volume_key(0xAE)  # VK_VOLUME_DOWN
         return "Volume decreased."
 
-    def mute(self) -> str:
-        """Toggle mute."""
+    def unmute(self) -> str:
+        """Explicitly unmute audio."""
         if self._volume_interface:
             try:
-                is_muted = self._volume_interface.GetMute()
-                self._volume_interface.SetMute(not is_muted, None)
-                return "Muted." if not is_muted else "Unmuted."
+                self._volume_interface.SetMute(0, None)
+                return "Unmuted."
+            except Exception as e:
+                print(f"[SystemControl] Unmute error: {e}")
+        return "Audio unmuted."
+
+    def mute(self, state: Optional[bool] = None) -> str:
+        """Mute or toggle mute."""
+        if self._volume_interface:
+            try:
+                is_muted = bool(self._volume_interface.GetMute())
+                new_state = (not is_muted) if state is None else bool(state)
+                self._volume_interface.SetMute(new_state, None)
+                return "Muted." if new_state else "Unmuted."
             except Exception as e:
                 print(f"[SystemControl] Mute error: {e}")
 

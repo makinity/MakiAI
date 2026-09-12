@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maki Desktop UI</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+        crossorigin="anonymous"
+    >
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <div class="background-grid"></div>
+        <div class="background-glow background-glow-a"></div>
+        <div class="background-glow background-glow-b"></div>
+
+        <button
+            class="scene-backdrop"
+            id="scene-backdrop"
+            type="button"
+            aria-label="Close open panels"
+            hidden
+        ></button>
+
+        <nav class="control-dock glass-panel" aria-label="Interface controls">
+            <button
+                class="dock-button"
+                id="status-toggle"
+                data-panel-target="status-panel"
+                type="button"
+                aria-label="Toggle status panel"
+                aria-controls="status-panel"
+                aria-expanded="false"
+                title="Status"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3a9 9 0 1 0 9 9 9.01 9.01 0 0 0-9-9Zm0 4a1.4 1.4 0 1 1-1.4 1.4A1.4 1.4 0 0 1 12 7Zm2 10h-4a1 1 0 0 1 0-2h1v-3h-1a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"></path>
+                </svg>
+            </button>
+            <button
+                class="dock-button"
+                id="command-toggle"
+                data-panel-target="command-panel"
+                type="button"
+                aria-label="Toggle command panel"
+                aria-controls="command-panel"
+                aria-expanded="false"
+                title="Command"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 2v10h16V7Zm3.71 2.29a1 1 0 0 1 0 1.42L6.41 12l1.3 1.29a1 1 0 0 1-1.42 1.42l-2-2a1 1 0 0 1 0-1.42l2-2a1 1 0 0 1 1.42 0ZM11 14h6a1 1 0 0 1 0 2h-6a1 1 0 0 1 0-2Z"></path>
+                </svg>
+            </button>
+            <button
+                class="dock-button"
+                id="activity-toggle"
+                data-panel-target="activity-panel"
+                type="button"
+                aria-label="Toggle recent activity panel"
+                aria-controls="activity-panel"
+                aria-expanded="false"
+                title="Activity"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.41l-4.83-4.83A2 2 0 0 0 14.17 3Zm9 1.41L18.59 9H15a1 1 0 0 1-1-1Zm-7 8.59h10a1 1 0 0 1 0 2H7a1 1 0 0 1 0-2Zm0-4h4a1 1 0 0 1 0 2H7a1 1 0 0 1 0-2Zm0 8h10a1 1 0 0 1 0 2H7a1 1 0 0 1 0-2Z"></path>
+                </svg>
+            </button>
+            <button
+                class="dock-button"
+                id="settings-toggle"
+                data-panel-target="settings-panel"
+                type="button"
+                aria-label="Toggle settings panel"
+                aria-controls="settings-panel"
+                aria-expanded="false"
+                title="Settings"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path>
+                </svg>
+            </button>
+        </nav>
+
+        <main class="scene-shell">
+            <div class="scene-brand">
+                <p class="scene-kicker mb-0">Maki Desktop Interface</p>
+                <h1 class="brand-title mb-0">MakiAI</h1>
+            </div>
+
+            <section class="orb-stage" id="orb-stage">
+                <canvas id="orb-canvas" aria-hidden="true"></canvas>
+                <div class="orb-core-ring orb-core-ring-outer"></div>
+                <div class="orb-core-ring orb-core-ring-inner"></div>
+                <div class="orb-caption">
+                    <span class="orb-caption-label">Core Status</span>
+                    <strong id="orb-caption-value">Ready</strong>
+                </div>
+            </section>
+
+            <p class="scene-hint mb-0">Use the side icons to reveal command, status, activity, and settings panels.</p>
+        </main>
+
+        <aside class="panel-sheet panel-sheet-status glass-panel" id="status-panel" hidden>
+            <div class="panel-header">
+                <div>
+                    <p class="panel-kicker mb-1">System Status</p>
+                    <h2 class="panel-title mb-0">Assistant state</h2>
+                </div>
+                <button class="panel-close" type="button" data-close-panel aria-label="Close status panel">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <div class="status-pill status-pill-panel" id="status-pill" data-state="ready">
+                    <span class="status-dot"></span>
+                    <span id="status-label">Preparing desktop bridge...</span>
+                </div>
+
+                <div class="status-card-grid">
+                    <article class="status-card glass-subpanel">
+                        <span class="status-card-label">Mode</span>
+                        <strong id="status-mode">Desktop Interface</strong>
+                    </article>
+                    <article class="status-card glass-subpanel">
+                        <span class="status-card-label">Session</span>
+                        <strong>Live Native Bridge</strong>
+                    </article>
+                </div>
+            </div>
+        </aside>
+
+        <aside class="panel-sheet panel-sheet-command glass-panel" id="command-panel" hidden>
+            <div class="panel-header">
+                <div>
+                    <p class="panel-kicker mb-1">Command Console</p>
+                    <h2 class="panel-title mb-0">Send a message to Maki</h2>
+                </div>
+                <button class="panel-close" type="button" data-close-panel aria-label="Close command panel">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <p class="panel-copy mb-0">
+                    Voice standby is active. Type here to send manual commands or questions.
+                </p>
+
+                <div class="command-input-group">
+                    <button
+                        class="btn action-btn mic-btn"
+                        id="mic-button"
+                        type="button"
+                        aria-label="Pause voice standby"
+                        title="Pause voice standby"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 15a3 3 0 0 0 3-3V7a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a1 1 0 1 1 2 0 7 7 0 0 1-6 6.93V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.07A7 7 0 0 1 5 12a1 1 0 0 1 2 0 5 5 0 0 0 10 0Z"></path>
+                        </svg>
+                    </button>
+                    <input
+                        type="text"
+                        class="form-control command-input"
+                        id="command-input"
+                        placeholder="Type a command, question, or note for Maki..."
+                        autocomplete="off"
+                    >
+                    <button class="btn action-btn send-btn" id="send-button" type="button">
+                        <span>Send</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3.4 20.4 21 12 3.4 3.6 3 10l12 2-12 2 .4 6.4Z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <aside class="panel-sheet panel-sheet-activity glass-panel" id="activity-panel" hidden>
+            <div class="panel-header">
+                <div>
+                    <p class="panel-kicker mb-1">Recent Activity</p>
+                    <h2 class="panel-title mb-0">Current desktop session</h2>
+                </div>
+                <div class="panel-actions">
+                    <span class="activity-count" id="activity-count">0</span>
+                    <button class="panel-close" type="button" data-close-panel aria-label="Close activity panel">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel-body panel-body-scroll" id="activity-scroll-wrap">
+                <ul class="activity-list" id="activity-list" aria-live="polite"></ul>
+            </div>
+        </aside>
+
+        <aside class="panel-sheet panel-sheet-settings glass-panel" id="settings-panel" hidden>
+            <div class="panel-header">
+                <div>
+                    <p class="panel-kicker mb-1">Preferences & Core Config</p>
+                    <h2 class="panel-title mb-0">Settings</h2>
+                </div>
+                <button class="panel-close" type="button" data-close-panel aria-label="Close settings panel">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="panel-body panel-body-scroll" id="settings-scroll-wrap">
+                <form id="settings-form" class="settings-form" onsubmit="event.preventDefault();">
+                    
+                    <div class="settings-group glass-subpanel">
+                        <h3 class="settings-group-title">
+                            <svg viewBox="0 0 24 24" class="group-icon"><path d="M12 2a5 5 0 1 0 5 5 5 5 0 0 0-5-5Zm0 12c-4.42 0-8 2.69-8 6v2h16v-2c0-3.31-3.58-6-8-6Z"/></svg>
+                            General & Voice Controls
+                        </h3>
+                        <div class="form-item">
+                            <label for="setting-app-name" class="form-label">Assistant Name</label>
+                            <input type="text" id="setting-app-name" class="form-control" placeholder="MakiAI">
+                        </div>
+                        <div class="form-item">
+                            <label for="setting-wake-word" class="form-label">Wake Word</label>
+                            <input type="text" id="setting-wake-word" class="form-control" placeholder="Hey Maki">
+                        </div>
+                        <div class="form-item">
+                            <label for="setting-ptt-hotkey" class="form-label">Push-to-Talk (PTT) Hotkey</label>
+                            <input type="text" id="setting-ptt-hotkey" class="form-control" placeholder="right alt">
+                            <small class="form-hint">Hold to talk with lapel mic (e.g. right alt, ctrl+space, f8)</small>
+                        </div>
+                    </div>
+
+                    <div class="settings-group glass-subpanel">
+                        <h3 class="settings-group-title">
+                            <svg viewBox="0 0 24 24" class="group-icon"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm-7 3a2 2 0 1 1-2 2 2 2 0 0 1 2-2Zm-4 9v-1c0-1.33 2.67-2 4-2s4 .67 4 2v1H8Z"/></svg>
+                            AI Intelligence Models
+                        </h3>
+                        <div class="form-item">
+                            <label for="setting-gemini-key" class="form-label">Google Gemini API Key</label>
+                            <div class="password-input-wrap">
+                                <input type="password" id="setting-gemini-key" class="form-control" placeholder="AIzaSy...">
+                                <button type="button" class="btn-toggle-vis" data-target="setting-gemini-key" title="Toggle visibility">&#128065;</button>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label for="setting-groq-key" class="form-label">Groq API Key (Fast Fallback)</label>
+                            <div class="password-input-wrap">
+                                <input type="password" id="setting-groq-key" class="form-control" placeholder="gsk_...">
+                                <button type="button" class="btn-toggle-vis" data-target="setting-groq-key" title="Toggle visibility">&#128065;</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group glass-subpanel">
+                        <h3 class="settings-group-title">
+                            <svg viewBox="0 0 24 24" class="group-icon"><path d="M3 9v6h4l5 5V4L7 9H3Zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02ZM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77Z"/></svg>
+                            ElevenLabs Voice Synthesis
+                        </h3>
+                        <div class="form-item">
+                            <label for="setting-eleven-key" class="form-label">ElevenLabs API Key</label>
+                            <div class="password-input-wrap">
+                                <input type="password" id="setting-eleven-key" class="form-control" placeholder="sk_...">
+                                <button type="button" class="btn-toggle-vis" data-target="setting-eleven-key" title="Toggle visibility">&#128065;</button>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label for="setting-eleven-voice" class="form-label">Voice ID</label>
+                            <input type="text" id="setting-eleven-voice" class="form-control" placeholder="CwhRBWXzGAHq8TQ4Fs17">
+                        </div>
+                        <div class="form-check form-switch mt-2">
+                            <input class="form-check-input" type="checkbox" id="setting-tts-fallback" checked>
+                            <label class="form-check-label" for="setting-tts-fallback">Enable Local TTS Fallback</label>
+                        </div>
+                    </div>
+
+                    <div class="settings-group glass-subpanel">
+                        <h3 class="settings-group-title">
+                            <svg viewBox="0 0 24 24" class="group-icon"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6Zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2Zm0 14H8V4h12v12Z"/></svg>
+                            Knowledge Base
+                        </h3>
+                        <div class="form-item">
+                            <label for="setting-kb-path" class="form-label">Knowledge Base Folder</label>
+                            <input type="text" id="setting-kb-path" class="form-control" placeholder="C:\Knowledge-Base">
+                        </div>
+                    </div>
+
+                    <div class="settings-footer">
+                        <div id="settings-status-msg" class="settings-status-msg" hidden></div>
+                        <button type="button" class="btn action-btn send-btn w-100" id="save-settings-btn">
+                            <span>Save Configuration</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 1.1rem; height: 1.1rem;">
+                                <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17Z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <script src="./js/orb.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+</html>

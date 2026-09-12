@@ -19,7 +19,8 @@ CRITICAL: Never invent, guess, or construct URLs, social media links, or usernam
 You have full access to:
 - C:\\Knowledge Base\\ — sir's schedule, deadlines, projects, preferences
 - C:\\MakiSync Storage\\ — organized file storage (School, Work, Personal, Freelance, MakiAI with Screenshots/Photos/Recordings in date folders)
-You CAN create, edit, append to, search, open, and manage files in these locations."""
+- Windows System Control — audio volume, mute, brightness, application launching, media controls, multi-monitor window tiling/relocation, screen vision, and physical webcam vision.
+You CAN create, edit, append to, search, open, and manage files and control these system features."""
 
 
 class Orchestrator:

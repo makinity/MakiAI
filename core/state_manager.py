@@ -30,6 +30,10 @@ class StateManager:
         """Return the current app state."""
         return self._state
 
+    def get_state(self) -> AppState:
+        """Return the current app state."""
+        return self._state
+
     def set_state(self, new_state: AppState) -> None:
         """
         Transition to a new state and notify all listeners.

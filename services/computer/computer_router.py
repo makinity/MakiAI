@@ -14,6 +14,7 @@ from services.computer.system_control import SystemControl
 from services.computer.system_health import SystemHealthMonitor
 from services.computer.window_manager import WindowManager
 from services.computer.screen_vision import ScreenVisionService
+from services.computer.camera_tool import CameraTool
 from services.browser.chrome_profile_launcher import ChromeProfileLauncher
 from services.media.media_control import MediaControl
 from services.camera.camera_service import CameraService
@@ -43,6 +44,7 @@ class ComputerRouter:
         self.screenshot = ScreenshotService()
         self.window_mgr = WindowManager()
         self.screen_vision = ScreenVisionService()
+        self.camera_tool = CameraTool()
         self.health = SystemHealthMonitor()
         self.chrome_profiles = ChromeProfileLauncher()
         self.ai_service = None
@@ -70,6 +72,7 @@ class ComputerRouter:
         result = (
             self._handle_browser_profile_site(lowered, text)
             or self._handle_system_health(lowered)
+            or self._handle_physical_camera_vision(lowered, text)
             or self._handle_screen_vision(lowered, text)
             or self._handle_window_move(lowered, text)
             or self._handle_auto_tile(lowered, text)
@@ -132,6 +135,34 @@ class ComputerRouter:
             return self.health.get_vitals_summary()
 
         return None
+
+    # ─── Physical Webcam Vision & Object/Activity Awareness ──────────────────
+
+    def _handle_physical_camera_vision(self, lowered: str, original: str) -> str | None:
+        """
+        Handle physical optical vision requests via webcam.
+        Examples:
+          - "what am i doing" / "tell me what i'm doing"
+          - "what am i holding" / "what is in my hand" / "what object is in my hand"
+          - "look at me and tell me..." / "look at me" / "check the camera"
+          - "is there anyone behind me" / "check the background for people" / "who is behind me"
+          - "what am i wearing" / "what is this in my hand"
+        """
+        is_camera_vision = bool(
+            re.search(r"\b(what\s+am\s+i\s+(?:doing|holding|wearing|carrying|holding\s+up))\b", lowered)
+            or re.search(r"\b(what(?:'s|\s+is)\s+(?:this|that|the\s+object)\s+in\s+my\s+hand)\b", lowered)
+            or re.search(r"\b(what\s+object\s+is\s+in\s+my\s+hand|what\s+is\s+in\s+my\s+hands?)\b", lowered)
+            or re.search(r"\b(look\s+at\s+me|take\s+a\s+look\s+at\s+me|see\s+me|can\s+you\s+see\s+me)\b", lowered)
+            or re.search(r"\b(look\s+through\s+(?:the\s+)?(?:camera|webcam)|check\s+(?:the\s+)?webcam)\b", lowered)
+            or re.search(r"\b(is\s+(?:there\s+)?anyone\s+behind\s+me|who\s+is\s+behind\s+me|someone\s+behind\s+me)\b", lowered)
+            or re.search(r"\b(check\s+the\s+background(?:\s+for\s+people)?|is\s+anyone\s+in\s+the\s+background|who\s+is\s+in\s+the\s+background)\b", lowered)
+            or re.search(r"\b(describe\s+what\s+i\s+am\s+doing|tell\s+me\s+what\s+i\s+am\s+doing)\b", lowered)
+            or re.search(r"\b(what\s+do\s+you\s+see\s+in\s+front\s+of\s+the\s+camera)\b", lowered)
+        )
+        if not is_camera_vision:
+            return None
+
+        return self.camera_tool.analyze(original, self.ai_service)
 
     # ─── Contextual Screen Awareness & Vision ────────────────────────────────
 
@@ -336,24 +367,47 @@ class ComputerRouter:
         """Handle volume control commands."""
         if not self.system:
             return None
-        if re.search(r"\bvolume\s+up\b|\blouder\b|\bincrease\s+volume\b", lowered):
-            # Check for custom step: "volume up 20"
-            step_match = re.search(r"volume\s+up\s+(\d+)", lowered)
+
+        # 1. Max / Full Volume
+        if (
+            re.search(r"\b(?:set|turn|put|make|crank|raise|push)?\s*(?:up\s+)?(?:the\s+)?volume\s+(?:to\s+|at\s+)?(?:max|maximum|full|100%?|highest|top|the\s+max|the\s+maximum)\b", lowered)
+            or re.search(r"\b(?:full|max|maximum|highest|top)\s+volume\b", lowered)
+            or re.search(r"\b(?:100\s*(?:percent|%)|all\s+the\s+way\s+up)\s*(?:volume)?\b", lowered)
+            or re.search(r"\b(?:crank\s+up\s+the\s+volume|crank\s+it\s+up)\b", lowered)
+        ):
+            return self.system.set_volume(100)
+
+        # 2. Min / Zero / 0%
+        if (
+            re.search(r"\b(?:set|turn|put|make|lower)?\s*(?:down\s+)?(?:the\s+)?volume\s+(?:to\s+|at\s+)?(?:min|minimum|zero|0%?|lowest|the\s+min|the\s+minimum)\b", lowered)
+            or re.search(r"\b(?:min|minimum|zero|lowest|no)\s+volume\b", lowered)
+            or re.search(r"\b(?:0\s*(?:percent|%)|all\s+the\s+way\s+down)\s*(?:volume)?\b", lowered)
+        ):
+            return self.system.set_volume(0)
+
+        if re.search(r"\b(mute|unmute|toggle\s+mute|silence)\b", lowered):
+            return self.system.mute()
+
+        # 3. Numeric specific: "set volume to 50", "volume 70%", "turn volume to 80", "put volume at 30"
+        vol_match = re.search(r"(?:set|turn|put|make)?\s*(?:the\s+)?volume\s+(?:to|at)?\s*(\d+)(?:%|\s*percent)?", lowered)
+        if vol_match:
+            try:
+                val = int(vol_match.group(1))
+                return self.system.set_volume(val)
+            except (ValueError, TypeError):
+                pass
+
+        # 4. Volume Up / Louder
+        if re.search(r"\b(volume\s+up|louder|increase\s+volume|raise\s+(?:the\s+)?volume|boost\s+(?:the\s+)?volume|up\s+the\s+volume|turn\s+(?:the\s+)?volume\s+up|turn\s+up\s+(?:the\s+)?volume|pump\s+up\s+(?:the\s+)?volume|make\s+it\s+louder)\b", lowered):
+            step_match = re.search(r"(?:volume\s+up|increase\s+volume\s+by|up\s+the\s+volume\s+by|raise\s+volume\s+by)\s+(\d+)", lowered)
             step = int(step_match.group(1)) if step_match else 10
             return self.system.volume_up(step)
 
-        if re.search(r"\bvolume\s+down\b|\bquieter\b|\bdecrease\s+volume\b|\blower\s+volume\b", lowered):
-            step_match = re.search(r"volume\s+down\s+(\d+)", lowered)
+        # 5. Volume Down / Quieter
+        if re.search(r"\b(volume\s+down|quieter|softer|decrease\s+volume|lower\s+(?:the\s+)?volume|down\s+the\s+volume|turn\s+(?:the\s+)?volume\s+down|turn\s+down\s+(?:the\s+)?volume|make\s+it\s+quieter|make\s+it\s+softer)\b", lowered):
+            step_match = re.search(r"(?:volume\s+down|decrease\s+volume\s+by|lower\s+the\s+volume\s+by)\s+(\d+)", lowered)
             step = int(step_match.group(1)) if step_match else 10
             return self.system.volume_down(step)
-
-        if re.search(r"\bmute\b|\bunmute\b|\btoggle\s+mute\b", lowered):
-            return self.system.mute()
-
-        # "set volume to 50" / "volume 70"
-        vol_match = re.search(r"(?:set\s+)?volume\s+(?:to\s+)?(\d+)", lowered)
-        if vol_match:
-            return self.system.set_volume(int(vol_match.group(1)))
 
         return None
 
