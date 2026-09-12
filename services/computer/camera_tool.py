@@ -49,27 +49,37 @@ def capture_webcam_frame(
 
     cap = None
     try:
-        # Try DirectShow first on Windows for instant initialization without startup hang
-        try:
-            cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
-            if not cap.isOpened():
-                cap.release()
-                cap = cv2.VideoCapture(camera_index)
-        except Exception:
-            cap = cv2.VideoCapture(camera_index)
+        # Try device index 0, then 1 if 0 is unavailable or invalid
+        for dev_idx in [camera_index, 1, 2]:
+            try:
+                print(f"[CameraTool] Attempting webcam connection on device index {dev_idx}...")
+                cap = cv2.VideoCapture(dev_idx, cv2.CAP_DSHOW)
+                if not cap.isOpened():
+                    cap.release()
+                    cap = cv2.VideoCapture(dev_idx)
+                if cap and cap.isOpened():
+                    print(f"[CameraTool] Webcam connected successfully on device index {dev_idx}.")
+                    break
+            except Exception as e:
+                print(f"[CameraTool] Index {dev_idx} failed: {e}")
+                if cap:
+                    cap.release()
+                cap = None
 
         if not cap or not cap.isOpened():
             return None, None, "I could not access your webcam, sir. Please check if another application is using it or if it is connected."
 
-        # Sensor warmup & buffer flush (~0.3s) to allow auto-exposure / white-balance to calibrate
-        warmup_frames = max(3, int(warmup_seconds / 0.06))
+        # Sensor warmup & buffer flush (~0.35s) to allow auto-exposure / white-balance to calibrate
+        warmup_frames = max(4, int(warmup_seconds / 0.05))
         for _ in range(warmup_frames):
             cap.read()
-            time.sleep(0.05)
+            time.sleep(0.04)
 
         ret, frame = cap.read()
         if not ret or frame is None:
             return None, None, "Failed to capture image frame from the webcam."
+
+        print(f"[CameraTool] Frame captured successfully ({frame.shape[1]}x{frame.shape[0]}).")
 
         # Convert BGR (OpenCV) to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -101,6 +111,7 @@ def capture_webcam_frame(
         if cap is not None:
             try:
                 cap.release()
+                print("[CameraTool] Webcam hardware handle released.")
             except Exception:
                 pass
         if OPENCV_AVAILABLE:

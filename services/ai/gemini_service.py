@@ -122,6 +122,8 @@ class GeminiService:
 
     def _init_gemini(self, api_key: str) -> bool:
         try:
+            import logging
+            logging.getLogger("google.genai").setLevel(logging.ERROR)
             from google import genai
             self._gemini_client = genai.Client(api_key=api_key)
             self._provider = "gemini"
@@ -309,8 +311,9 @@ You CAN search, open, and manage files in these locations."""
                     model="gemini-3.6-flash",
                     contents=[prompt, pil_img],
                 )
-                answer = response.text.strip() if response.text else "I analyzed your screen, sir, but couldn't generate a clear description."
-                self._add_to_history("user", f"[Screen Vision]: {user_text}")
+                answer = response.text.strip() if response.text else "I analyzed the camera frame, sir, but couldn't generate a clear description."
+                print(f"[AIService] Vision response: {answer}")
+                self._add_to_history("user", f"[Vision]: {user_text}")
                 self._add_to_history("model", answer)
                 return answer
             except Exception as e:
