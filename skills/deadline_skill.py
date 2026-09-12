@@ -27,7 +27,7 @@ class DeadlineSkill(BaseSkill):
         """
         lowered = text.lower()
 
-        if any(kw in lowered for kw in ["add", "new", "create"]):
+        if any(kw in lowered for kw in ["add", "new", "create", "have a deadline", "set deadline", "urgent deadline"]):
             return self._add(text)
         elif any(kw in lowered for kw in ["done", "complete", "finish", "completed"]):
             return self._complete(text)
@@ -57,6 +57,8 @@ Return the full updated deadlines.md content only — no explanation.
         updated = self._ask_gemini(prompt)
         self.kb_writer.write("workflows/deadlines.md", updated)
         self.kb_writer.update_last_updated("workflows/deadlines.md")
+        if self.context_builder:
+            self.context_builder.invalidate_cache()
 
         # Confirm with a short spoken response
         confirm_prompt = f'The user said "{text}". Confirm in one short sentence that the deadline was added.'

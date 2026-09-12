@@ -65,8 +65,8 @@ class Orchestrator:
             services: A dict of service instances keyed by name.
                 Expected keys: gemini, tts, skill_router, kb_reader, kb_writer, context_builder
         """
-        self.gemini_service = services.get("gemini")
-        self.tts_service = services.get("tts")
+        self.gemini_service = services.get("gemini") or services.get("gemini_service")
+        self.tts_service = services.get("tts") or services.get("tts_service")
         self.skill_router = services.get("skill_router")
         self.kb_reader = services.get("kb_reader")
         self.kb_writer = services.get("kb_writer")
@@ -234,4 +234,8 @@ class Orchestrator:
             self.tts_service.speak(text)
         else:
             # Phase 1 stub — TTS not yet connected
-            print(f"[Orchestrator] (TTS stub) Maki says: {text}")
+            try:
+                print(f"[Orchestrator] (TTS stub) Maki says: {text}")
+            except Exception:
+                safe_text = text.encode("ascii", errors="replace").decode("ascii")
+                print(f"[Orchestrator] (TTS stub) Maki says: {safe_text}")

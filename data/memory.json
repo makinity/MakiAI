@@ -1,3 +1,25 @@
 {
-  "memories": []
+  "memories": [
+    {
+      "id": "66529c74-cbd5-430c-a056-479a8f9e509c",
+      "key": "Zoom meeting",
+      "value": "Zoom meeting today at 8:00 PM",
+      "created_at": "2026-09-12T13:58:36.668681",
+      "updated_at": "2026-09-12T13:58:36.669688"
+    },
+    {
+      "id": "5f71d70d-43e9-4520-abe9-faac37305f2d",
+      "key": "AI Ad Video deadline",
+      "value": "Tomorrow at 1:00\u202fPM we have an urgent deadline for the AI Ad Video",
+      "created_at": "2026-09-12T14:11:19.117457",
+      "updated_at": "2026-09-12T14:11:19.117457"
+    },
+    {
+      "id": "b9bf38da-9e03-4dc0-88ef-c31060a54894",
+      "key": "Canva Poster deadline",
+      "value": "Tomorrow at 3:00 PM urgent deadline for the Canva Poster",
+      "created_at": "2026-09-12T14:12:14.270268",
+      "updated_at": "2026-09-12T14:12:14.270268"
+    }
+  ]
 }

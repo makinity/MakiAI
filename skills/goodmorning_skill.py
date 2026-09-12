@@ -37,7 +37,7 @@ Cover these topics naturally in your speech:
 2. What sir should be doing right now and what is coming up next in his schedule
 3. His full schedule for today, described naturally in a sentence or two
 4. Any carry-over tasks from yesterday if there are any, or confirm everything is clean
-5. Any upcoming deadlines — mention urgent ones warmly, skip if none
+5. Any upcoming deadlines or saved meetings/notes for today (from Saved Long-Term Memories) — mention them warmly, skip if none
 6. A brief encouraging closing thought about his day
 
 End by asking: "Is there anything you would like to add to your day, sir?"

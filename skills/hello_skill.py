@@ -35,7 +35,7 @@ Generate a natural, helpful spoken response for sir:
 - Clearly state the exact current time ({time_str} PHT)
 - Check workflows/time-management.md and workflows/daily.md to state what block or activity sir should be doing right now on this day ({day}) at {time_str}
 - Mention what is coming up next on his schedule
-- Mention any urgent deadlines if present
+- Mention any urgent deadlines or saved notes/meetings for today (from Saved Long-Term Memories/Notes, such as meetings or appointments) if present
 
 Keep it concise (3-4 sentences max), warm, and spoken aloud by a personal assistant.
 Do not use bullet points or robotic lists. Do not say 'Certainly' or 'I don't have live-clock access'. You have direct access to the live clock.

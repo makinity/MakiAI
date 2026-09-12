@@ -100,6 +100,13 @@ class ContextBuilder:
         total_chars = len(MAKI_PERSONALITY)
         MAX_TOTAL = 9000  # ~2,250 tokens
 
+        # Inject Saved Long-Term Memories & Notes
+        memories_summary = self._get_saved_memories()
+        if memories_summary:
+            parts.append(memories_summary)
+            parts.append("")
+            total_chars += len(memories_summary)
+
         for source in CORE_DIRS:
             if total_chars >= MAX_TOTAL:
                 break
@@ -120,6 +127,27 @@ class ContextBuilder:
 
         self._general_context_cache = "\n".join(parts).strip()
         return self._general_context_cache
+
+    def _get_saved_memories(self) -> str:
+        """
+        Load active memories from data/memory.json and format for LLM context injection.
+        """
+        try:
+            from services.memory.memory_service import MemoryService
+            mem_service = MemoryService()
+            memories = mem_service.get_all()
+            if not memories:
+                return ""
+            lines = ["### Saved Long-Term Memories & Active Notes:"]
+            for m in memories:
+                k = m.get("key", "").strip()
+                v = m.get("value", "").strip()
+                if k or v:
+                    lines.append(f"- {k}: {v}" if k else f"- {v}")
+            return "\n".join(lines)
+        except Exception as e:
+            print(f"[ContextBuilder] Error loading memories: {e}")
+            return ""
 
     def build_topic_context(self, topic: str = "") -> str:
         """
@@ -153,6 +181,13 @@ class ContextBuilder:
             "preferences/preferences.md",
             "workflows/deadlines.md",
         ]
+
+        # Inject Long-Term Memories & Notes
+        memories_summary = self._get_saved_memories()
+        if memories_summary:
+            parts.append(memories_summary)
+            parts.append("")
+            total_chars += len(memories_summary)
 
         for file_path in CORE_FILES:
             if total_chars >= MAX_TOTAL:
@@ -329,6 +364,12 @@ class ContextBuilder:
                 parts.append(f"## {norm_path}")
                 parts.append(content if norm_path in FULL_FILES else content[:1500])
                 parts.append("")
+
+        # 3. SAVED LONG-TERM MEMORIES & ACTIVE NOTES
+        memories_summary = self._get_saved_memories()
+        if memories_summary:
+            parts.append(memories_summary)
+            parts.append("")
 
         full = "\n".join(parts).strip()
         if len(full) > MAX_CONTEXT_CHARS:

@@ -160,5 +160,7 @@ If nothing matches, return "none".
                 json.dumps({"memories": memories}, indent=2, default=str),
                 encoding="utf-8",
             )
+            if self.context_builder:
+                self.context_builder.invalidate_cache()
         except Exception as e:
             print(f"[MemorySkill] Save error: {e}")
