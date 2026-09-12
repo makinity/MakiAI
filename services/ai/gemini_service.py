@@ -252,27 +252,105 @@ You CAN search, open, and manage files in these locations."""
                 return "The AI model isn't available. Please check your API key settings."
             return "I had trouble thinking. Please try again."
 
-    def send_with_image(self, user_text: str, image_path: str, system_context: str = "") -> str:
-        """Send a message with an image for visual analysis (Gemini Vision)."""
+    def send_with_image(self, user_text: str, image_input, system_context: str = "") -> str:
+        """
+        Send a message with an image for visual analysis (Gemini Vision or Groq Vision).
+
+        Args:
+            user_text: The user's query or prompt about the image/screen.
+            image_input: Filepath (str/Path), PIL.Image.Image instance, or raw bytes.
+            system_context: Optional system prompt context.
+        """
         if not self._initialized:
             return self._stub_response(user_text)
 
-        # Only Gemini supports vision currently
+        import io
+        import base64
+        from PIL import Image
+
+        # Convert input to PIL Image
+        pil_img = None
+        if isinstance(image_input, Image.Image):
+            pil_img = image_input
+        elif isinstance(image_input, (bytes, bytearray)):
+            pil_img = Image.open(io.BytesIO(image_input))
+        elif isinstance(image_input, (str, Path)):
+            pil_img = Image.open(str(image_input))
+
+        if not pil_img:
+            return "I couldn't process the screen capture image, sir."
+
+        # Ensure RGB format
+        if pil_img.mode in ("RGBA", "P"):
+            pil_img = pil_img.convert("RGB")
+
+        # System prompt
+        prompt = (
+            f"{system_context}\n\nUser Question about Screen: {user_text}"
+            if system_context else
+            f"You are MakiAI, personal AI assistant for Mark Vencent Juntilla. Address the user as 'sir'.\n"
+            f"Analyze the attached computer screen capture and answer the user's question directly:\n"
+            f"User Question: {user_text}\n"
+            f"Be concise, clear, and direct. If analyzing code or an error, state the cause and fix clearly. Avoid excessive markdown."
+        )
+
+        # 1. Try Gemini Vision first (if available)
         if self._gemini_client:
             try:
-                import PIL.Image
-                image = PIL.Image.open(image_path)
-                prompt = f"{system_context}\n\nUser: {user_text}" if system_context else user_text
+                # Resize if excessively large to maintain sub-second latency
+                max_dim = 1600
+                if max(pil_img.width, pil_img.height) > max_dim:
+                    ratio = max_dim / max(pil_img.width, pil_img.height)
+                    pil_img = pil_img.resize((int(pil_img.width * ratio), int(pil_img.height * ratio)), Image.LANCZOS)
+
                 response = self._gemini_client.models.generate_content(
                     model="gemini-3.6-flash",
-                    contents=[prompt, image],
+                    contents=[prompt, pil_img],
                 )
-                return response.text.strip()
+                answer = response.text.strip() if response.text else "I analyzed your screen, sir, but couldn't generate a clear description."
+                self._add_to_history("user", f"[Screen Vision]: {user_text}")
+                self._add_to_history("model", answer)
+                return answer
             except Exception as e:
-                print(f"[AIService] Vision error: {e}")
-                return "I couldn't analyze that image. Please try again."
+                print(f"[AIService] Gemini Vision error: {e}")
+                # Fall through to try Groq vision if available
 
-        return "Image analysis requires Gemini. Please add a Gemini API key in settings."
+        # 2. Try Groq Vision fallback
+        if self._groq_client:
+            try:
+                buf = io.BytesIO()
+                pil_img.save(buf, format="JPEG", quality=85)
+                b64_data = base64.b64encode(buf.getvalue()).decode("utf-8")
+                data_url = f"data:image/jpeg;base64,{b64_data}"
+
+                vision_models = ["llama-3.2-11b-vision-preview", "llama-3.2-90b-vision-preview"]
+                for model in vision_models:
+                    try:
+                        response = self._groq_client.chat.completions.create(
+                            model=model,
+                            messages=[
+                                {
+                                    "role": "user",
+                                    "content": [
+                                        {"type": "text", "text": prompt},
+                                        {"type": "image_url", "image_url": {"url": data_url}},
+                                    ],
+                                }
+                            ],
+                            max_tokens=600,
+                            temperature=0.4,
+                        )
+                        answer = response.choices[0].message.content.strip()
+                        self._add_to_history("user", f"[Screen Vision]: {user_text}")
+                        self._add_to_history("model", answer)
+                        return answer
+                    except Exception as err:
+                        print(f"[AIService] Groq model {model} vision error: {err}")
+                        continue
+            except Exception as e:
+                print(f"[AIService] Groq Vision error: {e}")
+
+        return "I'm unable to analyze your screen right now. Please ensure your Gemini or Groq API key has vision capability enabled in settings."
 
     # ─── History ─────────────────────────────────────────────────────────────
 

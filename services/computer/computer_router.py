@@ -11,6 +11,10 @@ import re
 from services.computer.app_launcher import AppLauncher
 from services.computer.file_manager import FileManager
 from services.computer.system_control import SystemControl
+from services.computer.system_health import SystemHealthMonitor
+from services.computer.window_manager import WindowManager
+from services.computer.screen_vision import ScreenVisionService
+from services.browser.chrome_profile_launcher import ChromeProfileLauncher
 from services.media.media_control import MediaControl
 from services.camera.camera_service import CameraService
 from services.camera.screenshot_service import ScreenshotService
@@ -37,6 +41,10 @@ class ComputerRouter:
         self.media = MediaControl()
         self.camera = CameraService()
         self.screenshot = ScreenshotService()
+        self.window_mgr = WindowManager()
+        self.screen_vision = ScreenVisionService()
+        self.health = SystemHealthMonitor()
+        self.chrome_profiles = ChromeProfileLauncher()
         self.ai_service = None
 
         # SystemControl uses pycaw — may fail on some setups
@@ -47,7 +55,7 @@ class ComputerRouter:
             self.system = None
 
     def set_ai_service(self, ai_service) -> None:
-        """Inject AI service for smart generative file writing."""
+        """Inject AI service for smart generative file writing and vision."""
         self.ai_service = ai_service
 
     def handle(self, text: str) -> str | None:
@@ -60,7 +68,12 @@ class ComputerRouter:
 
         # Try each category in order
         result = (
-            self._handle_write_to_file(lowered, text)
+            self._handle_browser_profile_site(lowered, text)
+            or self._handle_system_health(lowered)
+            or self._handle_screen_vision(lowered, text)
+            or self._handle_window_move(lowered, text)
+            or self._handle_auto_tile(lowered, text)
+            or self._handle_write_to_file(lowered, text)
             or self._handle_open(lowered, text)
             or self._handle_volume(lowered)
             or self._handle_system(lowered)
@@ -73,15 +86,194 @@ class ComputerRouter:
 
         return result
 
+    # ─── Chrome Multi-Profile Site Launcher ──────────────────────────────────
+
+    def _handle_browser_profile_site(self, lowered: str, original: str) -> str | None:
+        """
+        Match specific web platforms to their dedicated Chrome profiles.
+        Examples:
+          - "open facebook" / "launch fb" / "open my facebook"
+          - "open github" / "go to canva" / "open gemini"
+          - "launch google flow" / "check linkedin" / "open tiktok" / "open youtube"
+        """
+        if hasattr(self, "chrome_profiles") and self.chrome_profiles:
+            return self.chrome_profiles.match_and_launch(lowered)
+        return None
+
+    # ─── System Health & Hardware Monitoring ─────────────────────────────────
+
+    def _handle_system_health(self, lowered: str) -> str | None:
+        """
+        Handle hardware introspection and vitals queries.
+        Examples:
+          - "what are my system vitals"
+          - "how is my battery"
+          - "what is my cpu and ram usage"
+          - "check system health"
+        """
+        if not hasattr(self, "health") or not self.health:
+            return None
+
+        # Battery specific
+        if re.search(r"\b(battery\s+(?:status|percentage|level|health)|how\s+is\s+(?:my\s+)?battery|is\s+my\s+laptop\s+charging|battery\s+life)\b", lowered):
+            bat = self.health.get_battery()
+            if not bat.get("available"):
+                return "Your system is operating on direct AC power with no battery sensor detected, sir."
+            plug_txt = "plugged in" if bat["plugged"] else "unplugged and running on battery"
+            return f"Sir, your battery is at {bat['percent']}% and currently {plug_txt} ({bat['time_str']})."
+
+        # CPU / RAM specific
+        if re.search(r"\b(cpu\s+usage|ram\s+usage|memory\s+usage|cpu\s+and\s+ram|processor\s+load)\b", lowered):
+            perf = self.health.get_cpu_ram()
+            return f"CPU utilization is at {perf['cpu_percent']}%, and RAM usage is at {perf['ram_percent']}% ({perf['ram_used_gb']} GB used out of {perf['ram_total_gb']} GB), sir."
+
+        # Overall vitals / health
+        if re.search(r"\b(system\s+vitals?|system\s+health|hardware\s+status|diagnostics|pc\s+health|system\s+status)\b", lowered):
+            return self.health.get_vitals_summary()
+
+        return None
+
+    # ─── Contextual Screen Awareness & Vision ────────────────────────────────
+
+    def _handle_screen_vision(self, lowered: str, original: str) -> str | None:
+        """
+        Handle live contextual screen awareness and visual OCR/debugging requests.
+        Examples:
+          - "look at my screen and summarize this"
+          - "what is causing this error / crash"
+          - "debug this terminal error"
+          - "what is on my screen"
+          - "can you read what is on my screen"
+          - "look at this code and explain what is wrong"
+        """
+        is_vision_query = bool(
+            re.search(r"\b(look\s+at\s+my\s+screen|look\s+at\s+the\s+screen|look\s+at\s+this|see\s+my\s+screen)\b", lowered)
+            or re.search(r"\b(what'?s\s+on\s+my\s+screen|what\s+is\s+on\s+my\s+screen|what\s+do\s+you\s+see\s+on\s+my\s+screen)\b", lowered)
+            or re.search(r"\b(debug\s+this\s+(?:error|crash|code|issue|bug)|fix\s+this\s+crash|why\s+is\s+this\s+crashing)\b", lowered)
+            or re.search(r"\b(what\s+is\s+causing\s+this\s+(?:error|crash|issue|bug|problem)|what\s+caused\s+this)\b", lowered)
+            or re.search(r"\b(summarize\s+this\s+(?:document|page|screen|article|code)\s+on\s+my\s+screen)\b", lowered)
+            or re.search(r"\b(read\s+(?:my\s+screen|the\s+screen|this\s+window|this\s+text\s+on\s+screen))\b", lowered)
+        )
+        if not is_vision_query:
+            return None
+
+        return self.screen_vision.analyze(original, self.ai_service)
+
+    # ─── Window Management & Inter-Monitor Relocation ────────────────────────
+
+    def _handle_window_move(self, lowered: str, original: str) -> str | None:
+        """
+        Handle inter-monitor window relocation and visual dragging commands.
+        Examples:
+          - "move Chrome to my second monitor"
+          - "drag this window to monitor 2"
+          - "relocate VS Code to the main screen"
+          - "move notepad to the other monitor"
+          - "put this app on the left display"
+        """
+        # Verbs: move, drag, transfer, relocate, shift, put, switch, send
+        move_verbs = r"\b(move|drag|transfer|relocate|shift|put|switch|send)\b"
+        monitor_terms = r"\b(monitor|screen|display|other\s+monitor|second\s+monitor|main\s+monitor|primary\s+monitor|secondary\s+monitor|left\s+monitor|right\s+monitor|left\s+screen|right\s+screen)\b"
+
+        if not (re.search(move_verbs, lowered) and re.search(monitor_terms, lowered)):
+            # Also catch "move to monitor 2", "move this window over"
+            if not re.search(r"\b(move|drag|transfer)\s+(?:this\s+)?(?:window|app|application)?\s+to\s+(?:monitor|screen|display)\s*([0-9]|one|two)?\b", lowered):
+                return None
+
+        # Extract target monitor
+        target_mon = "other"
+        if re.search(r"\b(second|secondary|monitor\s*2|screen\s*2|display\s*2|monitor\s+two|screen\s+two)\b", lowered):
+            target_mon = "2"
+        elif re.search(r"\b(main|primary|monitor\s*1|screen\s*1|display\s*1|monitor\s+one|screen\s+one)\b", lowered):
+            target_mon = "1"
+        elif re.search(r"\b(left)\b", lowered):
+            target_mon = "left"
+        elif re.search(r"\b(right)\b", lowered):
+            target_mon = "right"
+
+        # Extract app name
+        # Matches "move [app] to [monitor...]" or "drag [app] to [screen...]"
+        app_match = re.search(r"(?:move|drag|transfer|relocate|shift|put|send)\s+(?:the\s+)?(.*?)\s+(?:to|into|onto)\s+(?:my\s+)?(?:the\s+)?(second|secondary|main|primary|other|left|right|monitor|screen|display)", lowered)
+
+        app_query = "active"
+        if app_match:
+            candidate = app_match.group(1).strip()
+            # Clean candidate
+            candidate = re.sub(r"^(this\s+window|this\s+app|the\s+window|the\s+app|window|app)$", "active", candidate).strip()
+            if candidate and candidate not in ("this", "the", "it"):
+                app_query = candidate
+
+        return self.window_mgr.move_window_to_monitor(app_query=app_query, target_monitor=target_mon, visual_drag=True)
+
+    def _handle_auto_tile(self, lowered: str, original: str) -> str | None:
+        """
+        Handle dynamic auto-tiling, multi-monitor workspace fitting, and window grid splitting.
+        Examples:
+          - "tile my windows"
+          - "maximize screens across my 2 monitors"
+          - "fit all 3 windows across my monitors"
+          - "organize my workspace"
+          - "tile windows side by side"
+          - "tile chrome and vscode"
+        """
+        is_tile_cmd = bool(
+            re.search(r"\b(tile|auto-tile|autotile)\b", lowered)
+            or (re.search(r"\b(organize|snap|arrange|fit|grid|maximize)\b", lowered) and re.search(r"\b(windows?|workspace|screens?|displays?|monitors?|apps?)\b", lowered))
+            or re.search(r"\b(across\s+(?:my\s+)?(?:2\s+|both\s+)?monitors?|across\s+(?:my\s+)?screens?)\b", lowered)
+        )
+        if not is_tile_cmd:
+            return None
+
+        # Determine target monitor
+        target_mon = "auto"
+        if re.search(r"\b(second|secondary|monitor\s*2|screen\s*2|display\s*2|monitor\s+two|screen\s+two)\b", lowered) and not re.search(r"\b(across|both|2\s+monitors|all)\b", lowered):
+            target_mon = "2"
+        elif re.search(r"\b(main|primary|monitor\s*1|screen\s*1|display\s*1|monitor\s+one|screen\s+one)\b", lowered) and not re.search(r"\b(across|both|2\s+monitors|all)\b", lowered):
+            target_mon = "1"
+        elif re.search(r"\b(left)\b", lowered) and not re.search(r"\b(across|both|2\s+monitors|all)\b", lowered):
+            target_mon = "left"
+        elif re.search(r"\b(right)\b", lowered) and not re.search(r"\b(across|both|2\s+monitors|all)\b", lowered):
+            target_mon = "right"
+
+        # Determine layout preference
+        layout = "auto"
+        if re.search(r"\b(split|side\s+by\s+side|50/50|50\s+50|2\s+col|two\s+columns?)\b", lowered):
+            layout = "split"
+        elif re.search(r"\b(quadrant|quadrants|2x2|2\s+by\s+2|four\s+quadrants?|grid)\b", lowered):
+            layout = "quadrant"
+        elif re.search(r"\b(3\s+col|three\s+columns?|columns)\b", lowered):
+            layout = "columns"
+
+        # Check for specific priority apps (e.g., "tile chrome and vscode", "tile notepad, chrome, and vs code")
+        priority_apps = None
+        and_match = re.search(r"\btile\s+(?:the\s+)?([a-zA-Z0-9_\-\s]+?)\s+and\s+([a-zA-Z0-9_\-\s]+?)(?:\s+on|\s+in|\s+into|\s+side|$)", lowered)
+        if and_match:
+            app1 = and_match.group(1).replace("my", "").replace("the", "").strip()
+            app2 = and_match.group(2).replace("my", "").replace("the", "").strip()
+            # Verify they are not general layout keywords
+            if app1 not in ("windows", "window", "apps", "workspace") and app2 not in ("windows", "window", "apps", "workspace"):
+                priority_apps = [app1, app2]
+
+        return self.window_mgr.auto_tile(target_monitor=target_mon, layout=layout, priority_apps=priority_apps)
+
     # ─── Open / Launch ────────────────────────────────────────────────────────
 
     def _handle_open(self, lowered: str, original: str) -> str | None:
-        """Handle 'open X' and 'launch X' commands."""
+        """Handle 'open X', 'launch X', explicit paths, and file opening."""
+        # 1. Check for explicit absolute path anywhere in the command
+        path_match = re.search(r'([a-zA-Z]:\\[^\r\n"\'<>]+|[a-zA-Z]:/[^\r\n"\'<>]+)', original)
+        if path_match:
+            raw_path = path_match.group(1).rstrip(".,;")
+            found_direct = self.files.find_file(raw_path)
+            if found_direct:
+                self.files._open_file(found_direct)
+                return f"Opening {found_direct.name} from {found_direct.parent.name} for you, sir."
+
         # Strip filler words at the start
         cleaned = re.sub(r"^(just|please|can you|could you|hey|maki|,)\s+", "", lowered).strip()
         cleaned = re.sub(r"^(just|please|can you|could you)\s+", "", cleaned).strip()
 
-        # Check folder shortcuts first
+        # 2. Check folder shortcuts
         if re.search(r"photos?\s+folders?|pictures?\s+folders?|my\s+photos?|my\s+pictures?", cleaned):
             import subprocess
             subprocess.Popen(f'explorer "{self.camera.save_path}"')
@@ -106,18 +298,36 @@ class ComputerRouter:
             import subprocess, pathlib
             subprocess.Popen(f'explorer "{pathlib.Path.home() / "Desktop"}"')
             return "Opening your Desktop."
+        if re.search(r"knowledge\s+(base|space)\s+folders?|my\s+knowledge\s+base", cleaned):
+            from services.settings.settings_service import SettingsService
+            import subprocess
+            kb_dir = SettingsService().get_kb_path()
+            subprocess.Popen(f'explorer "{kb_dir}"')
+            return "Opening your Knowledge Base folder."
 
+        # 3. Match 'open / launch / view / show + target'
         patterns = [
-            r"^open\s+(.+)$",
-            r"^launch\s+(.+)$",
-            r"^start\s+(.+)$",
-            r"^run\s+(.+)$",
+            r"^(?:open|launch|start|run|view|show)\s+(?:the\s+file\s+(?:called\s+|named\s+)?|the\s+document\s+|the\s+)?(.+)$",
         ]
         for pattern in patterns:
             match = re.match(pattern, cleaned)
             if match:
                 target = match.group(1).strip()
-                return self.launcher.open(target)
+
+                # A. Try finding as a file or document across Knowledge Base & Storage first
+                found_file = self.files.find_file(target)
+                if found_file:
+                    self.files._open_file(found_file)
+                    return f"Opening {found_file.name} from {found_file.parent.name} for you, sir."
+
+                # B. Fall back to application / website launcher
+                launch_result = self.launcher.open(target)
+                if "couldn't find" not in launch_result:
+                    return launch_result
+
+                # C. If launcher couldn't find it, check if any keyword matches a file
+                return launch_result
+
         return None
 
     # ─── Volume ──────────────────────────────────────────────────────────────

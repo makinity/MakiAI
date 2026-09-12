@@ -144,6 +144,16 @@ class MainWindow(QMainWindow):
             sensitivity=0.6,
         )
 
+        # ── Push-to-Talk Service ──────────────────────────────────────────────
+        from services.voice.ptt_service import PushToTalkService
+        ptt_hotkey = self.settings.get("ptt_hotkey", "right alt")
+        self.ptt_service = PushToTalkService(
+            hotkey=ptt_hotkey,
+            on_ptt_start=lambda: self.state_manager.set_state(AppState.LISTENING),
+            on_ptt_end=lambda: self.state_manager.set_state(AppState.THINKING),
+            on_result=self._on_ptt_command_received,
+        )
+
         # ── Wire Orchestrator ─────────────────────────────────────────────────
         self.orchestrator.set_services({
             "gemini":           self.gemini,
@@ -271,6 +281,19 @@ class MainWindow(QMainWindow):
         print(f"[MainWindow] Reminder fired: '{text}'")
         self.main_page.add_message_signal.emit("maki", f"Reminder: {text}")
         self.tts_service.speak(text)
+
+    def _on_ptt_command_received(self, text: str) -> None:
+        """Called when PTT hotkey audio is transcribed."""
+        if not text or not text.strip():
+            self.state_manager.set_state(AppState.IDLE)
+            return
+
+        print(f"[MainWindow] PTT command received: '{text}'")
+        self.main_page.add_message_signal.emit("user", text)
+        self.state_manager.set_state(AppState.THINKING)
+        response = self.orchestrator.handle_command(text)
+        if response:
+            self.main_page.add_message_signal.emit("maki", response)
 
     # ─── Voice Engine ─────────────────────────────────────────────────────────
 

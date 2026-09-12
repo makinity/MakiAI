@@ -68,6 +68,9 @@ class Orchestrator:
         if self.gemini_service and self.computer_router:
             self.computer_router.set_ai_service(self.gemini_service)
 
+        if self.tts_service and self.computer_router and hasattr(self.computer_router, "health"):
+            self.computer_router.health.set_tts_callback(self._speak)
+
     def handle_command(self, text: str) -> str:
         """
         Main entry point for all voice/text commands.

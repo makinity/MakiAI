@@ -193,7 +193,17 @@ class AppLauncher:
             return None
 
     def _open_website(self, name_lower: str) -> str | None:
-        """Try to open a website by mapped name."""
+        """Try to open a website by mapped name with Chrome profile awareness."""
+        # 1. Check Chrome profile launcher first
+        try:
+            from services.browser.chrome_profile_launcher import ChromeProfileLauncher, SITE_PROFILE_MAP
+            for key, config in SITE_PROFILE_MAP.items():
+                if key in name_lower or any(alias in name_lower for alias in config["aliases"]):
+                    return ChromeProfileLauncher().launch_site_in_profile(key)
+        except Exception as e:
+            print(f"[AppLauncher] ChromeProfileLauncher check error: {e}")
+
+        # 2. Check general WEBSITE_MAP
         url = WEBSITE_MAP.get(name_lower)
 
         # Fuzzy match

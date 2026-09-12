@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Callable
 
 import pygame
+from services.voice.audio_ducking import AudioDuckingService
 
 
 class TTSService:
@@ -57,6 +58,7 @@ class TTSService:
         self.on_speaking_end = on_speaking_end or (lambda: None)
         self.on_error = on_error or (lambda msg: print(f"[TTSService] Error: {msg}"))
         self.use_fallback = use_fallback
+        self.ducker = AudioDuckingService(duck_ratio=0.30)
 
         self._speaking = False
         self._elevenlabs_disabled = False
@@ -170,6 +172,10 @@ class TTSService:
 
             # ── Play continuous audio ─────────────────────────────────────────
             if success and tmp_path:
+                try:
+                    self.ducker.duck()
+                except Exception:
+                    pass
                 self._play_audio(tmp_path)
             else:
                 print(f"\n[Maki speaks]: {text}\n")
@@ -177,6 +183,10 @@ class TTSService:
         except Exception as e:
             self.on_error(f"TTS error: {e}")
         finally:
+            try:
+                self.ducker.unduck()
+            except Exception:
+                pass
             if tmp_path and Path(tmp_path).exists():
                 try:
                     Path(tmp_path).unlink()

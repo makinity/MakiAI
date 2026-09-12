@@ -10,6 +10,7 @@ Handles commands like:
 """
 
 import os
+import re
 import shutil
 from pathlib import Path
 from datetime import datetime
@@ -238,43 +239,110 @@ class FileManager:
             print("[FileManager] python-docx not installed — creating plain file.")
             filepath.write_bytes(b"")  # Empty file
 
+    def find_file(self, query: str) -> Path | None:
+        """
+        Intelligently find any file by path, exact name, or keywords
+        across Knowledge Base, MakiSync Storage, and system folders.
+        """
+        from services.storage.maki_sync import MAKI_SYNC_ROOT
+        from services.settings.settings_service import SettingsService
+
+        kb_path = Path(SettingsService().get_kb_path())
+        query_clean = query.strip().strip('"\'')
+
+        def _prefer_pdf(path: Path) -> Path:
+            """If a PDF version exists alongside a docx/doc/md file, prefer the PDF."""
+            if path.suffix.lower() in (".docx", ".doc", ".md", ".txt"):
+                pdf_sibling = path.with_suffix(".pdf")
+                if pdf_sibling.exists() and pdf_sibling.is_file():
+                    return pdf_sibling
+            return path
+
+        # 1. Direct path check (e.g. C:\Knowledge-Base\docs\Weekly_Time_Management_Plan_UPDATED)
+        direct_p = Path(query_clean)
+        if direct_p.exists() and direct_p.is_file():
+            return _prefer_pdf(direct_p)
+        if direct_p.parent.exists() and direct_p.parent.is_dir():
+            for ext in [".pdf", ".docx", ".doc", ".txt", ".md", ".xlsx", ".pptx", ".py", ".png", ".jpg"]:
+                cand = direct_p.with_suffix(ext)
+                if cand.exists() and cand.is_file():
+                    return _prefer_pdf(cand)
+
+        # 2. Search primary roots first (Knowledge Base & MakiSync Storage)
+        primary_roots = [r for r in [kb_path, MAKI_SYNC_ROOT] if r and r.exists()]
+        secondary_roots = [Path.home() / "Documents", Path.home() / "Desktop", Path.home() / "Downloads"]
+
+        # Clean query tokens (remove filler words)
+        tokens_raw = re.sub(
+            r"\b(open|show|find|get|the|file|document|where|i|store|my|inside|in|knowledge|base|space|storage|please|can|you)\b",
+            "",
+            query_clean,
+            flags=re.IGNORECASE
+        ).strip()
+        keywords = [t.lower() for t in re.split(r"[\s_\-]+", tokens_raw) if len(t) >= 3]
+
+        IGNORED_DIRS = {"node_modules", ".git", ".next", "__pycache__", "venv", ".venv", "dist", "build", ".idea", ".vscode"}
+
+        # Check primary roots first (Exact filename/stem search)
+        for root in primary_roots:
+            for p in root.rglob("*"):
+                if p.is_file() and not p.name.startswith(".") and not any(part in IGNORED_DIRS for part in p.parts):
+                    if p.name.lower() == query_clean.lower() or p.stem.lower() == query_clean.lower():
+                        return _prefer_pdf(p)
+
+        # Check primary roots for keyword match
+        best_file = None
+        best_score = 0
+        if keywords:
+            for root in primary_roots:
+                for p in root.rglob("*"):
+                    if p.is_file() and not p.name.startswith(".") and not any(part in IGNORED_DIRS for part in p.parts):
+                        score = sum(1 for kw in keywords if kw in p.name.lower() or kw in str(p).lower())
+                        # Give bonus score if file is already a PDF
+                        if p.suffix.lower() == ".pdf":
+                            score += 0.5
+                        if score > best_score:
+                            best_score = score
+                            best_file = p
+
+        if best_score > 0 and best_file:
+            return _prefer_pdf(best_file)
+
+        # Fallback to secondary roots (Desktop, Documents, Downloads)
+        for root in secondary_roots:
+            if root and root.exists():
+                for p in root.glob("*"):
+                    if p.is_file() and not p.name.startswith("."):
+                        if p.name.lower() == query_clean.lower() or p.stem.lower() == query_clean.lower():
+                            return _prefer_pdf(p)
+
+        return None
+
     def find_folder(self, folder_name: str) -> Path | None:
         """
         Search for a folder by name inside MakiSync Storage.
-
-        Args:
-            folder_name: The folder name to look for.
-
-        Returns:
-            Path if found, None otherwise.
         """
         from services.storage.maki_sync import MAKI_SYNC_ROOT
 
-        # Search in MakiSync Storage
         for match in MAKI_SYNC_ROOT.rglob(folder_name):
             if match.is_dir():
                 return match
 
-    def search_file_path(self, filename: str) -> Path | None:
-        """Search for a specific file by name in MakiSync Storage and common locations."""
-        from services.storage.maki_sync import MAKI_SYNC_ROOT
-        try:
-            if MAKI_SYNC_ROOT.exists():
-                for match in MAKI_SYNC_ROOT.rglob(filename):
-                    if match.is_file():
-                        return match
-        except Exception:
-            pass
-
         common = [
-            Path.home() / "Desktop" / filename,
-            Path.home() / "Documents" / filename,
-            Path.home() / "Downloads" / filename,
+            Path.home() / "Desktop" / folder_name,
+            Path.home() / "Documents" / folder_name,
+            Path.home() / "Downloads" / folder_name,
+            MAKI_SYNC_ROOT / folder_name,
         ]
         for p in common:
-            if p.exists() and p.is_file():
+            if p.exists() and p.is_dir():
                 return p
+
         return None
+
+    def search_file_path(self, filename: str) -> Path | None:
+        """Search for a specific file by name in Knowledge Base and MakiSync Storage."""
+        return self.find_file(filename)
 
     def organize(self, folder_path: str = "downloads") -> str:
         """
