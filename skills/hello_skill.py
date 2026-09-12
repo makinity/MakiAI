@@ -15,30 +15,30 @@ class HelloSkill(BaseSkill):
     SKILL_ID = "hello"
     REQUIRED_FILES = [
         "workflows/time-management.md",
+        "workflows/daily.md",
         "workflows/carryover.md",
         "workflows/deadlines.md",
     ]
 
     def execute(self, text: str) -> str:
-        """Generate a quick time-aware check-in response."""
+        """Generate a quick time-aware check-in and schedule response."""
         now = datetime.now()
         time_str = now.strftime("%I:%M %p")
         day = now.strftime("%A")
+        date_str = now.strftime("%B %d, %Y")
 
         prompt = f"""
-It is currently {time_str} on {day}.
+The current live time is {time_str} ({day}, {date_str}) Philippine Standard Time (UTC+8).
+The user said: "{text}"
 
-Generate a quick, natural spoken check-in for sir. Speak like a warm, helpful assistant — not a robot.
-Keep it to 3 to 4 sentences maximum, spoken naturally.
+Generate a natural, helpful spoken response for sir:
+- Clearly state the exact current time ({time_str} PHT)
+- Check workflows/time-management.md and workflows/daily.md to state what block or activity sir should be doing right now on this day ({day}) at {time_str}
+- Mention what is coming up next on his schedule
+- Mention any urgent deadlines if present
 
-Tell sir:
-- What he should be doing right now based on his schedule
-- What is coming up next
-- Any urgent deadlines if there are any (skip if none)
-- Any carry-over tasks if present (skip if clean)
-
-Do not use bullet points, lists, or formatting. Just speak naturally as if talking to him.
-Do not say "Certainly" or "Of course". Just respond directly and warmly.
+Keep it concise (3-4 sentences max), warm, and spoken aloud by a personal assistant.
+Do not use bullet points or robotic lists. Do not say 'Certainly' or 'I don't have live-clock access'. You have direct access to the live clock.
 """.strip()
 
         return self._ask_gemini(prompt)

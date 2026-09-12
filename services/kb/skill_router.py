@@ -60,7 +60,12 @@ class SkillRouter:
             ]),
             ("hello", [
                 r"^(hey\s+maki[,.]?\s*)?(hello|hey|hi)\b",
-                r"\bwhat\s+should\s+i\s+do\s+(now|next)\b",
+                r"\bwhat\s+should\s+(i|we)\s+(do|be\s+doing)\b",
+                r"\bwhat\s+time\s+is\s+it\b",
+                r"\bwhat'?s?\s+(the\s+)?(time|current\s+time)\b",
+                r"\b(current|philippine)\s+time\b",
+                r"\bwhat\s+is\s+(our|my)\s+schedule\b",
+                r"\bwhat'?s?\s+(our|my)\s+schedule\b",
                 r"\bwhat'?s?\s+next\b",
                 r"\bcheck.?in\b",
             ]),

@@ -83,9 +83,17 @@ class ContextBuilder:
         if self._general_context_cache:
             return self._general_context_cache
 
-        parts = [MAKI_PERSONALITY, ""]
-        parts.append("## Mark's Knowledge Base Summary")
-        parts.append("")
+        from datetime import datetime
+        now = datetime.now()
+        time_str = now.strftime("%I:%M %p")
+        date_str = now.strftime("%A, %B %d, %Y")
+
+        parts = [
+            MAKI_PERSONALITY,
+            f"\n## Real-Time System Clock\n- Current Time: {time_str} (Philippine Standard Time, UTC+8)\n- Current Date: {date_str}\n",
+            "## Mark's Knowledge Base Summary",
+            "",
+        ]
 
         CORE_DIRS = ["workflows", "about", "preferences", "config"]
         SKIP_FILES = {"voice.md"}
@@ -120,10 +128,18 @@ class ContextBuilder:
         and current schedules on every query.
         """
         import re
+        from datetime import datetime
 
-        parts = [MAKI_PERSONALITY, ""]
-        parts.append("## Mark's Core Knowledge Base")
-        parts.append("")
+        now = datetime.now()
+        time_str = now.strftime("%I:%M %p")
+        date_str = now.strftime("%A, %B %d, %Y")
+
+        parts = [
+            MAKI_PERSONALITY,
+            f"\n## Real-Time System Clock\n- Current Time: {time_str} (Philippine Standard Time, UTC+8)\n- Current Date: {date_str}\n",
+            "## Mark's Core Knowledge Base",
+            "",
+        ]
 
         loaded_files = set()
         total_chars = len(MAKI_PERSONALITY)
