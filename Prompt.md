@@ -1,401 +1,601 @@
-# MakiAI — Master Prompting & Command Guide 🎙️⚡
+# 🎙️ MakiAI — The Ultimate Master Prompting & Command Encyclopedia
 
-> **Welcome to the MakiAI Mastery Guide.**  
-> This comprehensive manual details every voice and text interaction mode, keyword trigger, conversational prompt, and advanced workflow available in MakiAI.
+> **Personal Autonomous Operating Assistant for Mark Vencent Juntilla**  
+> *Inspired by Jarvis — Connected to Knowledge Base, Hardware Telemetry, Vision, Computer Automation, and Kiro CLI.*
 
 ---
 
 ## 📑 Table of Contents
-1. [Interaction Modes & Hotkeys](#1-interaction-modes--hotkeys)
-2. [Daily Routines, Live Clock & Briefings](#2-daily-routines-live-clock--briefings)
-3. [Long-Term Memory & Active Notes](#3-long-term-memory--active-notes)
-4. [Deadlines & Task Management](#4-deadlines--task-management)
-5. [Timed Reminders & Alarms](#5-timed-reminders--alarms)
-6. [Kiro CLI Coding Engine (`t=kiro`)](#6-kiro-cli-coding-engine-tkiro)
-7. [11-Stage Knowledge Base Project Pipeline](#7-11-stage-knowledge-base-project-pipeline)
-8. [Automated Homework & Research Paper Engine](#8-automated-homework--research-paper-engine)
-9. [Live File Creation & MakiSync Storage](#9-live-file-creation--makisync-storage)
-10. [Physical Webcam Vision (World Observer)](#10-physical-webcam-vision-world-observer)
-11. [Screen Vision & Visual Error Debugging](#11-screen-vision--visual-error-debugging)
-12. [Multi-Monitor Window Auto-Tiling & Management](#12-multi-monitor-window-auto-tiling--management)
-13. [Chrome Multi-Profile Site Launcher](#13-chrome-multi-profile-site-launcher)
-14. [Native Windows Audio, Volume & Media Controls](#14-native-windows-audio-volume--media-controls)
-15. [System Health, Telemetry & Power Controls](#15-system-health-telemetry--power-controls)
-16. [Master Prompting Best Practices & Tips](#16-master-prompting-best-practices--tips)
+
+1. [Architectural Overview & Operating Principles](#1-architectural-overview--operating-principles)
+2. [Input Channels & Interaction Modes](#2-input-channels--interaction-modes)
+3. [Daily Workflow Routines & Live Clock Briefings](#3-daily-workflow-routines--live-clock-briefings)
+4. [Long-Term Memory & Active Notes (`data/memory.json`)](#4-long-term-memory--active-notes-datamemoryjson)
+5. [Deadlines & Task Management (`workflows/deadlines.md`)](#5-deadlines--task-management-workflowsdeadlinesmd)
+6. [Timed Reminders & Audio Alarms (`data/reminders.json`)](#6-timed-reminders--audio-alarms-dataremindersjson)
+7. [⚡ Kiro CLI Autonomous Coding Engine (`t=kiro`)](#7-⚡-kiro-cli-autonomous-coding-engine-tkiro)
+8. [🏗️ 11-Stage Knowledge Base Project Pipeline](#8-🏗️-11-stage-knowledge-base-project-pipeline)
+9. [📝 Automated Homework & Research Paper Engine (`.docx`)](#9-📝-automated-homework--research-paper-engine-docx)
+10. [📂 MakiSync Storage & Intelligent File Operations](#10-📂-makisync-storage--intelligent-file-operations)
+11. [👁️ Physical Optical Webcam Vision (World Observer)](#11-👁️-physical-optical-webcam-vision-world-observer)
+12. [🖥️ Live Screen Vision & Visual Error Debugging](#12-🖥️-live-screen-vision--visual-error-debugging)
+13. [🪟 Multi-Monitor Window Management & Auto-Tiling](#13-🪟-multi-monitor-window-management--auto-tiling)
+14. [🌐 Chrome Multi-Profile Site Launcher](#14-🌐-chrome-multi-profile-site-launcher)
+15. [🔊 Native Windows Audio, Volume & Media Controls](#15-🔊-native-windows-audio-volume--media-controls)
+16. [⚡ System Health Telemetry & Power Controls](#16-⚡-system-health-telemetry--power-controls)
+17. [🎯 High-Efficiency Power-User Workflow Combos](#17-🎯-high-efficiency-power-user-workflow-combos)
+18. [🛠️ Troubleshooting, Audio Ducking & Fallback Lifecycles](#18-🛠️-troubleshooting-audio-ducking--fallback-lifecycles)
 
 ---
 
-## 1. Interaction Modes & Hotkeys
+## 1. Architectural Overview & Operating Principles
 
-MakiAI can be controlled via three simultaneous input channels:
+MakiAI operates as a zero-latency desktop operating intelligence. Every request passes through an intelligent multi-layer cascade:
 
-| Method | How to Use | Ideal For |
+```
+                  ┌──────────────────────────────┐
+                  │ Voice (PTT/Wake) / Chat Input│
+                  └──────────────┬───────────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │ 1. Kiro Coding Engine │ ── (t=kiro, "code with kiro")
+                     └───────────┬───────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │ 2. Project Plan Engine│ ── (11-Stage MunchBite Flow)
+                     └───────────┬───────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │ 3. Homework Follow-up │ ── (Temp-Guide .docx Flow)
+                     └───────────┬───────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │ 4. KB Skills Router   │ ── (Memory, Deadlines, Reminders,
+                     └───────────┬───────────┘     Hello, GoodMorning, GoodNight)
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │ 5. Computer Router    │ ── (Apps, Windows, Profiles, Files,
+                     └───────────┬───────────┘     Vision, Camera, Volume, Power)
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │ 6. LLM General Fallback│── (Groq GPT-OSS / Gemini Flash
+                     └───────────────────────┘     + Dynamic KB & Memory Context)
+```
+
+### Core Operating Rules:
+- **Speech Style**: Warm, professional, polite, addresses you as **"sir"**, speaks in natural conversational sentences (never robotic bullet lists when speaking aloud).
+- **Zero Hallucination Policy**: Never invents URLs, social links, or portfolio paths. Only quotes exact links from your Knowledge Base (`C:\Knowledge-Base\`).
+- **Live State Awareness**: Injects real-time system clock (PHT, UTC+8), active workflow blocks, hardware health, and stored memories into every AI query.
+- **Audio Ducking**: Automatically drops background Windows media volume by 70% whenever Maki speaks or listens, restoring full volume upon completion.
+
+---
+
+## 2. Input Channels & Interaction Modes
+
+| Channel | Trigger / Action | When to Use |
 | :--- | :--- | :--- |
-| **Push-to-Talk (PTT)** | Hold **`Right Alt`** key, speak naturally, release when done. | Fast, noise-free voice execution without saying wake words. |
-| **Wake Word** | Say **`"Hey Maki, [command]"`** from anywhere in the room. | Hands-free commands while coding, reading, or away from desk. |
-| **Desktop Chat UI** | Type your instruction into the input bar and press **`Enter`**. | Complex code prompts, pasting URLs, or silent typing. |
+| **Push-to-Talk (PTT)** | Hold **`Right Alt`** key ➔ speak ➔ release key. | Best for coding sessions, mechanical keyboards, gaming, or noisy environments. Eliminates wake-word delays. |
+| **Hands-Free Wake Word** | Say **`"Hey Maki, [command]"`** or direct command. | Best for desk check-ins, walking around the room, or hands-free cooking/studying. |
+| **Desktop Chat UI** | Type into the desktop interface and press **`Enter`**. | Best for complex prompts, pasting URLs, silent late-night typing, or inspecting formatted code. |
 
 ---
 
-## 2. Daily Routines, Live Clock & Briefings
+## 3. Daily Workflow Routines & Live Clock Briefings
 
-MakiAI has real-time clock synchronization (Philippine Standard Time, UTC+8) and reads your Knowledge Base schedule files (`workflows/time-management.md`, `workflows/daily.md`, `workflows/deadlines.md`, and saved memories).
+Maki synchronizes with your `workflows/time-management.md`, `workflows/daily.md`, `workflows/deadlines.md`, and active saved memories.
 
-### ☀️ Morning Briefing (`GoodMorningSkill`)
-* **Trigger Keywords**: `good morning`, `morning briefing`, `what's my schedule today`, `show me my schedule`
+---
+
+### ☀️ 1. Morning Briefing (`GoodMorningSkill`)
+* **Triggers**: `good morning`, `morning briefing`, `what's my schedule today`, `show me my schedule`
 * **Sample Prompts**:
   - `"Hey Maki, good morning!"`
   - `"Good morning Maki, what does my schedule look like today?"`
-  - `"Give me my morning briefing."`
-  - `"What's on my agenda for today?"`
-* **What Maki Returns**:
-  - Warm greeting with today's date & live clock time.
-  - Active time block and upcoming scheduled activities.
-  - Any urgent deadlines or saved meetings/notes scheduled for the day.
-  - Encouraging closing thought.
+  - `"Give me my morning briefing and any upcoming tasks."`
+  - `"Show me my schedule for today."`
+  - `"Morning briefing, sir."`
+* **Expected Output**:
+  - Greeting with today's day, date, and live clock time.
+  - Current morning block and entire daily schedule narrated in natural sentences.
+  - Any carryover tasks from yesterday or confirmation that everything is clear.
+  - Urgent deadlines or scheduled meetings from Long-Term Memory.
+  - Polite prompt: *"Is there anything you would like to add to your day, sir?"*
 
 ---
 
-### ⏱️ Quick Check-In & Real-Time Clock (`HelloSkill`)
-* **Trigger Keywords**: `hello`, `hey`, `hi`, `what's next`, `what should i do`, `what time is it`, `current time`, `check-in`
+### ⏱️ 2. Real-Time Check-In & Live Clock (`HelloSkill`)
+* **Triggers**: `hello`, `hey`, `hi`, `what's next`, `what should i do`, `what time is it`, `current time`, `check-in`
 * **Sample Prompts**:
   - `"Hey Maki, hello!"`
   - `"What should I be doing right now?"`
-  - `"Hey Maki, what's the current time?"`
+  - `"What time is it right now?"`
+  - `"What's the current time in Philippine Standard Time?"`
   - `"What's next on our schedule?"`
   - `"Quick check-in, Maki."`
-* **What Maki Returns**:
-  - Exact live clock time in Philippine Standard Time.
-  - Current workflow block (e.g., Coding Block, Job-Hunting Block, Exercise).
-  - Next upcoming transition and active notes/meetings for today.
+* **Expected Output**:
+  - Exact live clock time (`02:30 PM PHT`).
+  - Active time block (e.g., Coding Block, Job-Hunting Block, Study Session).
+  - Upcoming transition time and any saved meetings for today.
 
 ---
 
-### 🌙 Evening Wrap-Up (`GoodNightSkill`)
-* **Trigger Keywords**: `good night`, `wrap up my day`, `end of the day`, `day wrap up`
+### 🌙 3. Evening Wrap-Up (`GoodNightSkill`)
+* **Triggers**: `good night`, `wrap up my day`, `end of the day`, `day wrap up`
 * **Sample Prompts**:
   - `"Hey Maki, good night."`
-  - `"Let's wrap up my day, Maki."`
-  - `"End of the day check."`
-* **What Maki Returns**:
-  - Review of completed blocks.
-  - Carry-over tasks logged for tomorrow.
-  - Acknowledgment of pending deadlines and restful sign-off.
+  - `"Let's wrap up my day."`
+  - `"End of the day check-in."`
+  - `"Day wrap up, Maki."`
+* **Expected Output**:
+  - Review of today's accomplishments.
+  - Logging of any unfinished tasks to `workflows/carryover.md` for tomorrow.
+  - Review of tomorrow's starting schedule and restful sign-off.
 
 ---
 
-## 3. Long-Term Memory & Active Notes
+## 4. Long-Term Memory & Active Notes (`data/memory.json`)
 
-Maki stores persistent key-value memories in `data/memory.json`. All saved memories are automatically injected into Maki's thinking context across sessions, restarts, and check-ins.
+Maki persists facts, dates, Wi-Fi keys, personal preferences, and spontaneous reminders across app restarts and reboots.
+
+---
 
 ### 🧠 Storing Memories
-* **Trigger Keywords**: `remember that`, `remember this`, `remember my`, `don't forget`
+* **Triggers**: `remember that`, `remember this`, `remember my`, `remember our`, `don't forget`
 * **Sample Prompts**:
   - `"Hey Maki, remember that we have a Zoom meeting today at 8:00 PM."`
   - `"Remember that tomorrow at 1:00 PM we have an urgent deadline for the AI Ad Video."`
-  - `"Don't forget that my sister's birthday is on October 15."`
-  - `"Remember that my preferred coffee order is Iced Americano with oat milk."`
-  - `"Remember that the Wi-Fi password for the studio is StudioKey2026."`
-* **Expected Response**:
-  - *"Got it. I'll remember: Zoom meeting — Zoom meeting today at 8:00 PM."*
+  - `"Don't forget that the studio Wi-Fi password is StudioSecure2026."`
+  - `"Remember that my preferred coffee is Iced Americano with oat milk."`
+  - `"Remember that my client John wants the Figma wireframes by Wednesday."`
+  - `"Remember this: my GitHub token expires on November 30."`
+* **What Happens**:
+  - Stored in `data/memory.json`.
+  - Injects into LLM background prompt immediately.
+  - Automatically mentioned during `"Hello"` and `"Good Morning"` briefings!
 
 ---
 
-### 🔍 Recalling Memories & Direct Inquiries
-* **Trigger Keywords**: `what do you remember`, `recall`, `do you recall`, `what did i tell you`, or direct questions
+### 🔍 Recalling Memories & Conversational Questions
+* **Triggers**: `what do you remember`, `recall`, `do you recall`, `what did i tell you`, or direct conversational queries
 * **Sample Prompts**:
   - `"Hey Maki, what do you remember?"`
   - `"Do we have a Zoom meeting today?"`
-  - `"What meetings do we have scheduled for tonight?"`
-  - `"Do you recall what I told you about tomorrow's deadline?"`
-  - `"What is the studio Wi-Fi password?"`
-* **Expected Response**:
-  - *"Yes sir, you have a Zoom meeting scheduled for today at 8:00 PM, and an urgent deadline for the AI Ad Video tomorrow at 1:00 PM."*
+  - `"Do we have any deadlines scheduled for tomorrow?"`
+  - `"Do you recall what I told you about the studio Wi-Fi?"`
+  - `"What did I tell you about my coffee preference?"`
+  - `"What meetings do I have scheduled for tonight?"`
+* **Expected Output**:
+  - Direct, natural confirmation of the saved details.
 
 ---
 
-### 🗑️ Forgetting Memories
-* **Trigger Keywords**: `forget about`, `forget that`, `remove memory`, `delete memory`
+### 🗑️ Forgetting & Removing Memories
+* **Triggers**: `forget`, `forget about`, `delete memory`, `remove memory`, `clear memories`
 * **Sample Prompts**:
-  - `"Hey Maki, forget about the Zoom meeting."`
+  - `"Forget about the AI Ad Video as it is extended."`
+  - `"Remove the Canva Poster deadline."`
   - `"Forget that note about the Wi-Fi password."`
-  - `"Remove the memory regarding the AI Ad Video."`
-* **Expected Response**:
-  - *"Done. I've forgotten: Zoom meeting."*
+  - `"Delete memory regarding the client Figma wireframes."`
+  - `"Forget about the Zoom meeting."`
+* **What Happens**:
+  - Matches the key or description directly and removes it from `data/memory.json`.
+  - Invalidates prompt cache so it disappears from all future check-ins.
 
 ---
 
-## 4. Deadlines & Task Management
+## 5. Deadlines & Task Management (`workflows/deadlines.md`)
 
-Tracks deadlines in `C:\Knowledge-Base\workflows\deadlines.md` with priority markers (🔴 Overdue, 🚨 Today, 🟠 Tomorrow, 🟡 3 Days).
+Structured deadline tracking categorized with visual urgency indicators:
+- 🔴 **Overdue**
+- 🚨 **Due Today**
+- 🟠 **Due Tomorrow**
+- 🟡 **Due within 3 Days**
+- ⚪ **Due within 7 Days**
 
-### ➕ Adding Deadlines
-* **Trigger Keywords**: `add deadline`, `add a deadline`, `set deadline`, `new deadline`
+---
+
+### ➕ 1. Adding Deadlines
+* **Triggers**: `add deadline`, `set deadline`, `new deadline`, `add a deadline`
 * **Sample Prompts**:
   - `"Add a deadline: Machine Learning Final Project due this Friday at 11:59 PM."`
   - `"Set a deadline: Submit Upwork Freelance Proposal by tomorrow 5:00 PM."`
-  - `"New deadline: Capstone documentation review due September 18."`
-* **Expected Response**:
-  - Updates `workflows/deadlines.md` and confirms: *"I've added the Machine Learning Final Project deadline for Friday at 11:59 PM, sir."*
+  - `"New deadline: Submit Capstone Documentation due September 20 at 6:00 PM."`
+  - `"Add deadline: Pay Internet Bill by September 15."`
 
 ---
 
-### 📋 Viewing Deadlines
-* **Trigger Keywords**: `show my deadlines`, `list deadlines`, `what are my deadlines`, `check deadlines`, `deadlines`
+### 📋 2. Viewing Deadlines
+* **Triggers**: `show my deadlines`, `list deadlines`, `what are my deadlines`, `check deadlines`, `deadlines`
 * **Sample Prompts**:
   - `"Hey Maki, show my deadlines."`
   - `"What are my pending deadlines?"`
   - `"List all deadlines."`
-* **Expected Response**:
-  - Summarizes pending items grouped by urgency.
+  - `"Check my upcoming deadlines for this week."`
 
 ---
 
-### ✅ Completing Deadlines
-* **Trigger Keywords**: `deadline done`, `mark deadline complete`, `finish deadline`
+### ✅ 3. Marking Deadlines Complete
+* **Triggers**: `deadline done`, `mark deadline complete`, `complete deadline`, `finish deadline`
 * **Sample Prompts**:
   - `"Deadline done: Machine Learning Final Project."`
   - `"Mark deadline complete for Upwork proposal."`
-* **Expected Response**:
-  - Moves entry from `## Pending` to `## Completed` in `workflows/deadlines.md`.
+  - `"Complete deadline: Pay Internet Bill."`
 
 ---
 
-## 5. Timed Reminders & Alarms
+## 6. Timed Reminders & Audio Alarms (`data/reminders.json`)
 
-Schedules real-time background timers and audible voice notifications.
+Maki runs a background timer daemon that triggers audible voice notifications even if you are working in another app.
+
+---
 
 ### ⏰ Setting Reminders
-* **Trigger Keywords**: `remind me at`, `remind me in`, `remind me to`, `set a reminder`
+* **Triggers**: `remind me at`, `remind me in`, `remind me to`, `set a reminder`
 * **Sample Prompts**:
-  - `"Remind me in 25 minutes to take a break."`
-  - `"Remind me at 4:30 PM to submit my daily git commit."`
-  - `"Set a reminder in 10 minutes to drink water."`
-  - `"Remind me at 7:45 PM to prepare for the Zoom call."`
+  - `"Remind me in 25 minutes to take a short break."`
+  - `"Remind me at 4:30 PM to commit my code to GitHub."`
+  - `"Set a reminder in 10 minutes to check the oven."`
+  - `"Remind me at 7:45 PM to get ready for the Zoom meeting."`
+  - `"Remind me in 1 hour to drink water and stretch."`
 
 ---
 
-### 📋 Viewing & Cancelling Reminders
+### 📋 Managing Reminders
+* **Triggers**: `show my reminders`, `list reminders`, `cancel reminder`
 * **Sample Prompts**:
   - `"Show my active reminders."`
-  - `"List reminders."`
+  - `"List all reminders."`
   - `"Cancel reminder for drink water."`
+  - `"Cancel reminder for commit code."`
 
 ---
 
-## 6. Kiro CLI Coding Engine (`t=kiro`)
+## 7. ⚡ Kiro CLI Autonomous Coding Engine (`t=kiro`)
 
-Maki connects directly to your authenticated **Kiro CLI** to generate complete codebases, scaffold full apps, and write production code.
+Maki connects directly to your authenticated local **Kiro CLI** (`kiro-cli.exe`) to autonomously plan, scaffold, and code software in your project workspaces.
 
-### 🖥️ Mode A: Interactive Visible Terminal
-*Launches a visible, live PowerShell terminal with Kiro CLI active in your project directory.*
+---
+
+### 🖥️ Mode A: Interactive Visible Terminal Window
+*Opens a visible, dedicated PowerShell window running Kiro CLI in your target project directory (`C:\Users\Maki Liones\MakiSync Storage\Personal\<ProjectName>\`).*
+
 * **Sample Prompts**:
   - `"Open Kiro"`
   - `"Launch Kiro terminal"`
   - `"Open Kiro for TaskMaster"`
-  - `"Start interactive Kiro terminal to build TaskMaster"`
+  - `"Launch Kiro in terminal to build TaskMaster"`
+  - `"Start interactive Kiro terminal for MunchBite"`
+  - `"Launch Kiro terminal for stage 2 of TaskMaster"`
 
 ---
 
-### 🤖 Mode B: Headless Direct Code Generation
-*Directly triggers Kiro in the background using `--no-interactive --trust-all-tools`.*
-* **Prefix Tag**: `t=kiro [instruction]` or `use kiro to [instruction]`
-* **Sample Prompts**:
-  - `"t=kiro build a single-file modern landing page called portfolio.html with dark mode, glowing accents, and smooth scroll animations."`
-  - `"use kiro to write a Python FastAPI CRUD backend with SQLite and JWT authentication."`
-  - `"kiro code a responsive React dashboard component using Tailwind CSS and Chart.js."`
-  - `"code with kiro: create an automated script that organizes files in my Downloads folder by extension."`
-  - `"ask kiro to write a complete Dockerfile and docker-compose setup for a Next.js 15 app with Postgres."`
+### 🤖 Mode B: Headless Background Code Generation
+*Directly executes Kiro CLI in headless automated mode (`--no-interactive --trust-all-tools`) with full Knowledge Base context injection.*
+
+* **Command Syntax**: `t=kiro [instruction]` or `use kiro to [instruction]` or `code with kiro [instruction]`
+* **Sample Full-Stack Prompts**:
+  - `"t=kiro build a complete single-file task management website called taskmaster.html with sleek glassmorphic dark mode, smooth drag-and-drop, and localStorage persistence."`
+  - `"use kiro to write a Python script for automated web scraping with BeautifulSoup that extracts article titles and saves them to a CSV file."`
+  - `"kiro code a FastAPI backend with JWT authentication, password hashing, and SQLite user storage."`
+  - `"code with kiro: create a modern responsive React counter component styled with Tailwind CSS and Framer Motion animations."`
+  - `"ask kiro to write a Dockerfile and docker-compose.yml configuration for a Node.js Express server connected to PostgreSQL and Redis."`
+  - `"t=kiro generate a Next.js 15 App Router landing page with hero banner, pricing cards, and testimonials using Tailwind CSS."`
 
 ---
 
-## 7. 11-Stage Knowledge Base Project Pipeline
+## 8. 🏗️ 11-Stage Knowledge Base Project Pipeline
 
 MakiAI guides software ideas through an **11-Stage Planning Pipeline** following your Knowledge Base architecture standards (`MunchBite` template):
 `overview.md` ➔ `plan.md` ➔ `architecture.md` ➔ `filepath.md` ➔ `decisions.md` ➔ `progress.md` ➔ `ui.md`.
 
-### 🚀 Initiating a Project
-* **Trigger Keywords**: `new project`, `start project`, `i have a project idea`, `let's build`
-* **Sample Prompts**:
-  - `"I have a new project idea: a freelance client invoice generator."`
-  - `"Let's build a real-time collaborative whiteboard app."`
-  - `"Start a new project called StudyFlow."`
-  - `"I want to build an AI meal planning web app using Next.js and Supabase."`
+```
+Stage 1: Idea Inception & Core Problem
+Stage 2: Target Audience & User Stories
+Stage 3: Tech Stack & Architecture Selection
+Stage 4: Database Schema & Entity Relationships
+Stage 5: Folder & File Structure (filepath.md)
+Stage 6: API Endpoints & Route Definitions
+Stage 7: UI Wireframe & Component Breakdown (ui.md)
+Stage 8: State Management & Data Flow
+Stage 9: Step-by-Step Implementation Roadmap (plan.md)
+Stage 10: Architectural Decisions & Trade-offs (decisions.md)
+Stage 11: Active Progress & Scaffolding Execution (progress.md)
+```
 
-### 🔄 Project Planning Workflow:
-1. **Stage 1**: Maki outlines Project Name, Target Audience, Core Problem, and Platform.
-2. **Interactive Clarifications**: You answer or refine details.
-3. **KB Sync**: Maki creates the structured folder under `C:\Knowledge-Base\projects\<ProjectName>\`.
-4. **Execution Delegation**: Hand off the plan to Kiro CLI to scaffold and code the application.
+### 🚀 Starting and Driving a Project
+* **Triggers**: `new project`, `start project`, `i have a project idea`, `let's build`
+* **Sample Prompts**:
+  - `"I have a new project idea: a modern freelance portfolio website."`
+  - `"Let's build a real-time collaborative whiteboard web app."`
+  - `"Start a new project called TaskMaster."`
+  - `"I want to build an AI meal planning platform using Next.js and Supabase."`
+  - `"What is the current plan for TaskMaster?"`
+  - `"Continue planning TaskMaster for Stage 4."`
+  - `"Use Kiro to scaffold the project files based on the TaskMaster plan."`
 
 ---
 
-## 8. Automated Homework & Research Paper Engine
+## 9. 📝 Automated Homework & Research Paper Engine (`.docx`)
 
-Automates academic paper formatting and document generation following templates in `C:\MakiSync Storage\School\Temp-Guide\`.
+Generates fully styled Microsoft Word (`.docx`) reports, lab sheets, essays, and assignments following rubrics dropped into `C:\MakiSync Storage\School\Temp-Guide\`.
 
-### 📝 Two-Step Workflow
+---
 
-#### Step 1: Open the Guide Folder
-* **Trigger Keywords**: `create my homework`, `do my homework`, `make my assignment`, `help with homework`
+### 🔄 The 2-Step Workflow
+
+#### Step 1: Open Guide Folder
+* **Triggers**: `create my homework`, `do my homework`, `make my assignment`, `help with homework`
 * **Sample Prompts**:
   - `"Hey Maki, create my homework."`
   - `"Help me with my assignment."`
   - `"Make my homework."`
+  - `"Prepare my homework folder."`
 * **What Maki Does**:
   - Opens `C:\MakiSync Storage\School\Temp-Guide\` in Windows File Explorer.
-  - Tells you: *"I've opened the Temp-Guide folder for you, sir. Please drop your rubric, syllabus, or template there, then tell me what to write."*
+  - Prompts you: *"I've opened the Temp-Guide folder for you, sir. Please drop your rubric, syllabus, or template there, then tell me what to write."*
 
-#### Step 2: Give Instructions & Generate `.docx`
+#### Step 2: Drop Rubric & Give Content Prompt
 * **Sample Prompts**:
-  - `"Write a 3-page research report on Convolutional Neural Networks following the rubric in Temp-Guide."`
-  - `"Generate my Operating Systems lab report answering questions 1 to 5 based on the guide."`
-  - `"Write an essay discussing ethical implications of generative AI following the template."`
+  - `"Write a 3-page research paper on Convolutional Neural Networks based on the rubric in Temp-Guide."`
+  - `"Generate my Operating Systems laboratory report answering questions 1 through 5 following the template."`
+  - `"Write an essay discussing ethical implications of generative AI following the guide in Temp-Guide."`
 * **What Maki Does**:
-  - Reads PDF/Word/Text guides from `Temp-Guide`.
-  - Generates a styled `.docx` document in `C:\MakiSync Storage\School\Assignments\<Date>\`.
-  - Automatically opens the document in Microsoft Word.
+  - Parses PDF, Word, or Markdown files inside `Temp-Guide`.
+  - Generates a formatted `.docx` file inside `C:\MakiSync Storage\School\Assignments\<Date>\`.
+  - Automatically launches the document in Microsoft Word.
 
 ---
 
-## 9. Live File Creation & MakiSync Storage
+## 10. 📂 MakiSync Storage & Intelligent File Operations
 
-Create files, write scripts, and organize documents directly inside your structured `C:\MakiSync Storage\` filesystem (`School\`, `Work\`, `Personal\`, `Freelance\`).
+Organized file storage system located at `C:\MakiSync Storage\`:
+- `School/` (Assignments, Notes, Temp-Guide)
+- `Work/` (Documents, Reports)
+- `Personal/` (Projects, Notes)
+- `Freelance/` (Proposals, Invoices)
+- `MakiAI/` (Screenshots, Photos, Recordings)
 
-### 📄 Creating Files & Scripts
+---
+
+### 📄 1. Live File Creation & Script Writing
 * **Sample Prompts**:
   - `"Create a file called index.html with a sleek dark-mode landing page in my Personal folder."`
   - `"Create a Python script named backup_sync.py in my School folder that automates folder compression."`
   - `"Write a notes document for Machine Learning exam review in my School folder."`
   - `"Create a file named styles.css with modern glassmorphism utility classes."`
+  - `"Write a story about space exploration into story.txt in my Personal folder."`
+  - `"Append this note to my last document: test all endpoints before deployment."`
 
 ---
 
-### 📂 File Search & Recency Navigation
+### 🔍 2. Finding & Opening Recent Files
 * **Sample Prompts**:
+  - `"Could you open the last photo you captured in our storage?"`
+  - `"Open the last screenshot."`
+  - `"Open my photos folder."`
+  - `"Open my screenshots folder."`
   - `"Find my recent files in School."`
   - `"Open the last document I created."`
-  - `"Show files in my Freelance folder from this week."`
+  - `"Show files in my Freelance folder from today."`
+  - `"Open my Knowledge Base folder."`
+  - `"Open Downloads folder."`
 
 ---
 
-## 10. Physical Webcam Vision (World Observer)
+### 🧹 3. File Organization & Auto-Sorting
+* **Sample Prompts**:
+  - `"Organize my Downloads folder."`
+  - `"Clean up my Desktop."`
+  - `"Sort files in my Documents folder."`
 
-MakiAI connects to your hardware webcam using OpenCV (`CAP_DSHOW`) and multimodal vision AI (`gemini-3.6-flash`).
+---
 
-### 📷 Inspecting Objects in Real-Time
-* **Trigger Keywords**: `look through my camera`, `what do you see`, `describe what i'm holding`, `take a photo`
+## 11. 👁️ Physical Optical Webcam Vision (World Observer)
+
+MakiAI connects to your hardware webcam using OpenCV DirectShow (`CAP_DSHOW`) and multimodal vision AI (`gemini-3.6-flash`).
+
+---
+
+### 📷 Inspecting Physical Reality
+* **Triggers**: `look through my camera`, `what do you see`, `describe what i'm holding`, `take a photo`, `who is behind me`
 * **Sample Prompts**:
   - `"Hey Maki, look through my camera and tell me what you see."`
-  - `"Look through my camera and identify what I am holding in my hand."`
-  - `"Take a photo and describe the scene in front of me."`
+  - `"Look through my camera and identify what object is in my hand."`
+  - `"Take a photo of me."` *(Snaps photo, saves to MakiSync Storage, and opens immediately)*
   - `"Can you read the text on the book I am holding up to the webcam?"`
-  - `"Look at my camera and tell me if my lighting is good for a video call."`
-* **Expected Response**:
-  - Captures a frame, analyzes visual elements, and provides a clear spoken description.
+  - `"Is there anyone in the background behind me?"`
+  - `"Look at me and tell me what I am doing right now."`
+  - `"Check the camera and tell me if my lighting is good for a video call."`
+  - `"Describe what I am wearing today."`
 
 ---
 
-## 11. Screen Vision & Visual Error Debugging
+## 12. 🖥️ Live Screen Vision & Visual Error Debugging
 
-MakiAI captures full-resolution desktop screenshots and inspects code errors, UI layouts, or active applications.
+MakiAI takes high-resolution desktop screenshots and inspects code errors, UI layouts, terminal stack traces, or active browser tabs.
 
-### 🖥️ Desktop Analysis & Debugging
-* **Trigger Keywords**: `look at my screen`, `what is on my screen`, `debug this error`, `take a screenshot`
+---
+
+### 🔍 Screen OCR & Code Debugging
+* **Triggers**: `look at my screen`, `what is on my screen`, `debug this error`, `take a screenshot`, `read my screen`
 * **Sample Prompts**:
   - `"Hey Maki, look at my screen and help me debug this terminal error."`
-  - `"What's currently displayed on my screen?"`
-  - `"Take a screenshot and save it to my MakiSync folder."`
-  - `"Look at my screen and review the design of this web page."`
-  - `"Read the error message visible in my VS Code window."`
+  - `"What is currently displayed on my screen?"`
+  - `"Take a screenshot."` *(Captures screen, saves to MakiSync Storage, and opens immediately)*
+  - `"Take a screenshot of the active window."`
+  - `"Look at this code on my screen and explain what is causing the runtime exception."`
+  - `"Read the error message visible in my VS Code terminal."`
+  - `"Look at my screen and give me feedback on the UI layout of this webpage."`
+  - `"Summarize the document open on my screen."`
 
 ---
 
-## 12. Multi-Monitor Window Auto-Tiling & Management
+## 13. 🪟 Multi-Monitor Window Management & Auto-Tiling
 
 MakiAI detects physical display coordinates and snaps, tiles, or shifts application windows across monitors.
 
-### 🪟 Window Control Commands
+---
+
+### 🪟 1. Inter-Monitor Window Moving & Dragging
 * **Sample Prompts**:
-  - `"Snap VS Code to the left side of my main monitor."`
-  - `"Move Chrome to my secondary monitor."`
-  - `"Tile VS Code and Chrome side by side."`
+  - `"Move Chrome to my second monitor."`
+  - `"Move VS Code to my main monitor."`
+  - `"Drag this window to monitor 2."`
+  - `"Shift Spotify to the other monitor."`
+  - `"Put Chrome on the left screen."`
+  - `"Move Discord to my secondary display."`
+
+---
+
+### 📐 2. Auto-Tiling & Workspace Layouts
+* **Sample Prompts**:
+  - `"Tile my windows."`
+  - `"Tile Chrome and VS Code side by side."`
+  - `"Organize my workspace."`
+  - `"Maximize screens across my 2 monitors."`
+  - `"Fit all active windows across my displays."`
   - `"Maximize the active window."`
   - `"Minimize all windows."`
 
 ---
 
-## 13. Chrome Multi-Profile Site Launcher
+## 14. 🌐 Chrome Multi-Profile Site Launcher
 
-Opens URLs and web applications inside specific Google Chrome user profiles.
+Opens web applications and platforms directly inside dedicated Google Chrome user profiles:
+- **Personal Profile** (`Default`) ➔ YouTube, Facebook, Instagram, Netflix, Reddit, Spotify
+- **School Profile** (`Profile 1`) ➔ Google Drive, Canvas, School Portal, GitHub School
+- **Freelance Profile** (`Profile 2`) ➔ Upwork, Fiverr, Figma, Canva, LinkedIn
+- **Work Profile** (`Profile 3`) ➔ Google Docs, Slack, Jira, Company Mail
 
-### 🌐 Profile-Aware Browsing
+---
+
+### 🌐 Profile Browsing Commands
 * **Sample Prompts**:
   - `"Open YouTube in my Personal profile."`
   - `"Open GitHub in my School profile."`
   - `"Open Figma in my Freelance profile."`
   - `"Open Google Docs in my Work profile."`
+  - `"Open Upwork."`
+  - `"Open Canva."`
+  - `"Open Facebook."`
   - `"Open ChatGPT."`
+  - `"Open Gemini."`
 
 ---
 
-## 14. Native Windows Audio, Volume & Media Controls
+## 15. 🔊 Native Windows Audio, Volume & Media Controls
 
-Direct hardware audio management with volume ducking and Spotify/media integration.
+Direct hardware audio management with volume ducking and Spotify integration.
 
-### 🔊 Volume & Sound
+---
+
+### 🔊 1. Volume Controls
 * **Sample Prompts**:
-  - `"Volume up"` / `"Turn the volume up by 20%"`
-  - `"Volume down"` / `"Turn it down a bit"`
-  - `"Mute audio"` / `"Unmute"`
+  - `"Volume up"` / `"Make it louder"`
+  - `"Volume down"` / `"Make it quieter"`
+  - `"Increase volume by 20%"`
+  - `"Decrease volume by 15%"`
   - `"Set volume to 50%"`
+  - `"Turn volume to 80%"`
+  - `"Max volume"` / `"Turn volume all the way up"`
+  - `"Mute audio"` / `"Unmute"`
 
 ---
 
-### 🎵 Media Playback
+### 🎵 2. Media Playback & Spotify
 * **Sample Prompts**:
-  - `"Play"` / `"Pause"`
+  - `"Open Spotify."` *(Launches Spotify application)*
+  - `"Play"` / `"Pause"` / `"Resume music"`
   - `"Next track"` / `"Skip song"`
-  - `"Previous song"`
-  - `"Open Spotify"`
+  - `"Previous song"` / `"Previous track"`
+  - `"Play synthwave on Spotify."`
+  - `"Play lofi hip hop on Spotify."`
 
 ---
 
-## 15. System Health, Telemetry & Power Controls
+## 16. ⚡ System Health Telemetry & Power Controls
 
 Monitors CPU usage, RAM utilization, temperature thresholds, and system power states.
 
-### ⚡ System Status
+---
+
+### 📊 1. Hardware Vitals & Telemetry
 * **Sample Prompts**:
   - `"How is my system health?"`
+  - `"What are my system vitals?"`
   - `"What is my CPU and RAM usage right now?"`
-  - `"Check hardware telemetry."`
+  - `"How is my battery?"`
+  - `"Is my laptop charging?"`
+  - `"Check hardware status."`
 
 ---
 
-### 🔒 Power & Security
+### 🔒 2. System Power & Security
 * **Sample Prompts**:
   - `"Lock PC"` / `"Lock my computer"`
-  - `"Put computer to sleep"`
+  - `"Put computer to sleep"` / `"Sleep"`
   - `"Restart my PC"`
   - `"Shutdown computer"` *(Requires voice confirmation)*
+  - `"Cancel shutdown"`
+  - `"Brightness up"` / `"Increase brightness"`
+  - `"Brightness down"` / `"Lower brightness"`
+  - `"Set brightness to 70%"`
 
 ---
 
-## 16. Master Prompting Best Practices & Tips
+## 17. 🎯 High-Efficiency Power-User Workflow Combos
 
-To get the highest accuracy and most natural responses from MakiAI, keep these best practices in mind:
+Combine multiple features together for maximum productivity:
 
-### 💡 Top Tips:
-1. **Natural Phrasing**: Speak naturally as if talking to a personal human assistant. Maki understands context, pronouns, and implied references.
-2. **Explicit Skill Triggers for Accuracy**:
-   - Use `"Remember that [details]"` when you want facts/events stored in long-term memory.
-   - Use `"Add a deadline [task] due [date]"` when you want structured tracking in your KB deadlines file.
-   - Use `"Remind me in [X minutes]"` when you need an immediate alarm/timer.
-   - Use `"t=kiro [prompt]"` when you want autonomous code generation.
-3. **Combining Memories & Check-ins**: Once you tell Maki to remember a meeting or task, you don't need to ask specifically about memory—simply saying `"Hello"` or `"What's my schedule?"` will automatically weave that memory into your briefing.
-4. **Push-to-Talk (PTT)**: For coding sessions with loud mechanical keyboards or background music, holding **`Right Alt`** guarantees 100% clean voice transcription without false wake word activations.
+### 💼 Scenario 1: The Morning Kickoff
+1. **Start**: *"Good morning Maki"* ➔ Hear schedule, weather, and active notes.
+2. **Setup**: *"Tile VS Code and Chrome across my monitors"* ➔ Windows arrange automatically.
+3. **Music**: *"Play focus lofi on Spotify"* ➔ Music starts with automatic ducking.
+4. **Plan**: *"What is the current plan for TaskMaster?"* ➔ Review active project phase.
 
 ---
 
-*MakiAI — Your Autonomous AI Operating Assistant.* 🚀
+### 💻 Scenario 2: Autonomous Coding Session
+1. **Instruction**: *"t=kiro build a responsive Next.js pricing page with Stripe checkout cards"* ➔ Kiro builds code in background.
+2. **Review**: *"Open Kiro for TaskMaster"* ➔ Visible terminal opens to watch progress.
+3. **Debug**: *"Look at my screen and debug this terminal error"* ➔ Maki analyzes error and gives instant fix.
+
+---
+
+### 📚 Scenario 3: Homework & Research Rush
+1. **Setup**: *"Create my homework"* ➔ `Temp-Guide` folder opens.
+2. **Drop**: Drop assignment rubric into `Temp-Guide`.
+3. **Generate**: *"Write a 3-page research paper on Transformers based on the guide in Temp-Guide"* ➔ Formatted `.docx` is created and launched in Word.
+4. **Deadline**: *"Add deadline: Submit AI Paper by 11:59 PM tonight"* ➔ Logged to deadlines tracker.
+
+---
+
+### 📸 Scenario 4: Photo & Vision Check
+1. **Capture**: *"Take a photo of me"* ➔ Snaps photo, saves to MakiSync, opens photo immediately.
+2. **Inspect**: *"Look through my camera and tell me what I am holding in my hand"* ➔ Vision AI identifies object and reads text.
+3. **Retrieve**: *"Could you open the last photo you captured in our storage?"* ➔ Opens photo in default viewer and selects in Explorer.
+
+---
+
+## 18. 🛠️ Troubleshooting, Audio Ducking & Fallback Lifecycles
+
+### 🔄 Multi-Tier Fallback Lifecycle
+1. **AI Provider Fallback**: If Groq free tier hits rate limit, Maki automatically hot-swaps to Google Gemini (`gemini-3.6-flash`) seamlessly.
+2. **TTS Audio Fallback**: If ElevenLabs quota is exhausted, Maki switches to Microsoft Edge Neural TTS with zero downtime.
+3. **Webcam Connection**: OpenCV utilizes `CAP_DSHOW` DirectShow on Windows with device index fallback (`0` ➔ `1` ➔ `2`) and auto-exposure warmup.
+4. **Document Formatting**: Word homework generation utilizes `python-docx` with fallback to markdown text formatting.
+
+### 💡 Golden Rules for Perfect Interaction:
+- **Clean Voice Capture**: Hold **`Right Alt`** while speaking for 100% clean transcriptions without wake-word false alarms.
+- **Natural Phrasing**: You can speak completely naturally. Words like `"please"`, `"could you"`, `"hey"`, and `"maki"` are automatically parsed and stripped by the router.
+- **Cache Invalidation**: Whenever you store a memory or add a deadline, it is instantly available across all briefings without restarting the app!
+
+---
+
+*MakiAI — Built for speed, precision, and complete autonomous operating assistance.* 🚀

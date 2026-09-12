@@ -1,3 +1,11 @@
 {
-  "reminders": []
+  "reminders": [
+    {
+      "id": "c27d96bf-1554-4d2f-9344-157143f547e0",
+      "text": "buy a snack",
+      "datetime": "2026-09-12T14:53:00",
+      "repeat": null,
+      "status": "fired"
+    }
+  ]
 }
