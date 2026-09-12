@@ -77,11 +77,11 @@ class ComputerRouter:
             or self._handle_window_move(lowered, text)
             or self._handle_auto_tile(lowered, text)
             or self._handle_write_to_file(lowered, text)
+            or self._handle_smart_search(lowered)   # ← Before _handle_open so "open last photo/screenshot" wins
+            or self._handle_media(lowered)          # ← Before _handle_open so "open Spotify", "play", "pause" win
             or self._handle_open(lowered, text)
             or self._handle_volume(lowered)
             or self._handle_system(lowered)
-            or self._handle_media(lowered)
-            or self._handle_smart_search(lowered)   # ← before camera so "open last screenshot" wins
             or self._handle_camera(lowered)
             or self._handle_file_creation(lowered, text)
             or self._handle_files(lowered, text)
@@ -345,18 +345,31 @@ class ComputerRouter:
             if match:
                 target = match.group(1).strip()
 
-                # A. Try finding as a file or document across Knowledge Base & Storage first
+                # A. If target is a well-known app or website, launch it first!
+                if self.launcher.is_known(target):
+                    return self.launcher.open(target)
+
+                # B. Check if explicitly asking for a file/document or has file extension
+                has_file_ext = bool(re.search(r'\.(pdf|docx|doc|txt|md|xlsx|pptx|py|js|html|css|json|csv)\b', target, flags=re.IGNORECASE))
+                explicit_file_query = bool(re.search(r'\b(file|document|doc|pdf|notes|paper|report|guide)\b', cleaned, flags=re.IGNORECASE))
+
+                if has_file_ext or explicit_file_query:
+                    found_file = self.files.find_file(target)
+                    if found_file:
+                        self.files._open_file(found_file)
+                        return f"Opening {found_file.name} from {found_file.parent.name} for you, sir."
+
+                # C. Try general app launcher (handles system binaries, URLs, Chrome profiles)
+                launch_result = self.launcher.open(target)
+                if "couldn't find" not in launch_result:
+                    return launch_result
+
+                # D. Fall back to finding a file across Knowledge Base & Storage
                 found_file = self.files.find_file(target)
                 if found_file:
                     self.files._open_file(found_file)
                     return f"Opening {found_file.name} from {found_file.parent.name} for you, sir."
 
-                # B. Fall back to application / website launcher
-                launch_result = self.launcher.open(target)
-                if "couldn't find" not in launch_result:
-                    return launch_result
-
-                # C. If launcher couldn't find it, check if any keyword matches a file
                 return launch_result
 
         return None
@@ -688,12 +701,12 @@ class ComputerRouter:
         if not category:
             return None
 
-        # Detect "open/show/find + last/latest/just/recent" → find latest
-        if re.search(r"\b(open|show|find|get|display)\b.*\b(last|latest|recent|just|previous)\b|\b(last|latest|recent|just)\b.*\b(screenshot|photo|recording|picture)\b", lowered):
-            return self.files.find_latest(category)
-
-        # Detect "latest / last / just now" intent without open/show
-        if re.search(r"\blast\b|\blatest\b|\bjust\s+now\b|\bmost\s+recent\b|\bjust\s+took\b|\bjust\s+captured\b|\byou\s+took\b|\byou\s+take\b|\byou\s+captured\b", lowered):
+        # Detect "open/show/find + last/latest/just/recent/captured" → find latest
+        if (
+            re.search(r"\b(open|show|find|get|display|view)\b.*\b(last|latest|recent|just|previous|captured?|took|taken|saved)\b", lowered)
+            or re.search(r"\b(last|latest|recent|just|previous)\b.*\b(screenshot|photo|recording|picture|video|image|camera)\b", lowered)
+            or re.search(r"\blast\b|\blatest\b|\bjust\s+now\b|\bmost\s+recent\b|\bjust\s+took\b|\bjust\s+captured\b|\byou\s+took\b|\byou\s+take\b|\byou\s+captured?\b|\byou\s+save\b|\byou\s+saved\b", lowered)
+        ):
             return self.files.find_latest(category)
 
         # Detect date reference

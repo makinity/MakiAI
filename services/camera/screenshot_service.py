@@ -46,7 +46,7 @@ class ScreenshotService:
 
     def capture_full(self) -> str:
         """
-        Capture the entire screen and save as .png.
+        Capture the entire screen, save as .png, and open immediately.
 
         Returns:
             Response string with file path, or error message.
@@ -55,7 +55,16 @@ class ScreenshotService:
             screenshot = pyautogui.screenshot()
             filepath = self._save(screenshot, "screenshot")
             print(f"[ScreenshotService] Full screenshot saved: {filepath}")
-            return f"Screenshot saved to MakiSync Storage. {filepath.parent.name}/{filepath.name}"
+
+            # Auto-open screenshot immediately and reveal its folder
+            try:
+                import os, subprocess
+                os.startfile(str(filepath))
+                subprocess.Popen(f'explorer /select,"{filepath}"')
+            except Exception as ex:
+                print(f"[ScreenshotService] Auto-open failed: {ex}")
+
+            return f"Screenshot saved and opened from MakiSync Storage. {filepath.parent.name}/{filepath.name}"
 
         except Exception as e:
             print(f"[ScreenshotService] Full screenshot error: {e}")
@@ -65,7 +74,7 @@ class ScreenshotService:
 
     def capture_window(self) -> str:
         """
-        Capture the currently active (foreground) window.
+        Capture the currently active (foreground) window, save as .png, and open immediately.
         Falls back to full screenshot if window detection fails.
 
         Returns:
@@ -95,7 +104,16 @@ class ScreenshotService:
             filepath = self._save(screenshot, f"window_{safe_title}" if safe_title else "window")
 
             print(f"[ScreenshotService] Window screenshot saved: {filepath}")
-            return f"Screenshot of '{active.title[:30]}' saved to MakiSync Storage. {filepath.parent.name}/{filepath.name}"
+
+            # Auto-open screenshot immediately and reveal its folder
+            try:
+                import os, subprocess
+                os.startfile(str(filepath))
+                subprocess.Popen(f'explorer /select,"{filepath}"')
+            except Exception as ex:
+                print(f"[ScreenshotService] Auto-open failed: {ex}")
+
+            return f"Screenshot of '{active.title[:30]}' saved and opened from MakiSync Storage. {filepath.parent.name}/{filepath.name}"
 
         except ImportError:
             # pygetwindow not available — fall back to full screen

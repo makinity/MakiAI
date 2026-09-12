@@ -297,13 +297,15 @@ class FileManager:
             for root in primary_roots:
                 for p in root.rglob("*"):
                     if p.is_file() and not p.name.startswith(".") and not any(part in IGNORED_DIRS for part in p.parts):
-                        score = sum(1 for kw in keywords if kw in p.name.lower() or kw in str(p).lower())
-                        # Give bonus score if file is already a PDF
-                        if p.suffix.lower() == ".pdf":
-                            score += 0.5
-                        if score > best_score:
-                            best_score = score
-                            best_file = p
+                        fname_lower = p.name.lower()
+                        # Only score if keywords actually appear in the filename itself
+                        score = sum(1 for kw in keywords if kw in fname_lower)
+                        if score > 0:
+                            if p.suffix.lower() == ".pdf":
+                                score += 0.5
+                            if score > best_score:
+                                best_score = score
+                                best_file = p
 
         if best_score > 0 and best_file:
             return _prefer_pdf(best_file)

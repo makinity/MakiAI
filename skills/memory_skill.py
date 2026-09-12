@@ -116,7 +116,18 @@ If nothing is relevant, say "I don't have anything stored about that."
     def _forget(self, text: str) -> str:
         """Remove a memory matching the topic mentioned."""
         memories = self._load()
+        if not memories:
+            return "I don't have any memories stored right now, sir."
+
         lowered = text.lower()
+        search_words = [
+            w for w in re.split(r"[^\w]+", lowered)
+            if len(w) >= 3 and w not in {
+                "forget", "delete", "remove", "clear", "about", "the", "my",
+                "our", "that", "this", "memory", "memories", "note", "notes",
+                "sir", "maki", "please", "deadline", "task"
+            }
+        ]
 
         # Let Gemini identify which memory to remove
         memory_text = "\n".join([
@@ -133,18 +144,42 @@ Which memory key should be deleted? Return ONLY the key string — nothing else.
 If nothing matches, return "none".
 """.strip()
 
-        key_to_delete = self.gemini.send(prompt, "").strip().strip('"').strip("'")
+        key_to_delete = ""
+        try:
+            raw_key = self.gemini.send(prompt, "")
+            key_to_delete = re.sub(r"^[-*#\s`]+|[`\s]+$", "", raw_key).strip().strip('"').strip("'")
+            if key_to_delete.lower().startswith("key:"):
+                key_to_delete = key_to_delete[4:].strip()
+        except Exception:
+            key_to_delete = ""
 
-        if key_to_delete.lower() == "none":
-            return "I couldn't find a matching memory to forget."
-
+        target_k = key_to_delete.lower() if key_to_delete and key_to_delete.lower() != "none" else ""
         before = len(memories)
-        memories = [m for m in memories if m.get("key", "").lower() != key_to_delete.lower()]
 
-        if len(memories) < before:
-            self._save(memories)
-            return f"Done. I've forgotten: {key_to_delete}."
-        return "I couldn't find that memory."
+        remaining = []
+        deleted_names = []
+
+        for m in memories:
+            mk = m.get("key", "").lower()
+            mv = m.get("value", "").lower()
+
+            # 1. Match from AI key detection
+            matched_by_ai = bool(target_k and (mk == target_k or target_k in mk or mk in target_k))
+
+            # 2. Match from direct keyword tokens in user query
+            matched_by_words = bool(search_words and any(w in mk or w in mv for w in search_words))
+
+            if matched_by_ai or matched_by_words:
+                deleted_names.append(m.get("key", "Note"))
+            else:
+                remaining.append(m)
+
+        if len(remaining) < before:
+            self._save(remaining)
+            deleted_str = ", ".join(deleted_names)
+            return f"Done. I've forgotten: {deleted_str}."
+
+        return "I couldn't find that memory in my notes, sir."
 
     # ─── Storage ─────────────────────────────────────────────────────────────
 

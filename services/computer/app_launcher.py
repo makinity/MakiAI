@@ -110,6 +110,15 @@ class AppLauncher:
         result = launcher.open_url("https://github.com")
     """
 
+    def is_known(self, name: str) -> bool:
+        """Check if name matches a known desktop application or website."""
+        n = name.strip().lower()
+        if n in APP_MAP or any(k in n or n in k for k in APP_MAP):
+            return True
+        if n in WEBSITE_MAP or any(k in n or n in k for k in WEBSITE_MAP):
+            return True
+        return False
+
     def open(self, app_name: str) -> str:
         """
         Open a desktop app or website by name.

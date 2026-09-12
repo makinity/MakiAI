@@ -64,20 +64,35 @@ class CameraService:
 
     def take_photo(self) -> str:
         """
-        Capture a single frame from the webcam and save as .jpg.
+        Capture a single frame from the webcam, save as .jpg, and open immediately.
 
         Returns:
             Response string with file path, or error message.
         """
         cap = None
         try:
-            cap = cv2.VideoCapture(0)   # 0 = default camera
-            if not cap.isOpened():
+            # Try DirectShow device index 0, with standard fallback
+            for dev_idx in [0, 1]:
+                try:
+                    cap = cv2.VideoCapture(dev_idx, cv2.CAP_DSHOW)
+                    if not cap.isOpened():
+                        cap.release()
+                        cap = cv2.VideoCapture(dev_idx)
+                    if cap and cap.isOpened():
+                        break
+                except Exception:
+                    if cap:
+                        cap.release()
+                    cap = None
+
+            if not cap or not cap.isOpened():
                 return "I couldn't access the camera. Make sure it's connected and not in use."
 
-            # Allow camera to warm up
-            for _ in range(5):
+            # Allow camera exposure to warm up
+            for _ in range(6):
                 cap.read()
+                import time
+                time.sleep(0.04)
 
             ret, frame = cap.read()
             if not ret or frame is None:
@@ -90,7 +105,16 @@ class CameraService:
 
             cv2.imwrite(str(filepath), frame)
             print(f"[CameraService] Photo saved: {filepath}")
-            return f"Photo saved to MakiSync Storage. {filepath.parent.name}/{filepath.name}"
+
+            # Auto-open the photo immediately and reveal its folder
+            try:
+                import subprocess
+                os.startfile(str(filepath))
+                subprocess.Popen(f'explorer /select,"{filepath}"')
+            except Exception as ex:
+                print(f"[CameraService] Auto-open failed: {ex}")
+
+            return f"Photo captured and opened from MakiSync Storage. {filepath.parent.name}/{filepath.name}"
 
         except Exception as e:
             print(f"[CameraService] Photo error: {e}")

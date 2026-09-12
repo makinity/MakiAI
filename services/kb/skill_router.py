@@ -77,7 +77,7 @@ class SkillRouter:
                 r"\bwhat\s+do\s+you\s+remember\b",
                 r"\bwhat\s+did\s+i\s+(say|tell\s+you)\b",
                 r"\b(do\s+you\s+)?recall\b",
-                r"\bforget\s+(about\s+)?(that|this|my)\b",
+                r"\b(forget|delete|remove|clear)\b",
             ]),
             ("deadline", [
                 r"\badd\s+(a\s+)?deadline\b",
