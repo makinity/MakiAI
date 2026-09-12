@@ -6,6 +6,7 @@ Routes to the correct service or skill based on intent.
 
 from core.state_manager import StateManager, AppState
 from services.computer.computer_router import ComputerRouter
+from services.ai.kiro_service import KiroService
 
 # Lightweight system prompt for general conversation — no KB files injected
 # Keeps responses fast for questions outside the knowledge base
@@ -43,6 +44,7 @@ class Orchestrator:
         self.tts_service = None
         self.skill_router = None
         self.kb_reader = None
+        self.kb_writer = None
         self.context_builder = None
 
         # Homework state — tracks if we're waiting for homework instructions
@@ -52,18 +54,22 @@ class Orchestrator:
         # Computer control router
         self.computer_router = ComputerRouter()
 
+        # Kiro CLI Coding Engine
+        self.kiro_service = KiroService()
+
     def set_services(self, services: dict) -> None:
         """
         Inject all service dependencies after initialization.
 
         Args:
             services: A dict of service instances keyed by name.
-                Expected keys: gemini, tts, skill_router, kb_reader, context_builder
+                Expected keys: gemini, tts, skill_router, kb_reader, kb_writer, context_builder
         """
         self.gemini_service = services.get("gemini")
         self.tts_service = services.get("tts")
         self.skill_router = services.get("skill_router")
         self.kb_reader = services.get("kb_reader")
+        self.kb_writer = services.get("kb_writer")
         self.context_builder = services.get("context_builder")
 
         if self.gemini_service and self.computer_router:
@@ -109,13 +115,49 @@ class Orchestrator:
     def _route(self, text: str) -> str:
         """
         Route priority:
+          0. Homework follow-up / Kiro CLI coding requests
           1. KB Skills (good morning, deadlines, etc.)
           2. Computer control (open, volume, shutdown, etc.)
-          3. Gemini fallback (general conversation)
+          3. Gemini/Groq fallback (general conversation)
         """
         # Strip wake word before routing
         import re
         cleaned = re.sub(r"^(hey\s+maki[,.]?\s*)", "", text, flags=re.IGNORECASE).strip()
+
+        # 0. Kiro CLI Integration (Interactive Terminal or Headless Code Gen)
+        if "kiro" in cleaned.lower():
+            is_interactive = bool(re.search(r"\b(open|launch|start|terminal|window|develop|interactive)\b", cleaned, flags=re.IGNORECASE))
+            
+            # Extract project name if mentioned
+            proj_name = "TaskMaster"
+            proj_match = re.search(r"\b(?:for|on|in|developing|build|building)\s+([a-zA-Z0-9_\-]+)", cleaned, flags=re.IGNORECASE)
+            if proj_match:
+                cand = proj_match.group(1).strip()
+                if cand.lower() not in ("kiro", "the", "a", "an", "my", "this", "that"):
+                    proj_name = cand
+
+            if is_interactive:
+                # Check if user requested a specific sub-task or stage
+                task_spec = ""
+                stage_match = re.search(r"(stage\s+\d+|phase\s+\d+|step\s+\d+|[^\w\s].+)", cleaned, flags=re.IGNORECASE)
+                if stage_match:
+                    task_spec = f"Focus on implementing {stage_match.group(0).strip()}."
+                return self.kiro_service.launch_interactive_session(initial_prompt=task_spec, project_name=proj_name)
+            else:
+                # Strip kiro trigger keywords for clean headless instruction
+                instruction = re.sub(r"^(?:t|target)\s*=\s*kiro\s+", "", cleaned, flags=re.IGNORECASE)
+                instruction = re.sub(r"\b(?:use\s+kiro\s+to|with\s+kiro|ask\s+kiro\s+to|have\s+kiro|kiro)\b", "", instruction, flags=re.IGNORECASE).strip()
+                kb_ctx = ""
+                if self.context_builder:
+                    kb_ctx = self.context_builder.build_topic_context(instruction or cleaned)
+                return self.kiro_service.generate_code(instruction or cleaned, kb_context=kb_ctx)
+
+        # 0. Active Project Planning session follow-up
+        if self.skill_router:
+            new_proj_skill = self.skill_router.get_skill("new_project")
+            if new_proj_skill and getattr(new_proj_skill, "is_planning_active", lambda: False)():
+                # If the user is actively planning, send input to the planning engine
+                return new_proj_skill.execute(cleaned)
 
         # 0. Homework follow-up — if waiting for instructions after Temp-Guide was opened
         if self._awaiting_homework_instructions and self._homework_skill:
@@ -146,6 +188,30 @@ class Orchestrator:
             return self.gemini_service.send(cleaned, context)
 
         return f"I heard: {cleaned}. Full AI will be connected once your API key is set."
+
+    def _match_kiro_intent(self, text: str) -> str | None:
+        """Detect if the user is delegating a coding instruction to Kiro."""
+        import re
+        lowered = text.lower().strip()
+
+        # Direct tag: "t=kiro [prompt]" or "target=kiro [prompt]"
+        tag_match = re.match(r"^(?:t|target)\s*=\s*kiro\s+(.+)$", text, flags=re.IGNORECASE)
+        if tag_match:
+            return tag_match.group(1).strip()
+
+        # Voice / Natural language triggers
+        patterns = [
+            r"^(?:use\s+kiro\s+(?:to\s+)?|ask\s+kiro\s+(?:to\s+)?|have\s+kiro\s+)(.+)$",
+            r"^(?:code\s+with\s+kiro|build\s+with\s+kiro|generate\s+(?:code\s+)?with\s+kiro)\s*[:,\s]+(.+)$",
+            r"^kiro[:,\s]+(.+)$",
+            r"^(?:kiro\s+)(.+)$",
+        ]
+        for p in patterns:
+            m = re.match(p, lowered)
+            if m:
+                return text[m.start(1):].strip()
+
+        return None
 
     def _build_context(self, text: str) -> str:
         """

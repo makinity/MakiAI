@@ -160,6 +160,7 @@ class MainWindow(QMainWindow):
             "tts":              self.tts_service,
             "skill_router":     self.skill_router,
             "kb_reader":        self.kb_reader,
+            "kb_writer":        self.kb_writer,
             "context_builder":  self.context_builder,
         })
 

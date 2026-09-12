@@ -430,10 +430,12 @@ class MakiUIApi:
             if "kb_path" in new_settings and new_settings["kb_path"]:
                 kb_path = str(new_settings["kb_path"]).strip()
                 self.settings.set_env("KB_PATH", kb_path)
-                if self.orchestrator.kb_reader:
-                    self.orchestrator.kb_reader.kb_path = Path(kb_path)
-                if self.orchestrator.kb_writer:
-                    self.orchestrator.kb_writer.kb_path = Path(kb_path)
+                kb_reader = getattr(self.orchestrator, "kb_reader", None)
+                if kb_reader:
+                    kb_reader.kb_path = Path(kb_path)
+                kb_writer = getattr(self.orchestrator, "kb_writer", None)
+                if kb_writer:
+                    kb_writer.kb_path = Path(kb_path)
 
             self.add_activity("system", "Settings saved and applied successfully.")
             return {"ok": True, "settings": self.get_settings()}

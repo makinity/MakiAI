@@ -209,18 +209,33 @@ class TTSService:
             from elevenlabs import VoiceSettings
 
             client = ElevenLabs(api_key=self.elevenlabs_api_key)
+            active_voice = self.voice_id or "pNInz6obpgDQGcFmaJgB"
 
-            audio = client.text_to_speech.convert(
-                voice_id=self.voice_id,
-                text=text,
-                model_id="eleven_turbo_v2",       # Fastest model, lowest latency
-                voice_settings=VoiceSettings(
-                    stability=0.5,
-                    similarity_boost=0.75,
-                    style=0.0,
-                    use_speaker_boost=True,
-                ),
-            )
+            def _synthesize(v_id: str):
+                return client.text_to_speech.convert(
+                    voice_id=v_id,
+                    text=text,
+                    model_id="eleven_turbo_v2",       # Fastest model, lowest latency
+                    voice_settings=VoiceSettings(
+                        stability=0.5,
+                        similarity_boost=0.75,
+                        style=0.0,
+                        use_speaker_boost=True,
+                    ),
+                )
+
+            try:
+                audio = _synthesize(active_voice)
+            except Exception as e:
+                err_lower = str(e).lower()
+                # If custom voice is a library voice requiring paid plan (402), fallback to premade Adam voice
+                if "402" in err_lower or "paid_plan_required" in err_lower or "library voices" in err_lower:
+                    print(f"[TTSService] Custom voice '{active_voice}' requires paid tier. Falling back to default premade voice (Adam)...")
+                    active_voice = "pNInz6obpgDQGcFmaJgB"
+                    self.voice_id = active_voice
+                    audio = _synthesize(active_voice)
+                else:
+                    raise e
 
             # Save to temp file
             tmp = tempfile.NamedTemporaryFile(

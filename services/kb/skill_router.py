@@ -159,6 +159,11 @@ class SkillRouter:
         self._skills[skill_id] = skill_instance
         print(f"[SkillRouter] Registered skill: {skill_id}")
 
+    def get_skill(self, skill_id: str) -> Optional[object]:
+        """Return the skill instance for a given skill_id, or None."""
+        return self._skills.get(skill_id)
+
     def list_skills(self) -> list[str]:
         """Return a list of all registered skill IDs."""
         return list(self._skills.keys())
+

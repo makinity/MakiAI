@@ -27,11 +27,11 @@ class GeminiService:
 
     # Models to try in order — first available wins
     GROQ_MODELS = [
-        "qwen/qwen3.8-27b",
-        "openai/gpt-oss-20b",
         "openai/gpt-oss-120b",
         "groq/compound",
         "qwen/qwen3.6-27b",
+        "openai/gpt-oss-20b",
+        "qwen/qwen3.8-27b",
     ]
 
     def __init__(self, api_key: str = "", groq_api_key: str = ""):
@@ -167,64 +167,66 @@ class GeminiService:
         return self._stub_response(user_text)
 
     def _send_groq(self, user_text: str, system_context: str) -> str:
-        """Send via Groq API with streaming for faster response."""
-        try:
-            messages = []
-            system_prompt = system_context if system_context else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise. No markdown or bullet points. Just clear natural English.
+        """Send via Groq API with streaming for faster response and model rotation on 429."""
+        messages = []
+        system_prompt = system_context if system_context else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise. No markdown or bullet points. Just clear natural English.
 
 You have full access to:
 - C:\\Knowledge Base\\ — sir's schedule, deadlines, projects, preferences
 - C:\\MakiSync Storage\\ — organized file storage (School, Work, Personal, Freelance, MakiAI with Screenshots/Photos/Recordings in date folders)
 You CAN search, open, and manage files in these locations."""
-            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "system", "content": system_prompt})
 
-            for turn in self._history[-(MAX_HISTORY_TURNS * 2):]:
-                role = "user" if turn["role"] == "user" else "assistant"
-                messages.append({"role": role, "content": turn["text"]})
+        for turn in self._history[-(MAX_HISTORY_TURNS * 2):]:
+            role = "user" if turn["role"] == "user" else "assistant"
+            messages.append({"role": role, "content": turn["text"]})
 
-            messages.append({"role": "user", "content": user_text})
+        messages.append({"role": "user", "content": user_text})
 
-            # Use streaming for faster perceived response
-            stream = self._groq_client.chat.completions.create(
-                model=self._groq_model,
-                messages=messages,
-                max_tokens=800,       # Increased for KB-heavy responses
-                temperature=0.7,
-                stream=True,
-            )
+        # Try active model, rotate if rate limited
+        candidate_models = [self._groq_model] + [m for m in self.GROQ_MODELS if m != self._groq_model]
 
-            answer = ""
-            for chunk in stream:
-                delta = chunk.choices[0].delta.content
-                if delta:
-                    answer += delta
+        for model_name in candidate_models:
+            try:
+                stream = self._groq_client.chat.completions.create(
+                    model=model_name,
+                    messages=messages,
+                    max_tokens=800,
+                    temperature=0.7,
+                    stream=True,
+                )
 
-            answer = answer.strip()
-            # Strip reasoning tags if present
-            import re
-            answer = re.sub(r"<think>.*?</think>", "", answer, flags=re.DOTALL).strip()
+                answer = ""
+                for chunk in stream:
+                    delta = chunk.choices[0].delta.content
+                    if delta:
+                        answer += delta
 
-            if not answer:
-                print(f"[AIService] Groq returned empty response for: {user_text[:50]}")
-                if self._gemini_client:
-                    print("[AIService] Trying Gemini fallback for empty response.")
-                    return self._send_gemini(user_text, system_context)
-                return ""
-            self._add_to_history("user", user_text)
-            self._add_to_history("model", answer)
-            return answer
+                answer = answer.strip()
+                import re
+                answer = re.sub(r"<think>.*?</think>", "", answer, flags=re.DOTALL).strip()
 
-        except Exception as e:
-            error_str = str(e).lower()
-            print(f"[AIService] Groq error: {e}")
-            if self._gemini_client:
-                print("[AIService] Groq failed — trying Gemini fallback.")
-                return self._send_gemini(user_text, system_context)
-            if "rate" in error_str or "429" in error_str:
-                return "I'm being rate limited. Give me a moment and try again."
-            if "auth" in error_str or "invalid" in error_str or "401" in error_str:
-                return "My Groq API key seems invalid. Please check your settings."
-            return "I had trouble thinking. Please try again."
+                if answer:
+                    self._groq_model = model_name
+                    self._add_to_history("user", user_text)
+                    self._add_to_history("model", answer)
+                    return answer
+
+            except Exception as e:
+                err_str = str(e).lower()
+                if "429" in err_str or "rate limit" in err_str or "quota" in err_str:
+                    print(f"[AIService] Groq model '{model_name}' hit rate limit. Trying alternate model...")
+                    continue
+                else:
+                    print(f"[AIService] Groq error on {model_name}: {e}")
+                    break
+
+        # Fallback to Gemini if all Groq models fail or are rate limited
+        if self._gemini_client:
+            print("[AIService] Groq unavailable — using Gemini fallback.")
+            return self._send_gemini(user_text, system_context)
+
+        return "I had trouble thinking. Please try again."
 
     def _send_gemini(self, user_text: str, system_context: str) -> str:
         """Send via Gemini API."""

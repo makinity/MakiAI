@@ -90,7 +90,7 @@ class ContextBuilder:
         CORE_DIRS = ["workflows", "about", "preferences", "config"]
         SKIP_FILES = {"voice.md"}
         total_chars = len(MAKI_PERSONALITY)
-        MAX_TOTAL = 25000
+        MAX_TOTAL = 9000  # ~2,250 tokens
 
         for source in CORE_DIRS:
             if total_chars >= MAX_TOTAL:
@@ -104,7 +104,7 @@ class ContextBuilder:
                     continue
                 content = self.kb_reader.read(file_path)
                 if content and len(content.strip()) > 20:
-                    truncated = content[:1000]
+                    truncated = content[:600]
                     parts.append(f"### {file_path}")
                     parts.append(truncated)
                     parts.append("")
@@ -127,25 +127,23 @@ class ContextBuilder:
 
         loaded_files = set()
         total_chars = len(MAKI_PERSONALITY)
-        MAX_TOTAL = 22000
+        MAX_TOTAL = 9000  # ~2,250 tokens — fits comfortably within Groq free-tier ITPM (7,000 limit)
 
-        # 1. ALWAYS INJECTED CORE FILES
+        # 1. ALWAYS INJECTED CORE FILES (Concise summaries)
         CORE_FILES = [
             "about/social-media.md",
             "about/profile.md",
             "about/goals.md",
-            "about/biodata.md",
-            "workflows/time-management.md",
-            "workflows/deadlines.md",
-            "workflows/carryover.md",
             "preferences/preferences.md",
-            "config/coding-standards.md",
+            "workflows/deadlines.md",
         ]
 
         for file_path in CORE_FILES:
+            if total_chars >= MAX_TOTAL:
+                break
             content = self.kb_reader.read(file_path)
             if content and len(content.strip()) > 20:
-                truncated = content[:2000]
+                truncated = content[:800]
                 norm_p = file_path.replace("\\", "/")
                 parts.append(f"### {norm_p}")
                 parts.append(truncated)
@@ -159,49 +157,56 @@ class ContextBuilder:
         if query_text and query_text.lower() != "all":
             relevant_docs = []
 
-            # Method A: High-speed SQLite FTS5 index search
-            if self.kb_index:
-                hits = self.kb_index.search(query_text, limit=6)
-                for h in hits:
-                    norm_p = h["filepath"].replace("\\", "/")
-                    if norm_p not in loaded_files:
-                        relevant_docs.append((norm_p, h.get("content", "")))
-            else:
-                # Method B: In-memory RAM keyword scanner fallback
-                words = [re.sub(r"[^a-zA-Z0-9_-]", "", w.lower()) for w in query_text.split()]
-                STOPWORDS = {
-                    "what", "when", "where", "which", "who", "whom", "this", "that", "these", "those",
-                    "have", "has", "had", "does", "is", "are", "was", "were", "my", "your", "the", "a",
-                    "an", "in", "on", "at", "to", "for", "of", "with", "about", "and", "or", "tell",
-                    "me", "show", "current", "you", "sir", "maki", "please", "know", "how",
-                }
-                keywords = [w for w in words if len(w) > 2 and w not in STOPWORDS]
+            # Extract clean keyword tokens
+            words = [re.sub(r"[^a-zA-Z0-9_-]", "", w.lower()) for w in query_text.split()]
+            STOPWORDS = {
+                "what", "when", "where", "which", "who", "whom", "this", "that", "these", "those",
+                "have", "has", "had", "does", "is", "are", "was", "were", "my", "your", "the", "a",
+                "an", "in", "on", "at", "to", "for", "of", "with", "about", "and", "or", "tell",
+                "me", "show", "current", "you", "sir", "maki", "please", "know", "how", "use",
+                "generate", "based", "website",
+            }
+            keywords = [w for w in words if len(w) > 2 and w not in STOPWORDS]
 
-                if keywords:
-                    scores = []
-                    all_kb_files = self.kb_reader.list_files("", "*.md")
-                    for f in all_kb_files:
-                        norm_f = f.replace("\\", "/")
-                        if norm_f in loaded_files or any(skip in norm_f for skip in ["node_modules", ".git", "voice.md"]):
-                            continue
-                        content = self.kb_reader.read(f)
-                        if not content or len(content.strip()) < 10:
-                            continue
-                        c_lower = content.lower()
-                        f_lower = norm_f.lower()
+            # Method A: SQLite FTS5 search with OR tokenization
+            if self.kb_index and keywords:
+                fts_query = " OR ".join(f'"{kw}"' for kw in keywords[:5])
+                try:
+                    hits = self.kb_index.search(fts_query, limit=4)
+                    for h in hits:
+                        norm_p = h["filepath"].replace("\\", "/")
+                        if norm_p not in loaded_files:
+                            relevant_docs.append((norm_p, h.get("content", "")))
+                except Exception:
+                    pass
 
-                        score = 0
-                        for kw in keywords:
-                            if kw in f_lower:
-                                score += 35
-                            score += min(c_lower.count(kw) * 2, 30)
+            # Method B: In-memory RAM keyword scanner fallback
+            if len(relevant_docs) < 2 and keywords:
+                scores = []
+                all_kb_files = self.kb_reader.list_files("", "*.md")
+                for f in all_kb_files:
+                    norm_f = f.replace("\\", "/")
+                    if norm_f in loaded_files or any(skip in norm_f for skip in ["node_modules", ".git", "voice.md"]):
+                        continue
+                    content = self.kb_reader.read(f)
+                    if not content or len(content.strip()) < 10:
+                        continue
+                    c_lower = content.lower()
+                    f_lower = norm_f.lower()
 
-                        if score > 0:
-                            scores.append((score, f))
+                    score = 0
+                    for kw in keywords:
+                        if kw in f_lower:
+                            score += 50
+                        score += min(c_lower.count(kw) * 3, 40)
 
-                    scores.sort(reverse=True, key=lambda x: x[0])
-                    for score, f in scores[:6]:
-                        norm_f = f.replace("\\", "/")
+                    if score > 0:
+                        scores.append((score, f))
+
+                scores.sort(reverse=True, key=lambda x: x[0])
+                for score, f in scores[:4]:
+                    norm_f = f.replace("\\", "/")
+                    if not any(d[0] == norm_f for d in relevant_docs):
                         c = self.kb_reader.read(f)
                         if c:
                             relevant_docs.append((norm_f, c))
@@ -209,13 +214,13 @@ class ContextBuilder:
             if relevant_docs:
                 parts.append("## Highly Relevant Knowledge Base Documents:")
                 parts.append("")
-                for norm_f, content in relevant_docs[:6]:
+                for norm_f, content in relevant_docs[:4]:
                     if total_chars >= MAX_TOTAL:
                         break
                     if not content:
                         content = self.kb_reader.read(norm_f)
                     if content:
-                        truncated = content[:2000]
+                        truncated = content[:1000]
                         parts.append(f"### {norm_f}")
                         parts.append(truncated)
                         parts.append("")

@@ -159,6 +159,7 @@ def bootstrap_maki_services():
         "tts": tts_service,
         "skill_router": skill_router,
         "kb_reader": kb_reader,
+        "kb_writer": kb_writer,
         "context_builder": context_builder,
     })
 
