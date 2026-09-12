@@ -173,28 +173,31 @@ class WindowManager:
                 user32.GetWindowTextW(hwnd, buff, length + 1)
                 title = buff.value.strip()
 
-                # Filter out system utility overlays
+                # Filter out system utility overlays and assistant compact UI
                 ignored_titles = (
                     "Program Manager", "Settings", "Windows Input Experience",
                     "Task Switching", "TranslucentTB", "NVIDIA GeForce Overlay",
                     "MakiAI Overlay", "PopupHost", "Setup", "Default IME"
                 )
-                if title and not any(ign in title for ign in ignored_titles):
-                    rect = wintypes.RECT()
-                    user32.GetWindowRect(hwnd, ctypes.byref(rect))
-                    w = rect.right - rect.left
-                    h = rect.bottom - rect.top
-                    if (w > 120 and h > 120) or is_minimized:
-                        is_maximized = bool(user32.IsZoomed(hwnd))
-                        windows.append({
-                            "hwnd": hwnd,
-                            "title": title,
-                            "rect": (rect.left, rect.top, rect.right, rect.bottom),
-                            "width": w,
-                            "height": h,
-                            "is_maximized": is_maximized,
-                            "is_minimized": is_minimized,
-                        })
+                # Ignore exact assistant window title so it doesn't get stretched into a tile
+                if title in ("MakiAI", "MakiAI Desktop Interface") or any(ign in title for ign in ignored_titles):
+                    return True
+
+                rect = wintypes.RECT()
+                user32.GetWindowRect(hwnd, ctypes.byref(rect))
+                w = rect.right - rect.left
+                h = rect.bottom - rect.top
+                if (w > 120 and h > 120) or is_minimized:
+                    is_maximized = bool(user32.IsZoomed(hwnd))
+                    windows.append({
+                        "hwnd": hwnd,
+                        "title": title,
+                        "rect": (rect.left, rect.top, rect.right, rect.bottom),
+                        "width": w,
+                        "height": h,
+                        "is_maximized": is_maximized,
+                        "is_minimized": is_minimized,
+                    })
             return True
 
         WNDENUMPROC = ctypes.WINFUNCTYPE(ctypes.c_bool, wintypes.HWND, wintypes.LPARAM)
@@ -379,16 +382,10 @@ class WindowManager:
 
         Multi-Monitor Logic (Dual Display):
           - N = 1: 1 Window maximized on Main Monitor.
-          - N = 2: 1 Window on Secondary Monitor (Full screen), 1 Window on Main Monitor (Full screen).
-          - N = 3: 1 Window on Secondary Monitor (Full screen), 2 Windows on Main Monitor (50/50 side-by-side).
+          - N = 2: 1 Reference Window on Secondary Monitor (Full), 1 Work/IDE Window on Main Monitor (Full).
+          - N = 3: 2 Reference Windows on Secondary Monitor (50/50 side-by-side), 1 Work/IDE Window on Main Monitor (Full).
           - N = 4: 2 Windows on Secondary Monitor (50/50), 2 Windows on Main Monitor (50/50).
           - N > 4: First 4 active windows fitted; all remaining 5+ windows minimized.
-
-        Args:
-            target_monitor: "auto", "all", "workspace", "1", "2", "main", "secondary", "left", "right"
-            layout: "auto", "split", "quadrant", "columns"
-            priority_apps: Optional list of app aliases to prioritize
-            max_windows: Cap to 4 windows maximum
         """
         monitors = self.get_monitors()
         if not monitors:
@@ -442,53 +439,59 @@ class WindowManager:
             mx_w = main_mon.get("work_width", main_mon["width"])
             mx_h = main_mon.get("work_height", main_mon["height"])
 
+            # Separate into IDE/Work vs Reference/Browser/Explorer
+            ide_win = None
+            browser_win = None
+            other_wins = []
+
+            for w in windows_to_tile:
+                t = w["title"].lower()
+                if any(k in t for k in ("visual studio code", "antigravity ide", "vscode", "pycharm", "sublime", "editor")) and not ide_win:
+                    ide_win = w
+                elif any(k in t for k in ("chrome", "gemini", "facebook", "edge", "firefox", "brave", "youtube")) and not browser_win:
+                    browser_win = w
+                else:
+                    other_wins.append(w)
+
+            # Primary work window (IDE preferred, else first app)
+            primary_work_win = ide_win or (windows_to_tile[0] if windows_to_tile else None)
+
+            # Reference pool (all apps except primary work window)
+            ref_pool = [w for w in windows_to_tile if w["hwnd"] != (primary_work_win["hwnd"] if primary_work_win else 0)]
+
             assignments = []  # List of (window_dict, (x, y, w, h))
 
             if n == 1:
                 assignments.append((windows_to_tile[0], (mx_left, mx_top, mx_w, mx_h)))
 
             elif n == 2:
-                # 1 on Secondary (Full), 1 on Main (Full)
-                assignments.append((windows_to_tile[0], (sx_left, sx_top, sx_w, sx_h)))
-                assignments.append((windows_to_tile[1], (mx_left, mx_top, mx_w, mx_h)))
+                # 1 Reference on Secondary (Full), 1 Work on Main (Full)
+                assignments.append((ref_pool[0], (sx_left, sx_top, sx_w, sx_h)))
+                assignments.append((primary_work_win, (mx_left, mx_top, mx_w, mx_h)))
 
             elif n == 3:
-                # 1 on Secondary (Full), 2 on Main (50/50 side-by-side)
-                # If a browser is in the list, prioritize placing browser on secondary monitor
-                browser_win = None
-                for w in windows_to_tile:
-                    if any(b in w["title"].lower() for b in ("chrome", "gemini", "facebook", "edge", "firefox", "brave")):
-                        browser_win = w
-                        break
-
-                sec_win = browser_win if browser_win else windows_to_tile[0]
-                main_wins = [w for w in windows_to_tile if w["hwnd"] != sec_win["hwnd"]][:2]
-
-                # Secondary Monitor (Full screen)
-                assignments.append((sec_win, (sx_left, sx_top, sx_w, sx_h)))
-
-                # Main Monitor (50/50 split)
-                half_mw = mx_w // 2
-                assignments.append((main_wins[0], (mx_left, mx_top, half_mw, mx_h)))
-                assignments.append((main_wins[1], (mx_left + half_mw, mx_top, mx_w - half_mw, mx_h)))
+                # 2 Reference on Secondary (50/50 side-by-side), 1 Work on Main (Full)
+                half_sw = sx_w // 2
+                assignments.append((ref_pool[0], (sx_left, sx_top, half_sw, sx_h)))
+                assignments.append((ref_pool[1], (sx_left + half_sw, sx_top, sx_w - half_sw, sx_h)))
+                assignments.append((primary_work_win, (mx_left, mx_top, mx_w, mx_h)))
 
             elif n >= 4:
                 # 2 on Secondary (50/50), 2 on Main (50/50)
                 half_sw = sx_w // 2
-                assignments.append((windows_to_tile[0], (sx_left, sx_top, half_sw, sx_h)))
-                assignments.append((windows_to_tile[1], (sx_left + half_sw, sx_top, sx_w - half_sw, sx_h)))
+                assignments.append((ref_pool[0], (sx_left, sx_top, half_sw, sx_h)))
+                assignments.append((ref_pool[1], (sx_left + half_sw, sx_top, sx_w - half_sw, sx_h)))
 
                 half_mw = mx_w // 2
-                assignments.append((windows_to_tile[2], (mx_left, mx_top, half_mw, mx_h)))
-                assignments.append((windows_to_tile[3], (mx_left + half_mw, mx_top, mx_w - half_mw, mx_h)))
+                assignments.append((primary_work_win, (mx_left, mx_top, half_mw, mx_h)))
+                assignments.append((ref_pool[2] if len(ref_pool) > 2 else other_wins[0], (mx_left + half_mw, mx_top, mx_w - half_mw, mx_h)))
 
-            # Execute positioning
+            # Execute positioning with MoveWindow for pixel-exact placement
             for win, (x, y, w, h) in assignments:
                 hwnd = win["hwnd"]
-                if win.get("is_maximized"):
-                    user32.ShowWindow(hwnd, SW_RESTORE)
-                    time.sleep(0.04)
-                user32.SetWindowPos(hwnd, 0, x, y, w, h, SWP_NOZORDER | SWP_SHOWWINDOW)
+                user32.ShowWindow(hwnd, SW_RESTORE)
+                time.sleep(0.04)
+                user32.MoveWindow(hwnd, int(x), int(y), int(w), int(h), True)
 
             app_titles = [re.sub(r"[\-_|].*$", "", w["title"]).strip() for w, _ in assignments]
             desc = ", ".join(app_titles[:3])
