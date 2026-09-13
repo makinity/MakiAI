@@ -238,3 +238,39 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"You’re welcome, sir. Let me know if there’s anything else I can do for you."`
 
 ---
+
+### 🔹 Live Session Command — 05:22:25 PM
+* **Spoken / Typed Command:** `"what is the current time today?"`
+* **Extracted Payload:** `"what is the current time today?"`
+* **Matched Handler:** `Skill:HelloSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"It's 05:22 PM Philippine Time, sir. Right now you're in your Video Editing and AI Video Editing Mastery session, as today’s Sunday schedule ..."`
+
+---
+
+### 🔹 Live Session Command — 05:22:35 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You're welcome, sir. Let me know if there's anything else I can help with."`
+
+---
+
+### 🔹 Live Session Command — 05:29:12 PM
+* **Spoken / Typed Command:** `"Hi"`
+* **Extracted Payload:** `"Hi"`
+* **Matched Handler:** `Skill:HelloSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Good afternoon, sir. It’s 05:29 PM Philippine Time, and the day’s override has you in the Video Editing and AI Video Editing Mastery block r..."`
+
+---
+
+### 🔹 Live Session Command — 05:30:35 PM
+* **Spoken / Typed Command:** `"I want the pdf one"`
+* **Extracted Payload:** `"I want the pdf one"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure thing, sir. Which PDF are you looking for—perhaps the schedule, the deadline list, or one of your project documents? Let me know and I’..."`
+
+---

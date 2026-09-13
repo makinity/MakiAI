@@ -115,5 +115,41 @@
     "response": "You’re welcome, sir. Let me know if there’s anything else I can do for you.",
     "is_fallback": true,
     "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:22:25",
+    "raw_command": "what is the current time today?",
+    "cleaned_command": "what is the current time today?",
+    "handler": "Skill:HelloSkill",
+    "response": "It's 05:22 PM Philippine Time, sir. Right now you're in your Video Editing and AI Video Editing Mastery session, as today’s Sunday schedule is fully dedicated to that. After this hour you'll keep working on the same mastering block until you finish for the night. There are no urgent deadlines today, though the AI Ad Video is due tomorrow at 1 PM.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 17:22:35",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "You're welcome, sir. Let me know if there's anything else I can help with.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:29:12",
+    "raw_command": "Hi",
+    "cleaned_command": "Hi",
+    "handler": "Skill:HelloSkill",
+    "response": "Good afternoon, sir. It’s 05:29 PM Philippine Time, and the day’s override has you in the Video Editing and AI Video Editing Mastery block right now. After 6 PM you’ll keep working on the same task before your evening walk and dinner. And just a reminder, the AI Ad Video is due tomorrow at 1 PM.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 17:30:35",
+    "raw_command": "I want the pdf one",
+    "cleaned_command": "I want the pdf one",
+    "handler": "Fallback:Gemini",
+    "response": "Sure thing, sir. Which PDF are you looking for—perhaps the schedule, the deadline list, or one of your project documents? Let me know and I’ll pull it up for you.",
+    "is_fallback": true,
+    "flagged_for_review": true
   }
 ]
