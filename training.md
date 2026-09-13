@@ -274,3 +274,75 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"Sure thing, sir. Which PDF are you looking for—perhaps the schedule, the deadline list, or one of your project documents? Let me know and I’..."`
 
 ---
+
+### 🔹 Live Session Command — 05:33:42 PM
+* **Spoken / Typed Command:** `"assistant for Maki."`
+* **Extracted Payload:** `"assistant for Maki."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good afternoon, sir. How can I assist you today?"`
+
+---
+
+### 🔹 Live Session Command — 05:34:21 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You’re welcome, sir. Let me know if there’s anything I can help with."`
+
+---
+
+### 🔹 Live Session Command — 05:34:32 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Happy to help, sir. Anything else on your mind?"`
+
+---
+
+### 🔹 Live Session Command — 05:35:18 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"My pleasure, sir. Just let me know whenever you need anything."`
+
+---
+
+### 🔹 Live Session Command — 05:41:07 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `"Maki."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good afternoon, sir. How can I assist you today?"`
+
+---
+
+### 🔹 Live Session Command — 05:41:30 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You're welcome, sir. Let me know if there's anything you need."`
+
+---
+
+### 🔹 Live Session Command — 05:41:47 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Happy to help, sir. Anything else on your mind?"`
+
+---
+
+### 🔹 Live Session Command — 05:42:22 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"My pleasure, sir. If anything comes up—reminders, files, or just a quick check‑in—just let me know."`
+
+---

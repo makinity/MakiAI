@@ -91,7 +91,11 @@ class TelegramRemoteService:
         self._allowed_user_id: str = self.settings.get_env("TELEGRAM_ALLOWED_USER_ID", "").strip()
         self._transcriber = AudioTranscriber()
 
+        self._pending_folder_choices: Dict[int, List[Path]] = {}
         self._pending_file_choices: Dict[int, List[Path]] = {}
+        self._last_search_folder_map: Dict[int, Dict[Path, List[Path]]] = {}
+        self._last_search_query: Dict[int, str] = {}
+        self._picker_step: Dict[int, str] = {}  # "folder" or "file"
 
         self._app: Optional[Application] = None
         self._thread: Optional[threading.Thread] = None
@@ -147,6 +151,12 @@ class TelegramRemoteService:
             self._app.add_handler(CommandHandler("status", self._cmd_status))
             self._app.add_handler(CommandHandler("screenshot", self._cmd_screenshot))
             self._app.add_handler(CommandHandler("screen", self._cmd_screenshot))
+            self._app.add_handler(CommandHandler("camera", self._cmd_camera))
+            self._app.add_handler(CommandHandler("photo", self._cmd_camera))
+            self._app.add_handler(CommandHandler("lastphoto", lambda u, c: self._send_last_photo(u)))
+            self._app.add_handler(CommandHandler("lastcamera", lambda u, c: self._send_last_photo(u)))
+            self._app.add_handler(CommandHandler("lastscreenshot", lambda u, c: self._send_last_screenshot(u)))
+            self._app.add_handler(CommandHandler("lastscreen", lambda u, c: self._send_last_screenshot(u)))
             self._app.add_handler(CommandHandler("file", self._cmd_file))
             self._app.add_handler(CommandHandler("get", self._cmd_file))
             self._app.add_handler(CommandHandler("browse", self._cmd_browse))
@@ -224,15 +234,20 @@ class TelegramRemoteService:
         if not self._is_authorized(update):
             return
         await update.message.reply_text(
-            "📋 **MakiAI Mobile Commands:**\n\n"
-            "• `/browse` - Browse your PC folders (Capstone, MakiSync Storage, Documents)\n"
-            "• `/file <name>` or `send me [file]` - Search & pick PC files interactively\n"
-            "• `/screenshot` - Send live desktop capture\n"
-            "• `/status` - Check PC status, time, and active state\n"
+            "📋 **MakiAI Mobile Remote Commands:**\n\n"
+            "📷 **Camera & Visuals:**\n"
+            "• `send me the last camera capture` or `/lastphoto` - Get your most recent camera picture\n"
+            "• `send me the last screenshot` or `/lastscreenshot` - Get your most recent screenshot\n"
+            "• `take a photo` or `/camera` - Snap live photo from webcam\n"
+            "• `take a screenshot` or `/screenshot` - Capture live desktop screen\n\n"
+            "📁 **Files & Storage:**\n"
+            "• `/browse` or `browse capstone` - 2-step interactive folder & file explorer\n"
+            "• `send me [filename/query]` (e.g. `send my CV`, `send capstone paper`)\n\n"
+            "🧠 **Productivity & Schedule:**\n"
             "• `What is my schedule today?`\n"
             "• `Remind me at 8 PM to [task]`\n"
             "• `Add deadline: [task] due Friday`\n"
-            "• Attach a photo/PDF rubric to generate Word homework!",
+            "• Forward rubric photos/PDFs to generate Word homework!",
             parse_mode="Markdown"
         )
 
@@ -264,6 +279,186 @@ class TelegramRemoteService:
             await update.message.reply_photo(photo=bio, caption="🖥️ Current Desktop Screen View")
         except Exception as e:
             await update.message.reply_text(f"❌ Failed to capture screenshot: {e}")
+
+    async def _cmd_camera(self, update: Update, context: ContextTypes.DEFAULT_TYPE = None) -> None:
+        """Capture a live webcam photo and send to Telegram."""
+        if not self._is_authorized(update):
+            return
+
+        chat_obj = update.message or (update.callback_query.message if update.callback_query else None)
+        if chat_obj:
+            await chat_obj.reply_text("📷 Accessing webcam and capturing photo...")
+
+        try:
+            import cv2
+            def _capture_frame():
+                cap = None
+                for dev_idx in [0, 1]:
+                    try:
+                        cap = cv2.VideoCapture(dev_idx, cv2.CAP_DSHOW)
+                        if not cap.isOpened():
+                            cap.release()
+                            cap = cv2.VideoCapture(dev_idx)
+                        if cap and cap.isOpened():
+                            break
+                    except Exception:
+                        if cap:
+                            cap.release()
+                        cap = None
+
+                if not cap or not cap.isOpened():
+                    return None, "I couldn't access your webcam device, sir."
+
+                for _ in range(5):
+                    cap.read()
+                    time.sleep(0.04)
+
+                ret, frame = cap.read()
+                cap.release()
+
+                if not ret or frame is None:
+                    return None, "Failed to grab frame from webcam."
+
+                # Save photo to MakiSync Storage/Photos/YYYY-MM-DD
+                from services.storage.maki_sync import get_dated_folder
+                save_dir = get_dated_folder("Photos")
+                save_dir.mkdir(parents=True, exist_ok=True)
+                ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                save_file = save_dir / f"photo_{ts}.jpg"
+                cv2.imwrite(str(save_file), frame)
+
+                ret_enc, buf = cv2.imencode(".jpg", frame)
+                if not ret_enc:
+                    return None, "Failed to encode image."
+
+                return buf.tobytes(), str(save_file)
+
+            raw_bytes, result_info = await asyncio.to_thread(_capture_frame)
+            if not raw_bytes:
+                if chat_obj:
+                    await chat_obj.reply_text(f"⚠️ {result_info}")
+                return
+
+            bio = io.BytesIO(raw_bytes)
+            bio.name = "webcam_capture.jpg"
+            bio.seek(0)
+
+            pht_time = datetime.now().strftime("%I:%M %p")
+            if chat_obj:
+                await chat_obj.reply_photo(
+                    photo=bio,
+                    caption=f"📷 **Live Webcam Capture**\n🕒 Today at {pht_time}\n💾 Saved to `{Path(result_info).name}`",
+                    parse_mode="Markdown"
+                )
+        except Exception as e:
+            if chat_obj:
+                await chat_obj.reply_text(f"❌ Camera capture error: {e}")
+
+    async def _send_last_photo(self, update: Update) -> None:
+        """Find the most recently captured camera photo and send to Telegram."""
+        if not self._is_authorized(update):
+            return
+
+        chat_obj = update.message or (update.callback_query.message if update.callback_query else None)
+        if chat_obj:
+            await chat_obj.reply_text("🔍 Locating your latest camera capture...")
+
+        try:
+            from services.storage.maki_sync import MAKI_SYNC_ROOT
+            search_dirs = [
+                MAKI_SYNC_ROOT / "Photos",
+                Path.home() / "Pictures" / "MakiAI",
+                Path.home() / "Pictures" / "Camera Roll",
+                Path.home() / "Pictures",
+            ]
+
+            photo_candidates = []
+            valid_exts = {".jpg", ".jpeg", ".png"}
+
+            for root in search_dirs:
+                if not root.exists():
+                    continue
+                for dirpath, _, filenames in os.walk(str(root)):
+                    for fn in filenames:
+                        p = Path(dirpath) / fn
+                        if p.suffix.lower() in valid_exts and not p.name.startswith("."):
+                            try:
+                                photo_candidates.append((p.stat().st_mtime, p))
+                            except Exception:
+                                pass
+
+            if not photo_candidates:
+                if chat_obj:
+                    await chat_obj.reply_text("📷 No camera photos found in your storage yet, sir. You can type `take a photo` to capture one now!")
+                return
+
+            photo_candidates.sort(key=lambda x: x[0], reverse=True)
+            last_mtime, latest_photo = photo_candidates[0]
+            mtime_str = _format_mtime(last_mtime)
+
+            if chat_obj:
+                with open(latest_photo, "rb") as f:
+                    await chat_obj.reply_photo(
+                        photo=f,
+                        caption=f"📷 **Latest Camera Capture**\n📄 `{latest_photo.name}`\n🕒 Modified: {mtime_str}\n📍 `{latest_photo.parent}`",
+                        parse_mode="Markdown"
+                    )
+        except Exception as e:
+            if chat_obj:
+                await chat_obj.reply_text(f"❌ Failed to fetch latest photo: {e}")
+
+    async def _send_last_screenshot(self, update: Update) -> None:
+        """Find the most recently captured desktop screenshot and send to Telegram."""
+        if not self._is_authorized(update):
+            return
+
+        chat_obj = update.message or (update.callback_query.message if update.callback_query else None)
+        if chat_obj:
+            await chat_obj.reply_text("🔍 Locating your latest desktop screenshot...")
+
+        try:
+            from services.storage.maki_sync import MAKI_SYNC_ROOT
+            search_dirs = [
+                MAKI_SYNC_ROOT / "Screenshots",
+                Path.home() / "Pictures" / "Screenshots",
+                Path.home() / "Pictures" / "MakiAI",
+                Path.home() / "Pictures",
+            ]
+
+            ss_candidates = []
+            valid_exts = {".png", ".jpg", ".jpeg"}
+
+            for root in search_dirs:
+                if not root.exists():
+                    continue
+                for dirpath, _, filenames in os.walk(str(root)):
+                    for fn in filenames:
+                        p = Path(dirpath) / fn
+                        if p.suffix.lower() in valid_exts and not p.name.startswith("."):
+                            try:
+                                ss_candidates.append((p.stat().st_mtime, p))
+                            except Exception:
+                                pass
+
+            if not ss_candidates:
+                if chat_obj:
+                    await chat_obj.reply_text("🖥️ No screenshots found in your storage yet, sir. Type `/screenshot` to capture one right now!")
+                return
+
+            ss_candidates.sort(key=lambda x: x[0], reverse=True)
+            last_mtime, latest_ss = ss_candidates[0]
+            mtime_str = _format_mtime(last_mtime)
+
+            if chat_obj:
+                with open(latest_ss, "rb") as f:
+                    await chat_obj.reply_photo(
+                        photo=f,
+                        caption=f"🖥️ **Latest Desktop Screenshot**\n📄 `{latest_ss.name}`\n🕒 Modified: {mtime_str}\n📍 `{latest_ss.parent}`",
+                        parse_mode="Markdown"
+                    )
+        except Exception as e:
+            if chat_obj:
+                await chat_obj.reply_text(f"❌ Failed to fetch latest screenshot: {e}")
 
     async def _cmd_file(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Handle /file or /get <filename or search term>."""
@@ -475,47 +670,111 @@ class TelegramRemoteService:
                 seen_paths.add(str(p).lower())
                 unique_matches.append(p)
 
-        # ── Case 1: Exactly 1 Match or direct CV match ────────────────────────
+        # ── Case 1: Exactly 1 Match or direct CV match with 1 item ────────────
         if len(unique_matches) == 1 or (is_cv_query and len(unique_matches) <= 2):
             return await self._send_single_file(unique_matches[0], update)
 
-        # ── Case 2: Multiple Matches -> Group by Folders & Render Interactive List ──
-        top_candidates = unique_matches[:10]
+        # ── Case 2: Group by Folder for 2-Step Selection ──────────────────────
+        folder_map = defaultdict(list)
+        for p in unique_matches[:20]:
+            folder_map[p.parent].append(p)
+
         chat_id = update.effective_chat.id
-        self._pending_file_choices[chat_id] = top_candidates
+        self._last_search_folder_map[chat_id] = folder_map
+        self._last_search_query[chat_id] = clean_q
+        folders_list = list(folder_map.keys())
+        self._pending_folder_choices[chat_id] = folders_list
 
-        # Group by parent folder
-        folder_groups = defaultdict(list)
-        for global_idx, p in enumerate(top_candidates, start=1):
-            folder_groups[p.parent].append((global_idx, p))
+        if len(folders_list) == 1:
+            # Single folder contains all matches -> Show files inside this folder directly
+            await self._render_files_in_folder(folders_list[0], folder_map[folders_list[0]], update, is_new_message=True, can_go_back=False)
+        else:
+            # Multiple folders contain matches -> Present Folders First!
+            await self._render_folder_selection(folders_list, folder_map, clean_q, update, is_new_message=True)
+        return True
 
+    async def _render_folder_selection(self, folders_list: List[Path], folder_map: Dict[Path, List[Path]], query_str: str, update: Update, is_new_message: bool = True) -> None:
+        """Step 1: Render list of folders containing matching files."""
+        chat_id = update.effective_chat.id
+        self._picker_step[chat_id] = "folder"
+        self._pending_folder_choices[chat_id] = folders_list
+
+        total_files = sum(len(flist) for flist in folder_map.values())
         msg_lines = [
-            f"🔍 *Found {len(unique_matches)} matching files for* \"{clean_q}\":\n"
+            f"🔍 *Found {total_files} matching files across {len(folders_list)} folders for* \"{query_str}\":\n",
+            "📁 *Select a folder to view its files:*"
         ]
 
         buttons = []
-        for folder_path, items in folder_groups.items():
-            msg_lines.append(f"📂 `{folder_path}`")
-            for idx, p in items:
-                mtime_str = _format_mtime(p.stat().st_mtime if p.exists() else 0)
-                size_str = _format_size(p.stat().st_size if p.exists() else 0)
-                msg_lines.append(f"  **[{idx}]** `{p.name}` ({size_str}) • _{mtime_str}_")
-                buttons.append([InlineKeyboardButton(f"📄 {idx}. {p.name[:38]}", callback_data=f"pickfile:{idx-1}")])
-            msg_lines.append("")
+        for idx, fpath in enumerate(folders_list[:8], start=1):
+            file_count = len(folder_map.get(fpath, []))
+            folder_display_name = fpath.name or str(fpath)
+            msg_lines.append(f"  **[{idx}]** `{fpath}` ({file_count} file{'s' if file_count != 1 else ''})")
+            buttons.append([InlineKeyboardButton(f"📁 {idx}. {folder_display_name[:32]} ({file_count})", callback_data=f"pickfolder:{idx-1}")])
 
-        msg_lines.append("👉 *Tap a button below* or reply with the number (e.g. `1` or `send 1`):")
+        msg_lines.append("\n👉 *Tap a folder button below* or reply with the folder number (e.g. `1`):")
         buttons.append([InlineKeyboardButton("❌ Cancel", callback_data="cancel_picker")])
+
+        full_msg = "\n".join(msg_lines)
+        if is_new_message or not update.callback_query:
+            target_chat = update.message or (update.callback_query.message if update.callback_query else None)
+            if target_chat:
+                await target_chat.reply_text(
+                    full_msg,
+                    reply_markup=InlineKeyboardMarkup(buttons),
+                    parse_mode="Markdown"
+                )
+        else:
+            await update.callback_query.edit_message_text(
+                full_msg,
+                reply_markup=InlineKeyboardMarkup(buttons),
+                parse_mode="Markdown"
+            )
+
+    async def _render_files_in_folder(self, folder_path: Path, files_list: List[Path], update: Update, is_new_message: bool = False, can_go_back: bool = True) -> None:
+        """Step 2: Render files inside the chosen folder."""
+        chat_id = update.effective_chat.id
+        self._picker_step[chat_id] = "file"
+        self._pending_file_choices[chat_id] = files_list
+
+        msg_lines = [
+            f"📂 *Folder:* `{folder_path}`\n",
+            f"📄 *Files in this folder ({len(files_list)} total):*"
+        ]
+
+        buttons = []
+        for idx, p in enumerate(files_list[:10], start=1):
+            mtime_str = _format_mtime(p.stat().st_mtime if p.exists() else 0)
+            size_str = _format_size(p.stat().st_size if p.exists() else 0)
+            msg_lines.append(f"  **[{idx}]** `{p.name}` ({size_str}) • _{mtime_str}_")
+            buttons.append([InlineKeyboardButton(f"📄 {idx}. {p.name[:36]}", callback_data=f"pickfile:{idx-1}")])
+
+        msg_lines.append("\n👉 *Tap a file to download* or reply with the file number (e.g. `1` or `send 1`):")
+        
+        control_row = []
+        if can_go_back:
+            control_row.append(InlineKeyboardButton("🔙 Back to Folders", callback_data="back_to_folders"))
+        control_row.append(InlineKeyboardButton("❌ Cancel", callback_data="cancel_picker"))
+        buttons.append(control_row)
 
         full_msg = "\n".join(msg_lines)
         if len(full_msg) > 4000:
             full_msg = full_msg[:3950] + "\n..."
 
-        await update.message.reply_text(
-            full_msg,
-            reply_markup=InlineKeyboardMarkup(buttons),
-            parse_mode="Markdown"
-        )
-        return True
+        if is_new_message or not update.callback_query:
+            target_chat = update.message or (update.callback_query.message if update.callback_query else None)
+            if target_chat:
+                await target_chat.reply_text(
+                    full_msg,
+                    reply_markup=InlineKeyboardMarkup(buttons),
+                    parse_mode="Markdown"
+                )
+        else:
+            await update.callback_query.edit_message_text(
+                full_msg,
+                reply_markup=InlineKeyboardMarkup(buttons),
+                parse_mode="Markdown"
+            )
 
     async def _handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Handle interactive inline buttons from Telegram."""
@@ -523,11 +782,28 @@ class TelegramRemoteService:
             return
 
         query = update.callback_query
-        await query.answer()
+        try:
+            await query.answer()
+        except Exception:
+            pass
+
         data = query.data or ""
         chat_id = update.effective_chat.id
 
-        if data.startswith("pickfile:"):
+        if data.startswith("pickfolder:"):
+            try:
+                folder_idx = int(data.split(":")[1])
+                folders = self._pending_folder_choices.get(chat_id, [])
+                if 0 <= folder_idx < len(folders):
+                    selected_folder = folders[folder_idx]
+                    files_in_folder = self._last_search_folder_map.get(chat_id, {}).get(selected_folder, [])
+                    await self._render_files_in_folder(selected_folder, files_in_folder, update, is_new_message=False, can_go_back=True)
+                else:
+                    await query.edit_message_text("⚠️ Folder selection session expired. Please search again.", parse_mode="Markdown")
+            except Exception as e:
+                await query.edit_message_text(f"❌ Folder selection error: {e}")
+
+        elif data.startswith("pickfile:"):
             try:
                 idx = int(data.split(":")[1])
                 pending = self._pending_file_choices.get(chat_id, [])
@@ -540,12 +816,23 @@ class TelegramRemoteService:
             except Exception as e:
                 await query.edit_message_text(f"❌ Selection error: {e}")
 
+        elif data == "back_to_folders":
+            folders = self._pending_folder_choices.get(chat_id, [])
+            folder_map = self._last_search_folder_map.get(chat_id, {})
+            query_str = self._last_search_query.get(chat_id, "files")
+            if folders and folder_map:
+                await self._render_folder_selection(folders, folder_map, query_str, update, is_new_message=False)
+            else:
+                await query.edit_message_text("⚠️ Search session expired. Please search again.", parse_mode="Markdown")
+
         elif data.startswith("browse_dir:"):
             folder_str = data[len("browse_dir:"):]
             await self._render_folder_browser(folder_str, update)
 
         elif data == "cancel_picker":
+            self._pending_folder_choices.pop(chat_id, None)
             self._pending_file_choices.pop(chat_id, None)
+            self._picker_step.pop(chat_id, None)
             await query.edit_message_text("❌ Selection cancelled.")
 
     async def _send_single_file(self, file_path: Path, update: Update, additional_matches: list = None) -> bool:
@@ -601,16 +888,26 @@ class TelegramRemoteService:
 
         chat_id = update.effective_chat.id
 
-        # Check 1: User replied with a number to pick from recent search (e.g. "1", "2", "send 1", "list 2", "pick 3")
-        num_match = re.match(r"^(?:send\s+|list\s+|file\s+|pick\s+)?(\d{1,2})$", text, flags=re.IGNORECASE)
+        # Check 1: User replied with a number (e.g. "1", "2", "send 1", "folder 2", "pick 3")
+        num_match = re.match(r"^(?:send\s+|list\s+|file\s+|folder\s+|pick\s+)?(\d{1,2})$", text, flags=re.IGNORECASE)
         if num_match:
             idx = int(num_match.group(1)) - 1
-            pending = self._pending_file_choices.get(chat_id, [])
-            if pending and 0 <= idx < len(pending):
-                selected_file = pending[idx]
-                await update.message.reply_text(f"✅ Selected: `{selected_file.name}`\nUploading to your chat...", parse_mode="Markdown")
-                await self._send_single_file(selected_file, update)
-                return
+            current_step = self._picker_step.get(chat_id)
+
+            if current_step == "folder":
+                folders = self._pending_folder_choices.get(chat_id, [])
+                if 0 <= idx < len(folders):
+                    selected_folder = folders[idx]
+                    files_in_folder = self._last_search_folder_map.get(chat_id, {}).get(selected_folder, [])
+                    await self._render_files_in_folder(selected_folder, files_in_folder, update, is_new_message=True, can_go_back=True)
+                    return
+            elif current_step == "file":
+                pending = self._pending_file_choices.get(chat_id, [])
+                if 0 <= idx < len(pending):
+                    selected_file = pending[idx]
+                    await update.message.reply_text(f"✅ Selected: `{selected_file.name}`\nUploading to your chat...", parse_mode="Markdown")
+                    await self._send_single_file(selected_file, update)
+                    return
 
         # Check 2: User asked to browse folders (e.g. "browse capstone", "explore folders", "browse files", "folders")
         browse_match = re.search(r"^(?:browse|explore|open\s+folder|list\s+folder|show\s+folders?)(?:\s+(.+))?$", text, flags=re.IGNORECASE)
@@ -619,7 +916,29 @@ class TelegramRemoteService:
             await self._render_folder_browser(folder_target, update)
             return
 
-        # Check 3: User asked to send/upload a file (e.g. "send me my CV", "send me the CV pdf", "send file Prompt.md", "send capstone paper")
+        # Check 3: Last Camera Capture / Photo Request (e.g. "send me the last camera capture you have taken", "last photo")
+        if re.search(r"\b(?:last|latest|recent|previous)\s+(?:camera\s+(?:capture|shot|photo|picture|pic)|photo|picture|webcam\s+capture)\b", text, flags=re.IGNORECASE) or \
+           re.search(r"\b(?:send|give|get|show|upload)\s+(?:me\s+)?(?:the\s+)?(?:last|latest|recent)\s+(?:camera\s+(?:capture|shot|photo|picture|pic)|photo|picture|webcam\s+capture)\b", text, flags=re.IGNORECASE):
+            await self._send_last_photo(update)
+            return
+
+        # Check 4: Last Screenshot Request (e.g. "send me the last screenshot", "latest screenshot")
+        if re.search(r"\b(?:last|latest|recent|previous)\s+screenshot\b", text, flags=re.IGNORECASE) or \
+           re.search(r"\b(?:send|give|get|show|upload)\s+(?:me\s+)?(?:the\s+)?(?:last|latest|recent)\s+screenshot\b", text, flags=re.IGNORECASE):
+            await self._send_last_screenshot(update)
+            return
+
+        # Check 5: Live Camera Snap (e.g. "take a photo", "snap photo", "capture camera")
+        if re.search(r"^(?:take\s+(?:a\s+)?(?:photo|picture|webcam\s+shot|camera\s+capture)|capture\s+(?:the\s+)?camera|webcam\s+photo|snap\s+(?:a\s+)?photo)$", text, flags=re.IGNORECASE):
+            await self._cmd_camera(update, context)
+            return
+
+        # Check 6: Live Screenshot Snap (e.g. "take a screenshot", "screenshot screen")
+        if re.search(r"^(?:take\s+(?:a\s+)?screenshot|capture\s+(?:the\s+)?screen)$", text, flags=re.IGNORECASE):
+            await self._cmd_screenshot(update, context)
+            return
+
+        # Check 7: User asked to send/upload a generic file (e.g. "send me my CV", "send file Prompt.md", "send capstone paper")
         file_match = re.search(
             r"^(?:hey\s+|hi\s+|ok\s+)?(?:maki[,.]?\s*)?(?:can\s+you\s+|please\s+)?(?:send|upload|give|get|fetch)\s+(?:me\s+)?(?:the\s+|my\s+)?(?:file\s+|document\s+|pdf\s+)?(.+)$",
             text,

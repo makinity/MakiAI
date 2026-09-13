@@ -151,5 +151,77 @@
     "response": "Sure thing, sir. Which PDF are you looking for—perhaps the schedule, the deadline list, or one of your project documents? Let me know and I’ll pull it up for you.",
     "is_fallback": true,
     "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:33:42",
+    "raw_command": "assistant for Maki.",
+    "cleaned_command": "assistant for Maki.",
+    "handler": "Fallback:Gemini",
+    "response": "Good afternoon, sir. How can I assist you today?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:34:21",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "You’re welcome, sir. Let me know if there’s anything I can help with.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:34:32",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "Happy to help, sir. Anything else on your mind?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:35:18",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "My pleasure, sir. Just let me know whenever you need anything.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:41:07",
+    "raw_command": "Maki.",
+    "cleaned_command": "Maki.",
+    "handler": "Fallback:Gemini",
+    "response": "Good afternoon, sir. How can I assist you today?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:41:30",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "You're welcome, sir. Let me know if there's anything you need.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:41:47",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "Happy to help, sir. Anything else on your mind?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:42:22",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "My pleasure, sir. If anything comes up—reminders, files, or just a quick check‑in—just let me know.",
+    "is_fallback": true,
+    "flagged_for_review": true
   }
 ]
