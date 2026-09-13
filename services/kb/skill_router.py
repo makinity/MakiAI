@@ -117,6 +117,11 @@ class SkillRouter:
                 r"\bfinish\s+(my\s+)?homework\b",
                 r"\bhomework\s+help\b",
             ]),
+            ("clip", [
+                r"\b(find\s+clips?|create\s+clips?|make\s+clips?|clip\s+this|clip\s+(?:the\s+)?video|extract\s+clips?|viral\s+shorts?)\b",
+                r"\b(clip|slice)\s+(?:the\s+)?(?:best\s+moments|highlights|viral\s+moments|latest\s+recording|my\s+video)\b",
+                r"\b(deep\s*clip|deepclip)\b",
+            ]),
             ("research", [
                 r"https?://[^\s]+",
                 r"\b(search|look\s+up|google|research)\b",

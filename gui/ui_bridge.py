@@ -51,7 +51,8 @@ class MakiUIApi:
         self._activity: List[Dict[str, str]] = []
         self._auto_listen_enabled = True
         self._command_busy = False
-        self._conversation_active = False
+        self._session_active = False
+        self._session_expires_at = 0.0
 
         # Add initial welcome greeting to activity
         self._activity.append({
@@ -86,32 +87,133 @@ class MakiUIApi:
         """Called when Python AppState transitions."""
         pass
 
-    # ─── Conversational Voice Engine ──────────────────────────────────────────
+    # ─── Conversational Voice Engine (Active Session Mode) ────────────────────
 
     def _on_wake_detected(self) -> None:
-        """Wake word heard alone — greet user and return to standby."""
+        """Wake word heard alone — greet user and enter Active Conversation Session."""
         if not self.state_manager.is_idle():
             return
-        print("[UIBridge] Wake word detected alone.")
-        threading.Thread(
-            target=self._handle_voice_command_sync,
-            args=("hello",),
-            daemon=True,
-            name="WakeWordWorkerThread"
-        ).start()
+        print("[UIBridge] Wake word detected — activating conversation session.")
+        if self.wake_word_service and self.wake_word_service.is_running:
+            self.wake_word_service.stop()
+        self._start_active_session("hello")
 
     def _on_wake_with_command(self, command: str) -> None:
-        """Wake word + command in single phrase — handle command and return to standby."""
+        """Wake word + command — handle command and enter Active Conversation Session."""
         clean = (command or "").strip()
         if not clean or not self.state_manager.is_idle():
             return
-        print(f"[UIBridge] Wake word + command detected: '{clean}'")
+        print(f"[UIBridge] Wake word + command: '{clean}' — activating conversation session.")
+        if self.wake_word_service and self.wake_word_service.is_running:
+            self.wake_word_service.stop()
+        self._start_active_session(clean)
+
+    def _start_active_session(self, initial_command: str = "") -> None:
+        """Start or refresh the 45-second active conversation session."""
+        self._session_active = True
+        self._session_expires_at = time.time() + 45.0
         threading.Thread(
-            target=self._handle_voice_command_sync,
-            args=(clean,),
+            target=self._session_worker,
+            args=(initial_command,),
             daemon=True,
-            name="WakeCommandWorkerThread"
+            name="ActiveSessionThread"
         ).start()
+
+    def _session_worker(self, initial_command: str = "") -> None:
+        """Runs the active listening session without requiring 'Hey Maki'."""
+        if initial_command:
+            self._handle_voice_command_sync(initial_command)
+            self._session_expires_at = time.time() + 45.0
+
+        recognizer = sr.Recognizer()
+        recognizer.dynamic_energy_threshold = False
+        recognizer.energy_threshold = 250
+        recognizer.pause_threshold = 0.8
+
+        while self._session_active and self._auto_listen_enabled:
+            # Check timeout (45s of silence)
+            if time.time() > self._session_expires_at:
+                print("[UIBridge] Active session timed out — returning to standby.")
+                self._exit_active_session()
+                return
+
+            # Wait while Maki is speaking
+            if self.tts_service and self.tts_service.is_speaking_or_recent(0.6):
+                time.sleep(0.2)
+                continue
+
+            try:
+                self.state_manager.set_state(AppState.LISTENING)
+                with sr.Microphone() as source:
+                    audio = recognizer.listen(source, timeout=4, phrase_time_limit=10)
+
+                # Gate check: discard if TTS spoke during recording
+                if self.tts_service and self.tts_service.is_speaking_or_recent(0.6):
+                    continue
+
+                self.state_manager.set_state(AppState.THINKING)
+                wav_bytes = audio.get_wav_data()
+                text, provider = self.stt_service._transcriber.transcribe_wav_bytes(wav_bytes)
+
+                if not text or len(text.strip()) < 2:
+                    self.state_manager.set_state(AppState.IDLE)
+                    continue
+
+                print(f"[ActiveSession] Heard ({provider}): '{text}'")
+
+                # Check if user asked to sleep/standby (ensuring action commands like "remove the zoom meeting because it was cancelled" are not mistaken for standby)
+                clean_lower = text.strip().lower().rstrip(".!?,")
+                standby_phrases = {
+                    "go to sleep", "sleep", "goodbye", "good night", "stop listening",
+                    "never mind", "dismiss", "that's all", "that is all", "standby", "go to standby"
+                }
+                is_standby_phrase = (
+                    clean_lower in standby_phrases or
+                    clean_lower in ["cancel", "cancel that"] or
+                    clean_lower.startswith(("go to sleep", "stop listening", "go to standby"))
+                )
+                is_action_command = any(k in clean_lower for k in [
+                    "meeting", "schedule", "reminder", "timer", "alarm", "event", "zoom",
+                    "remove", "delete", "clear", "forget", "deadline", "video", "clip", "volume", "open", "launch"
+                ])
+
+                if is_standby_phrase and not is_action_command:
+                    self._exit_active_session("Going back to standby, sir.")
+                    return
+
+                # Execute command directly!
+                self._handle_voice_command_sync(text)
+                # Reset 45s activity timer so session stays open
+                self._session_expires_at = time.time() + 45.0
+
+            except sr.WaitTimeoutError:
+                self.state_manager.set_state(AppState.IDLE)
+                time.sleep(0.1)
+            except sr.UnknownValueError:
+                self.state_manager.set_state(AppState.IDLE)
+                time.sleep(0.1)
+            except Exception as e:
+                print(f"[ActiveSession] Error: {e}")
+                self.state_manager.set_state(AppState.IDLE)
+                time.sleep(0.3)
+
+    def _exit_active_session(self, farewell: str = "") -> None:
+        """End active session and restart wake word listener."""
+        self._session_active = False
+        self.state_manager.set_state(AppState.IDLE)
+        if farewell:
+            self.add_activity("assistant", farewell)
+            self.tts_service.speak(farewell)
+            waited = 0
+            while self.tts_service.is_speaking() and waited < 6:
+                time.sleep(0.1)
+                waited += 0.1
+
+        time.sleep(0.5)
+        if self._auto_listen_enabled and self.wake_word_service:
+            if not self.wake_word_service.is_running:
+                self.wake_word_service.start()
+        print("[UIBridge] Returned to Standby (Wake Word Mode).")
 
     def on_ptt_command(self, text: str) -> None:
         """Called when PTT hotkey audio is transcribed."""
@@ -211,7 +313,7 @@ class MakiUIApi:
                 "state": frontend_state,
             },
             "activity": activity_copy,
-            "mic_active": (app_state == AppState.LISTENING or self._conversation_active),
+            "mic_active": (app_state == AppState.LISTENING or self._session_active),
             "auto_listen_enabled": self._auto_listen_enabled,
             "speaking_active": is_speaking,
             "command_busy": self._command_busy,
@@ -268,14 +370,14 @@ class MakiUIApi:
     def start_voice_standby(self) -> Dict[str, Any]:
         """Start the wake word listener."""
         self._auto_listen_enabled = True
-        if not self._conversation_active and self.wake_word_service and not self.wake_word_service.is_running:
+        if not self._session_active and self.wake_word_service and not self.wake_word_service.is_running:
             self.wake_word_service.start()
         return self.get_ui_state()
 
     def stop_voice_standby(self) -> Dict[str, Any]:
         """Pause voice listening and stop active conversations."""
         self._auto_listen_enabled = False
-        self._conversation_active = False
+        self._session_active = False
         if self.wake_word_service and self.wake_word_service.is_running:
             self.wake_word_service.stop()
         self.state_manager.set_state(AppState.IDLE)

@@ -388,7 +388,22 @@ class MainWindow(QMainWindow):
                 self.main_page.update_transcription_signal.emit(text)
                 last_activity = time.time()
 
-                if any(kw in text.lower() for kw in ["go to sleep", "sleep", "goodbye", "stop listening"]):
+                clean_lower = text.strip().lower().rstrip(".!?,")
+                standby_phrases = {
+                    "go to sleep", "sleep", "goodbye", "good night", "stop listening",
+                    "never mind", "dismiss", "that's all", "that is all", "standby", "go to standby"
+                }
+                is_standby_phrase = (
+                    clean_lower in standby_phrases or
+                    clean_lower in ["cancel", "cancel that"] or
+                    clean_lower.startswith(("go to sleep", "stop listening", "go to standby"))
+                )
+                is_action_command = any(k in clean_lower for k in [
+                    "meeting", "schedule", "reminder", "timer", "alarm", "event", "zoom",
+                    "remove", "delete", "clear", "forget", "deadline", "video", "clip", "volume", "open", "launch"
+                ])
+
+                if is_standby_phrase and not is_action_command:
                     self._exit_conversation_mode("Alright, going to sleep.")
                     return
 

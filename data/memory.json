@@ -1,13 +1,6 @@
 {
   "memories": [
     {
-      "id": "66529c74-cbd5-430c-a056-479a8f9e509c",
-      "key": "Zoom meeting",
-      "value": "Zoom meeting today at 8:00 PM",
-      "created_at": "2026-09-12T13:58:36.668681",
-      "updated_at": "2026-09-12T13:58:36.669688"
-    },
-    {
       "id": "4d80827f-b5a9-45e7-917a-0faa9400574b",
       "key": "AI Ad Video deadline",
       "value": "Tomorrow at 1:00 PM we have an urgent deadline for the AI Ad Video.",

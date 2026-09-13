@@ -49,11 +49,18 @@ DIRECT_COMMAND_PATTERNS = [
     r"^(?:what\s+is|what's|show|check|list)\s+(?:my|our)\s+(?:schedule|deadlines?|reminders?|tasks?)\b",
     r"^(?:remind\s+me\s+(?:to|at|in)|set\s+(?:a\s+)?reminder)\b",
     r"^(?:remember\s+that|forget\s+about)\b",
+    r"^(?:can\s+you\s+)?(?:just\s+)?(?:remove|delete|cancel|clear|forget)\s+(?:it|this|about\s+the|the)\b",
+    r"^(?:cancel|remove|delete)\s+(?:the\s+)?(?:zoom\s+meeting|meeting|schedule|event|reminder|deadline)\b",
     
     # Live Search & URL Reading
     r"^(?:search\s+(?:the\s+web\s+|google\s+|online\s+)?for|google|look\s+up|research)\s+[a-zA-Z0-9_\-\s]+",
     r"^(?:read|check|summarize)\s+(?:this\s+)?(?:link|url|website|page|article)\b",
     r"https?://[^\s]+",
+    
+    # Video Clipping & Viral Shorts (DeepClip)
+    r"^(?:find\s+clips?|create\s+clips?|make\s+clips?|clip\s+this|clip\s+(?:the\s+)?video|extract\s+clips?|viral\s+shorts?)\b",
+    r"^(?:clip|slice)\s+(?:the\s+)?(?:best\s+moments|highlights|viral\s+moments|latest\s+recording|my\s+video)\b",
+    r"^(?:deep\s*clip|deepclip)\b",
     
     # Power
     r"^(?:shutdown|restart|lock\s+screen|hibernate)\b",

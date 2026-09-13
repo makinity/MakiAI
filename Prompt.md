@@ -622,5 +622,34 @@ Give Maki any URL to read and extract its content without ads or popups:
 
 ---
 
+## 20. 🎬 AI Video Clipping & Viral Shorts Creation (DeepClip)
+
+MakiAI features an autonomous video moment finder and auto-cutter powered by transcript virality analysis and FFmpeg layout filters:
+
+### 📹 Viral Shorts from YouTube Videos
+Feed Maki any YouTube URL and have it extract the highest-engagement moments into 9:16 vertical shorts:
+* *"Find 3 clips from https://www.youtube.com/watch?v=..."*
+* *"Create 5 viral shorts from https://youtu.be/..."*
+* *"Clip the best moments from this YouTube link: https://... in landscape format."*
+
+### 🖥️ Clipping Your Local Screen Recordings
+Extract the punchy highlights and delete dead air from your local screen recordings or tutorials:
+* *"Clip the viral moments from my latest recording in MakiSync."*
+* *"Make 3 vertical shorts from my latest screen recording."*
+* *"Clip the best moments from C:\MakiSync Storage\MakiAI\Recordings\2026-09-13\demo.mp4"*
+
+### 🎨 Available Output Layouts:
+* **`vertical-blur` (Default)**: 9:16 vertical 1080x1920 with blurred background fill (optimized for **TikTok, YouTube Shorts, Instagram Reels**).
+* **`vertical-black`**: 9:16 vertical with clean black letterboxing.
+* **`landscape`**: 16:9 native direct slice.
+
+### 📁 Automatic Storage & Auto-Open:
+All generated clips are automatically saved to:
+`C:\MakiSync Storage\MakiAI\Clips\YYYY-MM-DD\<index>_<Title>.mp4`
+Maki automatically opens the Clips folder in Windows Explorer the instant the render is complete!
+
+---
+
 *MakiAI — Built for speed, precision, and complete autonomous operating assistance.* 🚀
+
 
