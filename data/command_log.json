@@ -241,5 +241,167 @@
     "response": "The Python script successfully queried the C: drive and reported that 135.26 GB of free space remains.",
     "is_fallback": false,
     "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:21:39",
+    "raw_command": "Maki, check my unread emails on Gmail.",
+    "cleaned_command": "Maki, check my unread emails on Gmail.",
+    "handler": "Skill:ComposioSkill",
+    "response": "Sir, your Composio Cloud integration is ready, but requires a free API key to communicate with Google Workspace and cloud apps.\n\nTo enable it:\n1. Get your free key at https://app.composio.dev\n2. Add COMPOSIO_API_KEY=your_key to your .env file.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:24:58",
+    "raw_command": "Maki, check my unread emails on Gmail.",
+    "cleaned_command": "Maki, check my unread emails on Gmail.",
+    "handler": "Skill:ComposioSkill",
+    "response": "I had trouble executing the Gmail action, sir: Error code: 401 - {'error': {'message': 'Invalid API key: ck_**kHKg', 'code': 801, 'slug': 'APIKey_InvalidAPIKey', 'status': 401, 'request_id': '82c5777a8ac84ce69a99584649cff132', 'suggested_fix': 'Please check you are using a valid API key.'}}",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:30:26",
+    "raw_command": "Tampak.",
+    "cleaned_command": "Tampak.",
+    "handler": "Fallback:Gemini",
+    "response": "Sir, could you let me know what you'd like me to display?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 18:30:28",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "Anytime, sir. It is six-thirty in the evening now. Just a gentle reminder that the AI Ad Video is due tomorrow at one PM. Let me know if you need a hand with that or if you prefer to relax for a bit first.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 18:30:34",
+    "raw_command": "Maki, check my unread emails on Gmail.",
+    "cleaned_command": "Maki, check my unread emails on Gmail.",
+    "handler": "Skill:ComposioSkill",
+    "response": "I had trouble executing the Gmail action, sir: ToolsResource.execute() got an unexpected keyword argument 'slug'",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:33:48",
+    "raw_command": "Maki, check my unread emails on Gmail.",
+    "cleaned_command": "Maki, check my unread emails on Gmail.",
+    "handler": "Skill:ComposioSkill",
+    "response": "Sir, your Composio API key appears to be invalid or expired.\nPlease grab a new API key from https://dashboard.composio.dev/settings/api-keys and update COMPOSIO_API_KEY in your .env file.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:38:22",
+    "raw_command": "Tick.",
+    "cleaned_command": "Tick.",
+    "handler": "Fallback:Gemini",
+    "response": "Good evening, sir. I'm here and ready whenever you are. What can I help you with tonight?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 18:38:22",
+    "raw_command": "Maki, check my unread emails on Gmail.",
+    "cleaned_command": "Maki, check my unread emails on Gmail.",
+    "handler": "Skill:ComposioSkill",
+    "response": "I had trouble executing the Gmail action, sir: Error code: 400 - }",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:38:37",
+    "raw_command": "Maki, check my unread emails on Gmail.",
+    "cleaned_command": "Maki, check my unread emails on Gmail.",
+    "handler": "Skill:ComposioSkill",
+    "response": "I had trouble executing the Gmail action, sir: Error code: 400 - }",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:40:57",
+    "raw_command": "Tampak.",
+    "cleaned_command": "Tampak.",
+    "handler": "Fallback:Gemini",
+    "response": "Noted, sir. Just to make sure I’m on the same page, what exactly do you mean by that? If you need me to check a file, review a project, or look into something specific, just say the word and I’ll handle it right away.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 18:40:58",
+    "raw_command": "Maki, check my unread emails on Gmail.",
+    "cleaned_command": "Maki, check my unread emails on Gmail.",
+    "handler": "Skill:ComposioSkill",
+    "response": "Sir, your Gmail account is not connected yet in Composio.\nPlease click here to connect your account: https://dashboard.composio.dev/toolkits/gmail",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:45:55",
+    "raw_command": "Maki, check my unread emails on Gmail",
+    "cleaned_command": "Maki, check my unread emails on Gmail",
+    "handler": "Skill:ComposioSkill",
+    "response": "Sir, your Gmail account is not connected yet in Composio.\nPlease click here to connect your account: https://dashboard.composio.dev/toolkits/gmail",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:46:15",
+    "raw_command": "Topics.",
+    "cleaned_command": "Topics.",
+    "handler": "Fallback:Gemini",
+    "response": "*   *Draft 1 (Too robotic):* I checked your files. ICC 600 has Topic 1 through 4. ICC 601 also has Topic 1 through 4. They are placeholders. Please give me the real topics.\n    *   *Draft 2 (Better):* Sir, looking at your ICC 600 and ICC 601 files, the \"Key Topics\" sections are currently just placeholders like \"Topic 1\" and \"Topic 2\". I don't have the actual list yet. Would you like to tell me what you are working on so I can update the database?\n    *   *Draft 3 (Refining for Persona - \"Maki\"):* Right now, the topic lists for ICC 600 and ICC 601 in your Knowledge Base are just placeholders. I don't have the specific subjects or course outlines recorded yet. If you give me the details of what you're covering in those classes, I can update the files immediately so you have a proper study guide.\n\n5.  **Final Polish (Checking against constraints):**\n    *   *Address as \"sir\"?* Yes.\n    *   *No robotic lists?* Yes.\n    *   *Conversational?* Yes.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 18:48:52",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "You are most welcome, sir. It is a pleasure to assist you. Since it is nearly seven in the evening on a Sunday, I hope you are having a relaxing weekend. Just a gentle reminder that we have that urgent AI Ad Video deadline tomorrow at one in the afternoon. Let me know if you need any help preparing for that or anything else.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 18:48:53",
+    "raw_command": "Maki, send an email to   astra.chile.maki@gmail.com  with subject 'Testing MakiAI' and message 'Jarvis online and ready, sir.'\"",
+    "cleaned_command": "Maki, send an email to   astra.chile.maki@gmail.com  with subject 'Testing MakiAI' and message 'Jarvis online and ready, sir.'\"",
+    "handler": "Skill:ComposioSkill",
+    "response": "Sir, your Composio API key appears to be invalid or expired.\nPlease grab a new API key from https://dashboard.composio.dev/settings/api-keys and update COMPOSIO_API_KEY in your .env file.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:52:38",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "You are very welcome, sir. I am here whenever you need me. If you are preparing for that AI Ad Video deadline tomorrow at one, just let me know how I can help you wrap it up. Otherwise, I will be standing by.\n4.  **Check Constraints:**\n   - Addresses as \"sir\"? Yes.\n   - Natural/conversational? Yes.\n   - No markdown? Yes.\n   - No robotic phrases? Yes.\n   - Concise? Yes.\n   - Mentions deadline naturally? Yes, fits the context.\n   - Matches persona? Yes.\n5.  **Final Output Generation:** (matches the draft)✅\n   \"You are very welcome, sir. I am here whenever you need me. If you are preparing for that AI Ad Video deadline tomorrow at one, just let me know how I can help you wrap it up. Otherwise, I will be standing by.\" -> Slightly adjust to sound more like Maki/Jarvis: \"You are very welcome, sir. I am here whenever you need me. If you are getting ready for that AI Ad Video deadline tomorrow at one, just say the word and I will help you push it across the finish line. Otherwise, I will be standing by.\" -> Good. Proceed. \n   Wait, constraint check: \"Never use markdown in spoken responses\". The draft has no markdown. Good.\n   \"Always address the user as 'sir'\". Checked.\n   \"Speak in natural, flowing sentences\". Checked.\n   All good. Output matches response.✅\n   One minor thing: I'll keep it tight and natural. \"You are very welcome, sir. I am here whenever you need me. If you are getting ready for that AI Ad Video deadline tomorrow at one, just say the word and I will help you push it across the finish line. Otherwise, I will be standing by.\" -> Perfect. \n   Proceeds. \n   Output matches response. \n   [Self-Correction/Verification during thought]\n   - Check tone: Warm, calm, helpful.\n   - Check formatting: Plain text only.\n   - Check name: \"sir\" used.\n   - Check deadline mention: Natural, not pushy.\n   - All constraints met. Ready. \n   Output generation. \n   [Output] You are very welcome, sir. I am here whenever you need me. If you are getting ready for that AI Ad Video deadline tomorrow at one, just say the word and I will help you push it across the finish line. Otherwise, I will be standing by.✅\n   Matches exactly. Proceeds. \n   [Final Check of the Prompt] \"Never use markdown in spoken responses — no asterisks, no dashes, no headers, no code blocks\" -> I will ensure absolutely zero markdown characters.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 18:53:15",
+    "raw_command": "Maki, send an email to   astra.chile.maki@gmail.com  with subject 'Testing MakiAI' and message 'Jarvis online and ready, sir.'",
+    "cleaned_command": "Maki, send an email to   astra.chile.maki@gmail.com  with subject 'Testing MakiAI' and message 'Jarvis online and ready, sir.'",
+    "handler": "Skill:ComposioSkill",
+    "response": "*   *Goal:* Confirm the email was sent successfully.\n    *   *Draft 1:* The email to astra.chile.maki@gmail.com has been successfully sent, sir. It is now in your sent folder.\n    *   *Refining for Persona (Maki):* Needs to be more natural and polite. \"I have sent the email to astra.chile.maki@gmail.com with the subject 'Testing MakiAI', sir. It is currently in your sent folder.\"\n    *   *Polishing:* \"I have successfully sent the email to astra.chile.maki@gmail.com as requested, sir. You can find it in your sent folder whenever you like.\"\n\n3.  **Reviewing against Constraints:**\n    *   1-2 sentences? Yes (2 sentences).\n    *   Natural/Polite? Yes.\n    *   Address as 'sir'? Yes.\n    *   No markdown? Yes.\n    *   No  tags? Yes.\n\n4.  **Final Polish:**\n    \"I have successfully sent the email to astra.chile.maki@gmail.com with the subject 'Testing MakiAI', sir. It is now safely in your sent folder.\"\n\n5.  **Final Output Generation.** (Plain text only).\n\n    *Self-Correction during drafting:* The user asked to summarize cloud results. The context is a specific email send.\n    *Revised Draft:* \"I have successfully sent the email to astra.chile.maki@gmail.com with the subject 'Testing MakiAI', sir. It is now in your sent folder.\" -> This is concise and fits the persona perfectly.\n\n6.  **Final Output:** \"I have successfully sent the email to astra.chile.maki@gmail.com with the subject 'Testing MakiAI', sir. It is now in your sent folder.\"\n\n    *Wait, constraint check:* \"Do NOT output any  or internal reasoning tags.\" -> Okay.\n    \"Summarize cloud results concisely.\" -> Okay.\n\n    *Final String:* I have successfully sent the email to astra.chile.maki@gmail.com with the subject 'Testing MakiAI', sir. It is now in your sent folder.\n\n    *Double check persona:* Maki is warm and helpful. \"I have sent the email to astra.chile.maki@gmail.com with the subject 'Testing MakiAI' for you, sir. It is ready in your sent folder.\" -> Slightly warmer.\n\n    Let's go with the concise version. It's efficient.\n\n    *Final Plan:* \"I have successfully sent the email to astra.chile.maki@gmail.com with the subject 'Testing MakiAI', sir. It is now in your sent folder.\"\n\n    *Wait, looking at the previous turn's context (which I shouldn't strictly use unless necessary, but good for tone):* The user just said \"Thank you\" previously, and now we are doing a specific",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 18:54:03",
+    "raw_command": "Tumorow at 1. Just let me know how I can help you wrap",
+    "cleaned_command": "Tumorow at 1. Just let me know how I can help you wrap",
+    "handler": "Fallback:Gemini",
+    "response": "\"That deadline for the AI Ad Video is due tomorrow at one in the afternoon, sir. I can help you finalize the script, check the assets, or review the draft if you like. Just let me know where we are currently at with it.\"\n\nCritique:\n- \"one in the afternoon\" is natural.\n- \"AI Ad Video\" is from KB.\n- Tone is helpful.\n\nRefinement:\n\"That AI Ad Video project is due tomorrow at one, sir. I can help you review the script, organize your assets, or just review the draft to make sure everything is on track. Where would you like to start?\"\n\nFinal Polish (No Markdown):\nThat AI Ad Video project is due tomorrow at one, sir. I can help you review the script, organize your assets, or take a look at the draft to make sure everything is ready. Where would you like to start?\n\nWait, looking at the user input again: \"Tumorow at 1. Just let me know how I can help you wrap\". It sounds like the user *pasted* the AI's previous response or is just testing.\nActually, the user might be completing the sentence from the previous turn where the AI said \"Just let me know how I can help you wrap it up.\"\nIn the previous turn (hidden context in history?):\nUser: \"Maki, send an email...\"\nAI: \"...If you are getting ready for that AI Ad Video deadline tomorrow at one, just say the word and I will help you push it across the finish line.\"\nUser: \"Tumorow at 1. Just let me know how I can help you wrap\"\nThis looks like the user is quoting me back or confirming.\nI should acknowledge the deadline and offer specific help.\n\n\"That deadline is for the AI Ad Video, due tomorrow at one, sir. I can help you review the script, check the visual assets, or simply proofread the final cut. Which part would you like to tackle first?\"",
+    "is_fallback": true,
+    "flagged_for_review": true
   }
 ]

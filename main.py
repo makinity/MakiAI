@@ -64,6 +64,8 @@ def bootstrap_maki_services():
     from skills.research_skill import ResearchSkill
     from skills.clip_skill import ClipSkill
     from skills.interpreter_skill import InterpreterSkill
+    from skills.composio_skill import ComposioSkill
+    from services.cloud.composio_service import ComposioService
     from gui.ui_bridge import MakiUIApi
 
     # Storage initialization
@@ -116,6 +118,7 @@ def bootstrap_maki_services():
     # 4. Skills
     skill_deps = (gemini, context_builder, kb_reader, kb_writer)
     reminder_service = ReminderService()
+    composio_service = ComposioService()
     skills = {
         "goodmorning": GoodMorningSkill(*skill_deps),
         "goodnight": GoodNightSkill(*skill_deps),
@@ -128,6 +131,7 @@ def bootstrap_maki_services():
         "research": ResearchSkill(*skill_deps),
         "clip": ClipSkill(*skill_deps),
         "interpreter": InterpreterSkill(*skill_deps),
+        "composio": ComposioSkill(*skill_deps, composio_service=composio_service),
     }
     skill_router = SkillRouter(skills)
 

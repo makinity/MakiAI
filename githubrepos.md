@@ -49,3 +49,11 @@ This document contains the verified, conflict-free open-source repositories sele
 * **Conflict Status:** **Conflict-Free ✅** (`Silero VAD` is already bundled inside `RealtimeSTT`, removing duplicate dependencies).
 
 ---
+
+## 🌐 6. Cloud Apps & SaaS Workspace Bridge
+* **Repository:** [ComposioHQ/composio](https://github.com/ComposioHQ/composio)
+* **Designated Role in MakiAI:** **Cloud SaaS & Google Workspace Engine (`skills/composio_skill.py`)**
+* **Capability:** Connects MakiAI to 500+ cloud services (Google Docs, Google Sheets, Google Calendar, Gmail, Notion, GitHub, Discord, Spotify, Trello) with zero OAuth setup.
+* **Conflict Status:** **Conflict-Free ✅** (Independent cloud toolset that communicates over HTTPS REST APIs without interfering with local Win32/file operations).
+
+---

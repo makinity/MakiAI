@@ -364,3 +364,165 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"The Python script successfully queried the C: drive and reported that 135.26 GB of free space remains."`
 
 ---
+
+### 🔹 Live Session Command — 06:21:39 PM
+* **Spoken / Typed Command:** `"Maki, check my unread emails on Gmail."`
+* **Extracted Payload:** `"Maki, check my unread emails on Gmail."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, your Composio Cloud integration is ready, but requires a free API key to communicate with Google Workspace and cloud apps.  To enable i..."`
+
+---
+
+### 🔹 Live Session Command — 06:24:58 PM
+* **Spoken / Typed Command:** `"Maki, check my unread emails on Gmail."`
+* **Extracted Payload:** `"Maki, check my unread emails on Gmail."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I had trouble executing the Gmail action, sir: Error code: 401 - {'error': {'message': 'Invalid API key: ck_**kHKg', 'code': 801, 'slug': 'A..."`
+
+---
+
+### 🔹 Live Session Command — 06:30:26 PM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sir, could you let me know what you'd like me to display?"`
+
+---
+
+### 🔹 Live Session Command — 06:30:28 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Anytime, sir. It is six-thirty in the evening now. Just a gentle reminder that the AI Ad Video is due tomorrow at one PM. Let me know if you..."`
+
+---
+
+### 🔹 Live Session Command — 06:30:34 PM
+* **Spoken / Typed Command:** `"Maki, check my unread emails on Gmail."`
+* **Extracted Payload:** `"Maki, check my unread emails on Gmail."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I had trouble executing the Gmail action, sir: ToolsResource.execute() got an unexpected keyword argument 'slug'"`
+
+---
+
+### 🔹 Live Session Command — 06:33:48 PM
+* **Spoken / Typed Command:** `"Maki, check my unread emails on Gmail."`
+* **Extracted Payload:** `"Maki, check my unread emails on Gmail."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, your Composio API key appears to be invalid or expired. Please grab a new API key from https://dashboard.composio.dev/settings/api-keys..."`
+
+---
+
+### 🔹 Live Session Command — 06:38:22 PM
+* **Spoken / Typed Command:** `"Tick."`
+* **Extracted Payload:** `"Tick."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good evening, sir. I'm here and ready whenever you are. What can I help you with tonight?"`
+
+---
+
+### 🔹 Live Session Command — 06:38:22 PM
+* **Spoken / Typed Command:** `"Maki, check my unread emails on Gmail."`
+* **Extracted Payload:** `"Maki, check my unread emails on Gmail."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I had trouble executing the Gmail action, sir: Error code: 400 - }"`
+
+---
+
+### 🔹 Live Session Command — 06:38:37 PM
+* **Spoken / Typed Command:** `"Maki, check my unread emails on Gmail."`
+* **Extracted Payload:** `"Maki, check my unread emails on Gmail."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I had trouble executing the Gmail action, sir: Error code: 400 - }"`
+
+---
+
+### 🔹 Live Session Command — 06:40:57 PM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Noted, sir. Just to make sure I’m on the same page, what exactly do you mean by that? If you need me to check a file, review a project, or l..."`
+
+---
+
+### 🔹 Live Session Command — 06:40:58 PM
+* **Spoken / Typed Command:** `"Maki, check my unread emails on Gmail."`
+* **Extracted Payload:** `"Maki, check my unread emails on Gmail."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, your Gmail account is not connected yet in Composio. Please click here to connect your account: https://dashboard.composio.dev/toolkits..."`
+
+---
+
+### 🔹 Live Session Command — 06:45:55 PM
+* **Spoken / Typed Command:** `"Maki, check my unread emails on Gmail"`
+* **Extracted Payload:** `"Maki, check my unread emails on Gmail"`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, your Gmail account is not connected yet in Composio. Please click here to connect your account: https://dashboard.composio.dev/toolkits..."`
+
+---
+
+### 🔹 Live Session Command — 06:46:15 PM
+* **Spoken / Typed Command:** `"Topics."`
+* **Extracted Payload:** `"Topics."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"*   *Draft 1 (Too robotic):* I checked your files. ICC 600 has Topic 1 through 4. ICC 601 also has Topic 1 through 4. They are placeholders...."`
+
+---
+
+### 🔹 Live Session Command — 06:48:52 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You are most welcome, sir. It is a pleasure to assist you. Since it is nearly seven in the evening on a Sunday, I hope you are having a rela..."`
+
+---
+
+### 🔹 Live Session Command — 06:48:53 PM
+* **Spoken / Typed Command:** `"Maki, send an email to   astra.chile.maki@gmail.com  with subject 'Testing MakiAI' and message 'Jarvis online and ready, sir.'""`
+* **Extracted Payload:** `"Maki, send an email to   astra.chile.maki@gmail.com  with subject 'Testing MakiAI' and message 'Jarvis online and ready, sir.'""`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, your Composio API key appears to be invalid or expired. Please grab a new API key from https://dashboard.composio.dev/settings/api-keys..."`
+
+---
+
+### 🔹 Live Session Command — 06:52:38 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You are very welcome, sir. I am here whenever you need me. If you are preparing for that AI Ad Video deadline tomorrow at one, just let me k..."`
+
+---
+
+### 🔹 Live Session Command — 06:53:15 PM
+* **Spoken / Typed Command:** `"Maki, send an email to   astra.chile.maki@gmail.com  with subject 'Testing MakiAI' and message 'Jarvis online and ready, sir.'"`
+* **Extracted Payload:** `"Maki, send an email to   astra.chile.maki@gmail.com  with subject 'Testing MakiAI' and message 'Jarvis online and ready, sir.'"`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"*   *Goal:* Confirm the email was sent successfully.     *   *Draft 1:* The email to astra.chile.maki@gmail.com has been successfully sent, ..."`
+
+---
+
+### 🔹 Live Session Command — 06:54:03 PM
+* **Spoken / Typed Command:** `"Tumorow at 1. Just let me know how I can help you wrap"`
+* **Extracted Payload:** `"Tumorow at 1. Just let me know how I can help you wrap"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `""That deadline for the AI Ad Video is due tomorrow at one in the afternoon, sir. I can help you finalize the script, check the assets, or re..."`
+
+---

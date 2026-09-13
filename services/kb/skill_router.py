@@ -132,6 +132,13 @@ class SkillRouter:
                 r"\b(parse\s+csv|calculate\s+this\s+in\s+python|merge\s+pdf|resize\s+images?)\b",
                 r"\b(script|python\s+code|run\s+python)\b",
             ]),
+            ("composio", [
+                r"\b(google\s+(doc|docs|sheet|sheets|drive|slides)|gdoc|gsheet)\b",
+                r"\b(google\s+calendar|gcal|my\s+calendar|calendar\s+events?|check\s+(my\s+)?calendar)\b",
+                r"\b(gmail|check\s+(my\s+)?emails?|unread\s+emails?|send\s+(an?\s+)?email|draft\s+(an?\s+)?email)\b",
+                r"\b(notion|trello|github|gitlab|discord|spotify)\b",
+                r"\b(composio|cloud\s+app|connect\s+app)\b",
+            ]),
             ("research", [
                 r"https?://[^\s]+",
                 r"\b(search|look\s+up|google|research)\b",
