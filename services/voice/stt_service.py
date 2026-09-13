@@ -1,10 +1,7 @@
 """
-MakiAI — Speech-to-Text Service
-Uses Google STT via SpeechRecognition — same library as wake word detection.
-No model download required. Works immediately.
-
-Whisper can be re-enabled later once the model is fully cached.
-Pattern based on MakiBot's proven listen.py implementation.
+MakiAI — Speech-to-Text Service (stt_service.py)
+Captures microphone audio and transcribes using Groq Whisper (whisper-large-v3-turbo)
+with custom vocabulary biasing, falling back gracefully to Google STT.
 """
 
 import threading
@@ -12,8 +9,9 @@ import speech_recognition as sr
 from dataclasses import dataclass
 from typing import Callable
 
+from services.voice.audio_transcriber import AudioTranscriber
 
-AMBIENT_NOISE_SECONDS = 0.3
+
 VOICE_TIMEOUT_SECONDS = 8
 PHRASE_LIMIT_SECONDS = 10
 
@@ -29,28 +27,25 @@ class TranscriptionResult:
 
 class STTService:
     """
-    Speech-to-Text using Google STT via SpeechRecognition.
-    No model download. Works out of the box.
+    Dual-tier Speech-to-Text service using Groq Whisper with Google STT fallback.
     """
 
     def __init__(
         self,
-        model_size: str = "tiny",          # unused — kept for API compat
+        model_size: str = "tiny",          # kept for API compat
         on_transcription_update: Callable[[str], None] | None = None,
         on_error: Callable[[str], None] | None = None,
     ):
         self.on_transcription_update = on_transcription_update or (lambda t: None)
         self.on_error = on_error or (lambda msg: print(f"[STTService] Error: {msg}"))
         self._recording = False
-        print("[STTService] Using Google STT — no model download needed.")
+        self._transcriber = AudioTranscriber()
+        print("[STTService] Initialized with Groq Whisper & Google STT fallback.")
 
     def listen(self, on_result: Callable[[TranscriptionResult], None]) -> None:
         """
         Record and transcribe one spoken command.
         Non-blocking — runs in a background thread.
-
-        Args:
-            on_result: Called with TranscriptionResult when done.
         """
         if self._recording:
             return
@@ -69,22 +64,19 @@ class STTService:
     def _record_and_transcribe(
         self, on_result: Callable[[TranscriptionResult], None]
     ) -> None:
-        """Background thread: record audio and transcribe with Google STT."""
+        """Background thread: record audio from mic and transcribe."""
         self._recording = True
         self.on_transcription_update("Listening...")
 
-        # Fresh recognizer per call — MakiBot pattern
         recognizer = sr.Recognizer()
-        recognizer.dynamic_energy_threshold = False   # Fixed threshold — more reliable
-        recognizer.energy_threshold = 200             # Low = picks up quiet speech
+        recognizer.dynamic_energy_threshold = False
+        recognizer.energy_threshold = 200
         recognizer.pause_threshold = 0.8
         recognizer.non_speaking_duration = 0.5
         recognizer.phrase_threshold = 0.1
 
         try:
             with sr.Microphone() as source:
-                # No calibration here — wake word already calibrated the mic
-                # Calibration was consuming the user's speech
                 self.on_transcription_update("Speak now...")
                 print("[STTService] Recording started...")
 
@@ -95,19 +87,27 @@ class STTService:
                 )
 
             self.on_transcription_update("Transcribing...")
-            text = recognizer.recognize_google(audio, language="en-US")
-            text = text.strip()
+            wav_bytes = audio.get_wav_data()
 
-            print(f"[STTService] Transcribed: '{text}'")
-            self.on_transcription_update(text)
+            text, provider = self._transcriber.transcribe_wav_bytes(wav_bytes)
 
-            self._recording = False
-            on_result(TranscriptionResult(
-                text=text,
-                confidence=0.9,     # Google STT doesn't return confidence
-                language="en",
-                success=True,
-            ))
+            if text:
+                print(f"[STTService] Transcribed ({provider}): '{text}'")
+                self.on_transcription_update(text)
+                self._recording = False
+                on_result(TranscriptionResult(
+                    text=text,
+                    confidence=0.98 if "whisper" in provider else 0.90,
+                    language="en",
+                    success=True,
+                ))
+            else:
+                print("[STTService] No speech understood.")
+                self._recording = False
+                on_result(TranscriptionResult(
+                    text="", confidence=0.0, language="en",
+                    success=False, error="Could not understand speech."
+                ))
 
         except sr.WaitTimeoutError:
             print("[STTService] No speech detected — timeout.")
@@ -115,22 +115,6 @@ class STTService:
             on_result(TranscriptionResult(
                 text="", confidence=0.0, language="en",
                 success=False, error="No speech detected."
-            ))
-
-        except sr.UnknownValueError:
-            print("[STTService] Could not understand speech.")
-            self._recording = False
-            on_result(TranscriptionResult(
-                text="", confidence=0.0, language="en",
-                success=False, error="Could not understand speech."
-            ))
-
-        except sr.RequestError as e:
-            print(f"[STTService] Google STT API error: {e}")
-            self._recording = False
-            on_result(TranscriptionResult(
-                text="", confidence=0.0, language="en",
-                success=False, error=f"STT API error: {e}"
             ))
 
         except Exception as e:

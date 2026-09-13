@@ -7,9 +7,11 @@ Example: "Hey Maki what's the weather" → wakes AND captures "what's the weathe
 If only wake word heard: fires on_wake with empty command, caller does second listen.
 """
 
+import re
 import threading
 import speech_recognition as sr
-from typing import Callable
+from typing import Callable, Optional
+from services.voice.audio_transcriber import AudioTranscriber
 
 
 AMBIENT_NOISE_SECONDS = 0.5
@@ -24,17 +26,40 @@ WAKE_VARIANTS = [
     "maki", "macky", "mackie", "marky", "lucky", "matty",
 ]
 
-
-DIRECT_COMMAND_STARTERS = [
-    "volume", "set volume", "set the volume", "up the volume", "down the volume",
-    "turn up", "turn down", "mute", "unmute", "silence", "louder", "quieter",
-    "open", "launch", "start", "run", "close", "kill",
-    "tile", "auto-tile", "autotile", "maximize", "move window", "drag window", "snap",
-    "what am i", "what is", "what are", "what's", "look at", "see my",
-    "is there anyone", "who is", "check the", "tell me", "how is my",
-    "take a photo", "take a picture", "take a screenshot", "start recording", "stop recording",
-    "good morning", "good night", "play", "pause", "skip",
-    "shutdown", "restart", "lock screen", "sleep", "hibernate", "how are you", "hello", "hi"
+DIRECT_COMMAND_PATTERNS = [
+    # System volume & audio
+    r"^(?:set\s+(?:the\s+)?)?volume\s+(?:to\s+)?(?:\d+|up|down|max|half|zero)\b",
+    r"^(?:turn\s+(?:up|down)\s+(?:the\s+)?volume|volume\s+(?:up|down)|louder|quieter|mute|unmute|silence)$",
+    
+    # App launch & close
+    r"^(?:open|launch|start|run|close|kill)\s+(?:google\s+chrome|chrome|vs\s+code|vscode|spotify|discord|terminal|notepad|calculator|word|excel|zoom|[a-zA-Z0-9_\-]+)\b",
+    
+    # Window management, tiling & workspace
+    r"^(?:organize|tile|auto-tile|autotile|maximize|minimize|restore|snap|move\s+window|drag\s+window|fit\s+windows?|arrange)\b",
+    r"^(?:organize|clean\s+up|sort)\s+(?:my\s+)?(?:workspace|workflow|workshop|work\s+space|windows?|downloads?|desktop|files?|documents?)\b",
+    
+    # Media controls
+    r"^(?:play|pause|resume|skip|next\s+song|previous\s+song|stop\s+music)\b",
+    
+    # Vision & Camera
+    r"^(?:take\s+a\s+(?:photo|picture|screenshot)|look\s+at\s+my\s+screen|see\s+my\s+screen|what\s+is\s+on\s+my\s+screen|look\s+through\s+my\s+camera|who\s+is\s+in\s+front\s+of\s+me)\b",
+    
+    # Information & Knowledge Base
+    r"^(?:good\s+morning|good\s+night)\b",
+    r"^(?:what\s+is|what's|show|check|list)\s+(?:my|our)\s+(?:schedule|deadlines?|reminders?|tasks?)\b",
+    r"^(?:remind\s+me\s+(?:to|at|in)|set\s+(?:a\s+)?reminder)\b",
+    r"^(?:remember\s+that|forget\s+about)\b",
+    
+    # Live Search & URL Reading
+    r"^(?:search\s+(?:the\s+web\s+|google\s+|online\s+)?for|google|look\s+up|research)\s+[a-zA-Z0-9_\-\s]+",
+    r"^(?:read|check|summarize)\s+(?:this\s+)?(?:link|url|website|page|article)\b",
+    r"https?://[^\s]+",
+    
+    # Power
+    r"^(?:shutdown|restart|lock\s+screen|hibernate)\b",
+    
+    # Kiro CLI
+    r"^(?:t=kiro|open\s+kiro|launch\s+kiro)\b",
 ]
 
 
@@ -60,19 +85,19 @@ def _contains_wake_word(text: str) -> bool:
 
 
 def _is_direct_command(text: str) -> bool:
-    """Check if phrase starts with an unambiguous computer control action or question."""
-    lowered = text.lower().strip()
-    for starter in DIRECT_COMMAND_STARTERS:
-        if lowered == starter or lowered.startswith(starter + " ") or lowered.startswith(starter + ","):
+    """Check if phrase matches an unambiguous, actionable command structure."""
+    lowered = text.lower().strip().rstrip(".!?,")
+    if len(lowered) < 3:
+        return False
+    for pat in DIRECT_COMMAND_PATTERNS:
+        if re.search(pat, lowered):
             return True
     return False
 
 
 class WakeWordService:
     """
-    Single-phrase wake word + direct command capture.
-    Opens the mic per cycle, captures a full phrase,
-    checks for wake word or direct commands, extracts intent, and fires callbacks.
+    Single-phrase wake word + direct command capture with acoustic echo gating.
     """
 
     def __init__(
@@ -83,14 +108,20 @@ class WakeWordService:
         on_error: Callable[[str], None] = None,
         sensitivity: float = 0.6,
         access_key: str = "",
+        tts_service: Optional[object] = None,
     ):
         self.wake_word = wake_word
         self.on_wake = on_wake or (lambda: None)
-        self.on_wake_with_command = on_wake_with_command  # Fires with command text
+        self.on_wake_with_command = on_wake_with_command
         self.on_error = on_error or (lambda msg: print(f"[WakeWordService] {msg}"))
+        self._tts_service = tts_service
+        self._transcriber = AudioTranscriber()
 
         self._running = False
         self._thread: threading.Thread | None = None
+
+    def set_tts_service(self, tts_service: object) -> None:
+        self._tts_service = tts_service
 
     def start(self) -> bool:
         if self._running:
@@ -137,16 +168,25 @@ class WakeWordService:
                     except sr.WaitTimeoutError:
                         continue
 
-                # Transcribe outside the mic context
-                try:
-                    text = recognizer.recognize_google(audio, language="en-US")
-                except sr.UnknownValueError:
-                    continue
-                except sr.RequestError as e:
-                    print(f"[WakeWordService] API error: {e}")
+                # Gate check: Discard audio captured while Maki is speaking or during reverb
+                if self._tts_service and getattr(self._tts_service, "is_speaking_or_recent", lambda: False)(0.7):
                     continue
 
-                print(f"[WakeWordService] Heard: '{text}'")
+                # Transcribe outside the mic context using Groq Whisper / Google STT
+                try:
+                    wav_bytes = audio.get_wav_data()
+                    text, provider = self._transcriber.transcribe_wav_bytes(wav_bytes)
+                except Exception as e:
+                    continue
+
+                if not text:
+                    continue
+
+                # Secondary gate check right after transcription in case TTS started speaking during transcribe
+                if self._tts_service and getattr(self._tts_service, "is_speaking_or_recent", lambda: False)(0.7):
+                    continue
+
+                print(f"[WakeWordService] Heard ({provider}): '{text}'")
 
                 has_wake = _contains_wake_word(text)
                 is_direct = _is_direct_command(text)

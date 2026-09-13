@@ -1,18 +1,21 @@
 """
-MakiAI — Dedicated Push-to-Talk (PTT) Service
-Provides low-latency, hardware-triggered voice recording via global hotkey
-(e.g., Right Alt, Ctrl+Space, or F8).
-Holding the key records direct audio stream buffers from the wireless lapel mic;
-releasing it immediately dispatches the audio buffer to the STT engine.
+MakiAI — Dedicated Push-to-Talk (PTT) Service (ptt_service.py)
+Provides hardware-triggered voice recording via global hotkey (Right Alt) with:
+  1. Continuous background pre-roll audio ring buffer (~300ms) to eliminate initial clipping
+  2. Post-roll release padding (~120ms) to eliminate trailing clipping
+  3. Ultra-fast Groq Whisper (whisper-large-v3-turbo) transcription with domain vocabulary biasing
+  4. Google STT fallback for offline/limit resilience
 """
 
 import io
-import wave
+import time
+import collections
 import threading
-import numpy as np
 from typing import Optional, Callable
+import numpy as np
 import sounddevice as sd
-import speech_recognition as sr
+
+from services.voice.audio_transcriber import AudioTranscriber
 
 try:
     import keyboard
@@ -23,7 +26,7 @@ except Exception:
 
 class PushToTalkService:
     """
-    Push-to-Talk service using global keyboard hooks and sounddevice buffer recording.
+    Hardware-triggered Push-to-Talk service with rolling pre-roll buffer and Whisper STT.
     """
 
     def __init__(
@@ -35,15 +38,6 @@ class PushToTalkService:
         samplerate: int = 16000,
         channels: int = 1,
     ):
-        """
-        Args:
-            hotkey: Global key trigger (e.g. "right alt", "ctrl+space", "f8").
-            on_ptt_start: Callback when user presses & holds PTT hotkey.
-            on_ptt_end: Callback when user releases PTT hotkey.
-            on_result: Callback receiving final transcribed text.
-            samplerate: 16000 Hz standard for voice recognition.
-            channels: 1 (Mono).
-        """
         self.hotkey = hotkey.lower().strip()
         self.on_ptt_start = on_ptt_start or (lambda: None)
         self.on_ptt_end = on_ptt_end or (lambda: None)
@@ -52,12 +46,14 @@ class PushToTalkService:
         self.channels = channels
 
         self._recording = False
-        self._audio_frames = []
+        self._audio_frames: list[np.ndarray] = []
+        self._pre_roll_buffer = collections.deque(maxlen=12)  # ~300ms rolling ring buffer
         self._stream: Optional[sd.InputStream] = None
         self._lock = threading.Lock()
-        self._recognizer = sr.Recognizer()
+        self._transcriber = AudioTranscriber()
 
         self._active = False
+        self._start_audio_stream()
         self.start_listener()
 
     def set_callbacks(
@@ -73,6 +69,28 @@ class PushToTalkService:
         if on_result:
             self.on_result = on_result
 
+    def _start_audio_stream(self) -> None:
+        """Keep a background input stream active to feed the pre-roll ring buffer."""
+        def _callback(indata, frames, time_info, status):
+            chunk = indata.copy()
+            with self._lock:
+                if self._recording:
+                    self._audio_frames.append(chunk)
+                else:
+                    self._pre_roll_buffer.append(chunk)
+
+        try:
+            self._stream = sd.InputStream(
+                samplerate=self.samplerate,
+                channels=self.channels,
+                dtype="int16",
+                callback=_callback,
+                blocksize=int(self.samplerate * 0.025),  # 25ms blocks
+            )
+            self._stream.start()
+        except Exception as e:
+            print(f"[PTTService] Background audio stream error: {e}")
+
     def start_listener(self) -> None:
         """Register low-level global hotkey hooks."""
         if self._active:
@@ -80,11 +98,10 @@ class PushToTalkService:
 
         if KEYBOARD_AVAILABLE:
             try:
-                # Handle single keys like 'right alt' or 'f8'
                 keyboard.on_press_key(self.hotkey, self._on_key_down, suppress=False)
                 keyboard.on_release_key(self.hotkey, self._on_key_up, suppress=False)
                 self._active = True
-                print(f"[PTTService] Global Push-to-Talk active on '{self.hotkey}'.")
+                print(f"[PTTService] Global Push-to-Talk active on '{self.hotkey}' (Pre-roll buffer active).")
             except Exception as e:
                 print(f"[PTTService] keyboard hook error on '{self.hotkey}': {e}. Trying fallback.")
                 self._init_pynput_fallback()
@@ -122,84 +139,52 @@ class PushToTalkService:
             if self._recording:
                 return
             self._recording = True
-            self._audio_frames = []
+            # Prepend pre-roll buffer so the very first word is preserved
+            self._audio_frames = list(self._pre_roll_buffer)
+            self._pre_roll_buffer.clear()
 
         print(f"[PTTService] PTT Engaged — Recording live stream...")
         self.on_ptt_start()
-
-        # Start sounddevice input stream
-        def _audio_callback(indata, frames, time_info, status):
-            if self._recording:
-                self._audio_frames.append(indata.copy())
-
-        try:
-            self._stream = sd.InputStream(
-                samplerate=self.samplerate,
-                channels=self.channels,
-                dtype="int16",
-                callback=_audio_callback,
-            )
-            self._stream.start()
-        except Exception as e:
-            print(f"[PTTService] InputStream error: {e}")
-            self._recording = False
 
     def _on_key_up(self, event) -> None:
         """Triggered on hotkey release."""
         with self._lock:
             if not self._recording:
                 return
+
+        # Post-roll padding (~120ms) to ensure trailing word is captured
+        time.sleep(0.12)
+
+        with self._lock:
             self._recording = False
+            frames_to_process = list(self._audio_frames)
+            self._audio_frames = []
 
-        print(f"[PTTService] PTT Released — Processing {len(self._audio_frames)} audio frames...")
-        if self._stream:
-            try:
-                self._stream.stop()
-                self._stream.close()
-            except Exception:
-                pass
-            self._stream = None
-
+        print(f"[PTTService] PTT Released — Processing {len(frames_to_process)} audio frames...")
         self.on_ptt_end()
 
         # Process recorded audio in background thread
-        threading.Thread(target=self._transcribe_and_dispatch, daemon=True).start()
+        threading.Thread(target=self._process_audio_frames, args=(frames_to_process,), daemon=True).start()
 
-    def _transcribe_and_dispatch(self) -> None:
-        """Convert in-memory numpy frames to WAV and transcribe via Google STT."""
-        if not self._audio_frames:
+    def _process_audio_frames(self, frames: list[np.ndarray]) -> None:
+        """Transcribe audio frames using Groq Whisper with Google STT fallback."""
+        if not frames:
             return
 
         try:
-            audio_data = np.concatenate(self._audio_frames, axis=0)
-            if len(audio_data) < self.samplerate * 0.3:  # Less than 300ms is too short
+            total_samples = sum(len(f) for f in frames)
+            if total_samples < self.samplerate * 0.25:  # Less than 250ms is too brief
                 print("[PTTService] Audio too brief — discarded.")
                 return
 
-            # Write WAV into memory buffer
-            wav_buffer = io.BytesIO()
-            with wave.open(wav_buffer, "wb") as wf:
-                wf.setnchannels(self.channels)
-                wf.setsampwidth(2)  # 16-bit
-                wf.setframerate(self.samplerate)
-                wf.writeframes(audio_data.tobytes())
+            text, provider = self._transcriber.transcribe_numpy_frames(frames, self.samplerate, self.channels)
 
-            wav_buffer.seek(0)
+            if text:
+                print(f"[PTTService] Transcribed ({provider}): '{text}'")
+                if self.on_result:
+                    self.on_result(text)
+            else:
+                print("[PTTService] Could not understand speech in PTT recording.")
 
-            # Read with SpeechRecognition AudioFile
-            with sr.AudioFile(wav_buffer) as source:
-                audio = self._recognizer.record(source)
-
-            # Transcribe
-            text = self._recognizer.recognize_google(audio, language="en-US").strip()
-            print(f"[PTTService] Transcribed: '{text}'")
-
-            if text and self.on_result:
-                self.on_result(text)
-
-        except sr.UnknownValueError:
-            print("[PTTService] Could not understand speech in PTT recording.")
-        except sr.RequestError as e:
-            print(f"[PTTService] STT API error: {e}")
         except Exception as e:
-            print(f"[PTTService] Transcription error: {e}")
+            print(f"[PTTService] Audio processing error: {e}")

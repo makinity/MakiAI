@@ -172,15 +172,14 @@ class KBIndex:
             return []
 
         # Tokenize and remove stopwords
-        words = [re.sub(r"[^a-zA-Z0-9_-]", "", w.lower()) for w in query.split()]
+        words = [re.sub(r"[^a-zA-Z0-9]", "", w.lower()) for w in query.split()]
         keywords = [w for w in words if len(w) > 2 and w not in STOPWORDS]
 
         if not keywords:
             return []
 
-        # Build FTS5 match query with prefixes
-        # e.g. "capstone* OR project* OR title*"
-        match_query = " OR ".join([f"{kw}*" for kw in keywords])
+        # Build FTS5 match query with sanitized tokens
+        match_query = " OR ".join([f'"{kw}"*' for kw in keywords])
 
         results = []
         try:

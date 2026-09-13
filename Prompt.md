@@ -598,4 +598,29 @@ Combine multiple features together for maximum productivity:
 
 ---
 
+## 19. 🌐 Live Web Research, Google Search & URL Reading (Bare Research)
+
+MakiAI features a zero-dependency, multi-tier web research engine powered by standard Python and free API fallbacks (`Tavily → Serper (Google) → Exa → DuckDuckGo`):
+
+### 🔍 Live Web Searches
+Ask Maki to search the live web for breaking news, developer documentation, sport scores, or facts:
+* *"Search for the latest Next.js 15 breaking changes."*
+* *"Google who won the NBA game last night."*
+* *"Research best practices for Supabase row level security."*
+* *"Look up how to configure Tailwind CSS with Vite."*
+* *"Find information about the newest Groq Whisper models."*
+
+### 📄 Reading & Summarizing Web Pages / Documentation Links
+Give Maki any URL to read and extract its content without ads or popups:
+* *"Read this link: https://github.com/paulablaza/bare-research and tell me what it does."*
+* *"Summarize this article: https://news.ycombinator.com/item?id=12345"*
+* *"Check https://fastapi.tiangolo.com/tutorial/security/ and explain how OAuth2 works."*
+
+### ⚡ Free & Automatic Resilience:
+* **Zero Keys Needed**: If no API keys are provided in `.env`, Maki automatically uses the built-in DuckDuckGo search and standard library HTML extractor for 100% free operation.
+* **Optional Superchargers**: If `TAVILY_API_KEY`, `SERPER_API_KEY`, or `FIRECRAWL_API_KEY` are provided in `.env`, Maki will automatically prioritize them for lightning-fast AI summaries.
+
+---
+
 *MakiAI — Built for speed, precision, and complete autonomous operating assistance.* 🚀
+

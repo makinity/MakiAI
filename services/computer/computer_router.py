@@ -249,7 +249,7 @@ class ComputerRouter:
         """
         is_tile_cmd = bool(
             re.search(r"\b(tile|auto-tile|autotile)\b", lowered)
-            or (re.search(r"\b(organize|snap|arrange|fit|grid|maximize)\b", lowered) and re.search(r"\b(windows?|workspace|screens?|displays?|monitors?|apps?)\b", lowered))
+            or (re.search(r"\b(organize|snap|arrange|fit|grid|maximize)\b", lowered) and re.search(r"\b(windows?|workspace|workflow|workshop|work\s+space|screens?|displays?|monitors?|apps?)\b", lowered))
             or re.search(r"\b(across\s+(?:my\s+)?(?:2\s+|both\s+)?monitors?|across\s+(?:my\s+)?screens?)\b", lowered)
         )
         if not is_tile_cmd:
@@ -732,10 +732,12 @@ class ComputerRouter:
         # Organize folder
         org_match = re.search(
             r"(?:organize|clean\s+up|sort)\s+(?:my\s+)?(.+?)(?:\s+folder)?$",
-            lowered
+            lowered.rstrip(".!?,")
         )
         if org_match:
-            folder = org_match.group(1).strip()
+            folder = org_match.group(1).strip().rstrip(".!?,")
+            if folder in ("windows", "workspace", "workflow", "workshop", "work space", "screens", "apps", "tabs"):
+                return self._handle_tile(lowered)
             return self.files.organize(folder)
 
         # Search files

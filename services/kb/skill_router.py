@@ -117,6 +117,15 @@ class SkillRouter:
                 r"\bfinish\s+(my\s+)?homework\b",
                 r"\bhomework\s+help\b",
             ]),
+            ("research", [
+                r"https?://[^\s]+",
+                r"\b(search|look\s+up|google|research)\b",
+                r"\bsearch\s+(the\s+web|online|google)\b",
+                r"\bfind\s+(out\s+about|information\s+about)\b",
+                r"\b(read|check|summarize)\s+(this\s+)?(link|url|website|page|article)\b",
+                r"\bwhat\s+is\s+the\s+latest\s+on\b",
+                r"\bwho\s+won\s+the\b",
+            ]),
         ]
 
         for skill_id, patterns in trigger_definitions:

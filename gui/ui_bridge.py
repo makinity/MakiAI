@@ -89,23 +89,29 @@ class MakiUIApi:
     # ─── Conversational Voice Engine ──────────────────────────────────────────
 
     def _on_wake_detected(self) -> None:
-        """Wake word heard alone — greet and enter continuous conversation."""
+        """Wake word heard alone — greet user and return to standby."""
         if not self.state_manager.is_idle():
             return
-        print("[UIBridge] Wake word detected alone — entering conversation mode.")
-        if self.wake_word_service and self.wake_word_service.is_running:
-            self.wake_word_service.stop()
-        self._enter_conversation_mode(initial_command="")
+        print("[UIBridge] Wake word detected alone.")
+        threading.Thread(
+            target=self._handle_voice_command_sync,
+            args=("hello",),
+            daemon=True,
+            name="WakeWordWorkerThread"
+        ).start()
 
     def _on_wake_with_command(self, command: str) -> None:
-        """Wake word + command in single phrase — handle command and enter conversation."""
+        """Wake word + command in single phrase — handle command and return to standby."""
         clean = (command or "").strip()
-        if not self.state_manager.is_idle():
+        if not clean or not self.state_manager.is_idle():
             return
         print(f"[UIBridge] Wake word + command detected: '{clean}'")
-        if self.wake_word_service and self.wake_word_service.is_running:
-            self.wake_word_service.stop()
-        self._enter_conversation_mode(initial_command=clean)
+        threading.Thread(
+            target=self._handle_voice_command_sync,
+            args=(clean,),
+            daemon=True,
+            name="WakeCommandWorkerThread"
+        ).start()
 
     def on_ptt_command(self, text: str) -> None:
         """Called when PTT hotkey audio is transcribed."""
@@ -115,81 +121,18 @@ class MakiUIApi:
             return
 
         print(f"[UIBridge] PTT voice command received: '{clean}'")
-        self.add_activity("user", clean)
-        self.state_manager.set_state(AppState.THINKING)
-        try:
-            response = self.orchestrator.handle_command(clean)
-            if response:
-                self.add_activity("assistant", response)
-        except Exception as e:
-            print(f"[UIBridge] Error executing PTT command: {e}")
-            self.add_activity("system", f"Voice error: {e}")
-
-    def _enter_conversation_mode(self, initial_command: str = "") -> None:
-        """Start continuous conversation listening loop."""
-        self._conversation_active = True
         threading.Thread(
-            target=self._run_conversation_loop,
-            args=(initial_command,),
+            target=self._handle_voice_command_sync,
+            args=(clean,),
             daemon=True,
-            name="ConversationLoopThread",
+            name="PTTWorkerThread"
         ).start()
 
-    def _run_conversation_loop(self, initial_command: str = "") -> None:
-        """Continuous listening session in background thread."""
-        if initial_command:
-            self._handle_voice_command_sync(initial_command)
-        else:
-            print("[UIBridge] Running Hello greeting on wake.")
-            self._handle_voice_command_sync("hello")
-
-        INACTIVITY_TIMEOUT = 90  # 90 seconds of silence before sleeping
-        last_activity = time.time()
-        print("[UIBridge] Conversation loop active — listening continuously.")
-
-        recognizer = sr.Recognizer()
-        recognizer.dynamic_energy_threshold = True
-        recognizer.pause_threshold = 1.0
-        recognizer.energy_threshold = 300
-
-        while self._conversation_active and self._auto_listen_enabled:
-            if time.time() - last_activity > INACTIVITY_TIMEOUT:
-                self._exit_conversation_mode("Going back to standby. Say Hey Maki to wake me.")
-                return
-
-            try:
-                self.state_manager.set_state(AppState.LISTENING)
-
-                with sr.Microphone() as source:
-                    recognizer.adjust_for_ambient_noise(source, duration=0.3)
-                    audio = recognizer.listen(source, timeout=8, phrase_time_limit=12)
-
-                self.state_manager.set_state(AppState.THINKING)
-                text = recognizer.recognize_google(audio, language="en-US").strip()
-                print(f"[ConversationLoop] Heard: '{text}'")
-                last_activity = time.time()
-
-                if any(kw in text.lower() for kw in ["go to sleep", "sleep", "goodbye", "stop listening"]):
-                    self._exit_conversation_mode("Alright, going back to standby.")
-                    return
-
-                self._handle_voice_command_sync(text)
-
-            except sr.WaitTimeoutError:
-                self.state_manager.set_state(AppState.IDLE)
-                time.sleep(0.3)
-            except sr.UnknownValueError:
-                self.state_manager.set_state(AppState.IDLE)
-                time.sleep(0.2)
-            except Exception as e:
-                print(f"[ConversationLoop] Error: {e}")
-                self.state_manager.set_state(AppState.IDLE)
-                time.sleep(1)
-
     def _handle_voice_command_sync(self, text: str) -> None:
-        """Execute command and block until TTS finishes speaking."""
+        """Execute command, speak response, and return cleanly to IDLE."""
         clean = (text or "").strip()
         if not clean:
+            self.state_manager.set_state(AppState.IDLE)
             return
 
         self.add_activity("user", clean)
@@ -199,33 +142,18 @@ class MakiUIApi:
             response = self.orchestrator.handle_command(clean)
             if response:
                 self.add_activity("assistant", response)
-                time.sleep(0.5)
+                time.sleep(0.3)
                 waited = 0
                 while self.tts_service.is_speaking() and waited < 30:
                     time.sleep(0.1)
                     waited += 0.1
-                time.sleep(0.5)
+                # Reverb decay buffer
+                time.sleep(0.4)
         except Exception as e:
             print(f"[UIBridge] Handle command error: {e}")
             self.add_activity("system", f"Command error: {e}")
-
-    def _exit_conversation_mode(self, farewell: str = "") -> None:
-        """Exit conversation mode and restart wake word listener."""
-        self._conversation_active = False
-        self.state_manager.set_state(AppState.IDLE)
-        if farewell:
-            self.add_activity("assistant", farewell)
-            self.tts_service.speak(farewell)
-            waited = 0
-            while self.tts_service.is_speaking() and waited < 10:
-                time.sleep(0.1)
-                waited += 0.1
-
-        time.sleep(1)
-        if self._auto_listen_enabled and self.wake_word_service:
-            if not self.wake_word_service.is_running:
-                self.wake_word_service.start()
-        print("[UIBridge] Returned to wake word mode.")
+        finally:
+            self.state_manager.set_state(AppState.IDLE)
 
     def _on_reminder_fire(self, text: str) -> None:
         """Called when a background reminder triggers."""

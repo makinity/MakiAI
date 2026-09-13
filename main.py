@@ -61,6 +61,7 @@ def bootstrap_maki_services():
     from skills.memory_skill import MemorySkill
     from skills.new_project_skill import NewProjectSkill
     from skills.homework_skill import HomeworkSkill
+    from skills.research_skill import ResearchSkill
     from gui.ui_bridge import MakiUIApi
 
     # Storage initialization
@@ -122,6 +123,7 @@ def bootstrap_maki_services():
         "memory": MemorySkill(*skill_deps),
         "new_project": NewProjectSkill(*skill_deps),
         "homework": HomeworkSkill(*skill_deps),
+        "research": ResearchSkill(*skill_deps),
     }
     skill_router = SkillRouter(skills)
 
@@ -144,6 +146,7 @@ def bootstrap_maki_services():
         on_wake=lambda: state_manager.set_state(AppState.LISTENING),
         on_error=lambda msg: print(f"[WakeWord] {msg}"),
         sensitivity=0.6,
+        tts_service=tts_service,
     )
 
     ptt_hotkey = settings.get("ptt_hotkey", "right alt")

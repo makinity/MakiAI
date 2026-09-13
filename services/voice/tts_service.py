@@ -61,6 +61,7 @@ class TTSService:
         self.ducker = AudioDuckingService(duck_ratio=0.30)
 
         self._speaking = False
+        self._last_spoke_time = 0.0
         self._elevenlabs_disabled = False
         self._pygame_initialized = False
         self._init_pygame()
@@ -146,11 +147,16 @@ class TTSService:
     def is_speaking(self) -> bool:
         return self._speaking
 
+    def is_speaking_or_recent(self, cooldown_seconds: float = 0.8) -> bool:
+        import time
+        return self._speaking or (time.time() - getattr(self, "_last_spoke_time", 0.0) < cooldown_seconds)
+
     def _speak_thread(self, text: str) -> None:
         """
         Background thread: generate single continuous audio stream and play it.
         Guarantees natural prosody and zero stops at sentence periods.
         """
+        import time
         self._speaking = True
         self.on_speaking_start()
 
@@ -193,6 +199,7 @@ class TTSService:
                 except Exception:
                     pass
             self._speaking = False
+            self._last_spoke_time = time.time()
             self.on_speaking_end()
 
     # ─── ElevenLabs ──────────────────────────────────────────────────────────
