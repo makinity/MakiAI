@@ -276,3 +276,79 @@ def _is_date(name: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+# ─── Storage Security & Sandboxing Guard ──────────────────────────────────────
+
+ALLOWED_WRITE_ROOTS = [
+    Path(r"C:\MakiSync Storage"),
+    Path(r"C:\Knowledge-Base"),
+    Path(__file__).resolve().parents[2] / "data",
+    Path(__file__).resolve().parents[2] / "logs",
+]
+
+SENSITIVE_EXTENSIONS_OR_FILES = {
+    ".env", "config.db", "id_rsa", "id_ed25519", ".pem", ".key", ".pfx", "token.json"
+}
+
+
+class StorageSecurityGuard:
+    """
+    Enforces the MakiAI Storage Sandbox Policy:
+      1. FULL CRUD (Create, Read, Update, Delete) ONLY inside MakiSync Storage & Knowledge Base.
+      2. OUTSIDE MakiSync Storage: READ & SEND ONLY (e.g. to Telegram).
+      3. Strictly FORBIDDEN from creating, modifying, updating, or deleting files outside MakiSync Storage.
+      4. Protects sensitive credential files (.env, config.db, private keys) from remote leak.
+    """
+
+    @staticmethod
+    def is_write_permitted(target_path: Path | str) -> bool:
+        """Check if writing/creating/updating/deleting is permitted at target path."""
+        try:
+            resolved = Path(target_path).resolve()
+            for allowed in ALLOWED_WRITE_ROOTS:
+                try:
+                    resolved.relative_to(allowed.resolve())
+                    return True
+                except ValueError:
+                    continue
+            return False
+        except Exception:
+            return False
+
+    @staticmethod
+    def assert_write_permitted(target_path: Path | str) -> None:
+        """Raise PermissionError if path is outside the allowed CRUD sandbox."""
+        if not StorageSecurityGuard.is_write_permitted(target_path):
+            raise PermissionError(
+                f"[StorageSecurityGuard] Sandboxing Violation: MakiAI is strictly forbidden from "
+                f"creating, modifying, or deleting files outside MakiSync Storage: {target_path}"
+            )
+
+    @staticmethod
+    def is_safe_for_remote_sending(target_path: Path | str) -> bool:
+        """Check if file can be safely read and sent over remote Telegram bridge."""
+        try:
+            p = Path(target_path).resolve()
+            if not p.is_file() or not p.exists():
+                return False
+
+            # Block sensitive files
+            name_lower = p.name.lower()
+            if name_lower in SENSITIVE_EXTENSIONS_OR_FILES:
+                return False
+            if any(name_lower.endswith(ext) for ext in SENSITIVE_EXTENSIONS_OR_FILES if ext.startswith(".")):
+                return False
+
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
+    def assert_safe_for_remote_sending(target_path: Path | str) -> None:
+        """Raise PermissionError if trying to send sensitive credentials over remote."""
+        if not StorageSecurityGuard.is_safe_for_remote_sending(target_path):
+            raise PermissionError(
+                f"[StorageSecurityGuard] Security Block: Cannot send sensitive system file or credentials: {target_path}"
+            )
+

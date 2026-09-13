@@ -175,3 +175,66 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"You’re welcome, sir. Anything else I can help with right now?"`
 
 ---
+
+### 🔹 Live Session Command — 05:11:28 PM
+* **Spoken / Typed Command:** `"Hey Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good evening, sir. It's 5:11 PM here in the Philippines. You have the AI Ad Video deadline tomorrow at 1 PM, so you might want to set aside ..."`
+
+---
+
+### 🔹 Live Session Command — 05:11:58 PM
+* **Spoken / Typed Command:** `"Maki, send me my cv"`
+* **Extracted Payload:** `"Maki, send me my cv"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I don’t see a CV file listed in your Knowledge Base or in the MakiSync storage, sir. Could you let me know where it’s saved, or would you li..."`
+
+---
+
+### 🔹 Live Session Command — 05:15:33 PM
+* **Spoken / Typed Command:** `"Maki, send me my cv"`
+* **Extracted Payload:** `"Maki, send me my cv"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I don’t see a CV file listed in your Knowledge Base, sir. Would you like me to look through your MakiSync storage for it, or create a new do..."`
+
+---
+
+### 🔹 Live Session Command — 05:19:55 PM
+* **Spoken / Typed Command:** `"Send me my latest capstone paper"`
+* **Extracted Payload:** `"Send me my latest capstone paper"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Right away, sir. Let me look in your MakiSync Storage under the School folder for the most recent capstone paper. I’ll open it for you in a ..."`
+
+---
+
+### 🔹 Live Session Command — 05:20:14 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `"Maki."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Yes, sir? How can I assist you?"`
+
+---
+
+### 🔹 Live Session Command — 05:20:18 PM
+* **Spoken / Typed Command:** `"Open youtube"`
+* **Extracted Payload:** `"Open youtube"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening YouTube in your personal profile, sir."`
+
+---
+
+### 🔹 Live Session Command — 05:20:24 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You’re welcome, sir. Let me know if there’s anything else I can do for you."`
+
+---

@@ -52,5 +52,68 @@
     "response": "You’re welcome, sir. Anything else I can help with right now?",
     "is_fallback": true,
     "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:11:28",
+    "raw_command": "Hey Maki.",
+    "cleaned_command": "",
+    "handler": "Fallback:Gemini",
+    "response": "Good evening, sir. It's 5:11 PM here in the Philippines. You have the AI Ad Video deadline tomorrow at 1 PM, so you might want to set aside some time this evening to finalize any remaining edits. Other than that, your day looks clear for now. Is there anything specific you’d like me to handle—perhaps a reminder, opening an app, or checking on a file?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:11:58",
+    "raw_command": "Maki, send me my cv",
+    "cleaned_command": "Maki, send me my cv",
+    "handler": "Fallback:Gemini",
+    "response": "I don’t see a CV file listed in your Knowledge Base or in the MakiSync storage, sir. Could you let me know where it’s saved, or would you like me to create a placeholder for you to add it?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:15:33",
+    "raw_command": "Maki, send me my cv",
+    "cleaned_command": "Maki, send me my cv",
+    "handler": "Fallback:Gemini",
+    "response": "I don’t see a CV file listed in your Knowledge Base, sir. Would you like me to look through your MakiSync storage for it, or create a new document for you?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:19:55",
+    "raw_command": "Send me my latest capstone paper",
+    "cleaned_command": "Send me my latest capstone paper",
+    "handler": "Fallback:Gemini",
+    "response": "Right away, sir. Let me look in your MakiSync Storage under the School folder for the most recent capstone paper. I’ll open it for you in a moment.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:20:14",
+    "raw_command": "Maki.",
+    "cleaned_command": "Maki.",
+    "handler": "Fallback:Gemini",
+    "response": "Yes, sir? How can I assist you?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 17:20:18",
+    "raw_command": "Open youtube",
+    "cleaned_command": "Open youtube",
+    "handler": "ComputerRouter",
+    "response": "Opening YouTube in your personal profile, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 17:20:24",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "You’re welcome, sir. Let me know if there’s anything else I can do for you.",
+    "is_fallback": true,
+    "flagged_for_review": true
   }
 ]

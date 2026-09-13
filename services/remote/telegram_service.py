@@ -31,6 +31,7 @@ from telegram.ext import (
 )
 
 from services.voice.audio_transcriber import AudioTranscriber
+from services.storage.maki_sync import StorageSecurityGuard, MAKI_SYNC_ROOT
 
 TEMP_GUIDE_DIR = Path(r"C:\MakiSync Storage\School\Temp-Guide")
 
@@ -113,6 +114,8 @@ class TelegramRemoteService:
             self._app.add_handler(CommandHandler("status", self._cmd_status))
             self._app.add_handler(CommandHandler("screenshot", self._cmd_screenshot))
             self._app.add_handler(CommandHandler("screen", self._cmd_screenshot))
+            self._app.add_handler(CommandHandler("file", self._cmd_file))
+            self._app.add_handler(CommandHandler("get", self._cmd_file))
 
             # Media & Content Handlers
             self._app.add_handler(MessageHandler(filters.VOICE | filters.AUDIO, self._handle_voice))
@@ -223,6 +226,109 @@ class TelegramRemoteService:
         except Exception as e:
             await update.message.reply_text(f"❌ Failed to capture screenshot: {e}")
 
+    async def _cmd_file(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Handle /file or /get <filename or search term>."""
+        if not self._is_authorized(update):
+            return
+        query = " ".join(context.args).strip() if context.args else ""
+        if not query:
+            await update.message.reply_text("Please specify a filename, sir. Example: `/file Prompt.md` or `/file assignment.docx`", parse_mode="Markdown")
+            return
+        await self._find_and_send_file(query, update, context)
+
+    async def _find_and_send_file(self, query: str, update: Update, context: ContextTypes.DEFAULT_TYPE = None) -> bool:
+        """Search local storage, projects, and documents, then send matching file."""
+        clean_q = query.strip().strip('"').strip("'")
+
+        # 1. Direct path check
+        direct_p = Path(clean_q)
+        if direct_p.is_file() and direct_p.exists():
+            return await self._send_single_file(direct_p, update)
+
+        # 2. Fast Prioritized Search Roots
+        priority_roots = [
+            Path(r"C:\capstone\CV"),
+            Path(r"C:\capstone"),
+            Path(r"C:\MakiSync Storage"),
+            Path(r"C:\Knowledge-Base"),
+            Path.home() / "Documents",
+            Path.home() / "Desktop",
+            Path.home() / "Downloads",
+            Path(r"C:\development\Python\MakiAI"),
+        ]
+
+        matches = []
+        q_lower = clean_q.lower()
+        is_cv_query = any(k in q_lower for k in ("cv", "resume", "curriculum vitae"))
+        ignore_dirs = {"venv", ".git", "__pycache__", "node_modules", "vendor", "obj", "bin", "build", "dist", ".next"}
+
+        for root in priority_roots:
+            if not root.exists():
+                continue
+            try:
+                for dirpath, dirnames, filenames in os.walk(str(root)):
+                    # Prune ignore directories in-place for fast traversal
+                    dirnames[:] = [d for d in dirnames if d.lower() not in ignore_dirs and not d.startswith(".")]
+                    
+                    for fn in filenames:
+                        fn_lower = fn.lower()
+                        p_obj = Path(dirpath) / fn
+                        # If looking for CV, match CV / resume in filename
+                        if is_cv_query:
+                            if any(k in fn_lower for k in ("_cv", "cv_", "-cv", "cv.", "resume", "cv")) or "cv" in fn_lower:
+                                if p_obj not in matches:
+                                    matches.append(p_obj)
+                        elif q_lower in fn_lower:
+                            if p_obj not in matches:
+                                matches.append(p_obj)
+
+                        if len(matches) >= 5:
+                            break
+                    if len(matches) >= 5:
+                        break
+            except Exception:
+                pass
+            if len(matches) >= 5:
+                break
+
+        if not matches:
+            await update.message.reply_text(f"🔍 I searched your PC folders (`C:\\capstone\\CV`, `MakiSync Storage`, Documents) for `{clean_q}`, but couldn't find a matching file, sir.", parse_mode="Markdown")
+            return False
+
+        # If PDF exists among matches, prioritize sending the PDF
+        matches.sort(key=lambda p: (0 if p.suffix.lower() == ".pdf" else (1 if p.suffix.lower() == ".docx" else 2)))
+        target_file = matches[0]
+        return await self._send_single_file(target_file, update, additional_matches=matches[1:])
+
+    async def _send_single_file(self, file_path: Path, update: Update, additional_matches: list = None) -> bool:
+        """Send a single file document to Telegram chat after checking security guard."""
+        try:
+            # Enforce storage security guard: Never leak credentials or sensitive system files
+            if not StorageSecurityGuard.is_safe_for_remote_sending(file_path):
+                await update.message.reply_text(f"🛡️ **Security Block:** `{file_path.name}` is a protected system credential and cannot be sent over remote chat, sir.", parse_mode="Markdown")
+                return False
+
+            file_size_mb = file_path.stat().st_size / (1024 * 1024)
+            if file_size_mb > 49.0:
+                await update.message.reply_text(f"⚠️ File `{file_path.name}` is {file_size_mb:.1f} MB (Telegram bot limit is 50 MB).", parse_mode="Markdown")
+                return False
+
+            await update.message.reply_text(f"📤 Uploading `{file_path.name}` from `{file_path.parent}` to your phone...", parse_mode="Markdown")
+            with open(file_path, "rb") as f:
+                await update.message.reply_document(
+                    document=f,
+                    filename=file_path.name,
+                    caption=f"📄 {file_path.name}\n📍 {file_path.parent}"
+                )
+
+            if additional_matches:
+                other_names = "\n".join([f"• `{p.name}` in `{p.parent.name}`" for p in additional_matches[:3]])
+                await update.message.reply_text(f"ℹ️ Other matching files found:\n{other_names}", parse_mode="Markdown")
+            return True
+        except Exception as e:
+            await update.message.reply_text(f"❌ Failed to send file `{file_path.name}`: {e}", parse_mode="Markdown")
+            return False
+
     async def _handle_text(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Process incoming text message through Orchestrator."""
         if not self._is_authorized(update):
@@ -232,6 +338,22 @@ class TelegramRemoteService:
         text = (update.message.text or "").strip()
         if not text:
             return
+
+        # Check if user asked to send/upload a file (e.g. "send me my CV", "send me the CV pdf", "send file Prompt.md")
+        import re
+        file_match = re.search(
+            r"^(?:hey\s+|hi\s+|ok\s+)?(?:maki[,.]?\s*)?(?:can\s+you\s+|please\s+)?(?:send|upload|give|get|fetch)\s+(?:me\s+)?(?:the\s+|my\s+)?(?:file\s+|document\s+|pdf\s+)?(.+)$",
+            text,
+            flags=re.IGNORECASE
+        )
+        if file_match:
+            candidate = file_match.group(1).strip().rstrip(".!?")
+            # Strip trailing word like 'pdf' or 'file' if user said 'cv pdf' or 'notes document'
+            candidate = re.sub(r"\s+(?:pdf|docx|file|document)$", "", candidate, flags=re.IGNORECASE).strip()
+            if candidate and not any(k in candidate.lower() for k in ("schedule", "time", "weather", "screenshot", "status", "hi", "hello")):
+                handled = await self._find_and_send_file(candidate, update)
+                if handled:
+                    return
 
         # Let user know Maki is thinking
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
@@ -314,6 +436,7 @@ class TelegramRemoteService:
                 photo = update.message.photo[-1]
                 file_obj = await context.bot.get_file(photo.file_id)
                 target_path = TEMP_GUIDE_DIR / f"{filename}.jpg"
+                StorageSecurityGuard.assert_write_permitted(target_path)
                 await file_obj.download_to_drive(str(target_path))
                 await update.message.reply_text(f"📥 Received rubric photo. Saved to `Temp-Guide/{target_path.name}`.", parse_mode="Markdown")
 
@@ -322,6 +445,7 @@ class TelegramRemoteService:
                 file_obj = await context.bot.get_file(doc.file_id)
                 orig_name = doc.file_name or f"{filename}.pdf"
                 target_path = TEMP_GUIDE_DIR / orig_name
+                StorageSecurityGuard.assert_write_permitted(target_path)
                 await file_obj.download_to_drive(str(target_path))
                 await update.message.reply_text(f"📥 Received document: `{orig_name}`. Saved to `Temp-Guide/`.", parse_mode="Markdown")
 
