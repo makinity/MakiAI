@@ -98,6 +98,7 @@ Write the actual homework document content.
 
         # Save as .docx
         output_path = self._save_homework(response, instructions)
+        self.last_generated_docx = output_path
 
         if output_path:
             subprocess.Popen(f'start "" "{output_path}"', shell=True)

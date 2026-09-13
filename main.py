@@ -186,6 +186,20 @@ def bootstrap_maki_services():
         reminder_service=reminder_service,
     )
 
+    # 8. Telegram Mobile Remote Bridge (24/7 Phone Access)
+    try:
+        from services.remote.telegram_service import TelegramRemoteService
+        telegram_service = TelegramRemoteService(
+            settings_service=settings,
+            orchestrator=orchestrator,
+            state_manager=state_manager,
+            tts_service=tts_service,
+            skill_router=skill_router,
+        )
+        telegram_service.start()
+    except Exception as e:
+        print(f"[MakiAI] Telegram service init error: {e}")
+
     return ui_api, settings
 
 

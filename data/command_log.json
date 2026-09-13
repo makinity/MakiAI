@@ -1,0 +1,56 @@
+[
+  {
+    "timestamp": "2026-09-13 16:54:36",
+    "raw_command": "Hey Maki.",
+    "cleaned_command": "",
+    "handler": "Fallback:Gemini",
+    "response": "Good afternoon, sir. How can I assist you today?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 16:54:59",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "You're welcome, sir. Anything you'd like me to take care of right now?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-13 16:56:40",
+    "raw_command": "Hi",
+    "cleaned_command": "Hi",
+    "handler": "Skill:HelloSkill",
+    "response": "Good afternoon, sir. It’s 04:56 PM Philippine Time, and you’re right now in your dedicated Video Editing and AI Video Editing Mastery session for today. This block runs until 6 PM, after which you’ll continue the same focus into the evening. Just a reminder you have an urgent AI Ad Video deadline tomorrow at 1 PM, so keep that on your radar.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 16:57:14",
+    "raw_command": "Can you open google classroom?",
+    "cleaned_command": "Can you open google classroom?",
+    "handler": "Skill:ResearchSkill",
+    "response": "Sure thing, sir. I’m opening Google Classroom for you now at https://classroom.google.com/. Let me know if you need anything else once you’re signed in.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 16:57:37",
+    "raw_command": "Open facebook",
+    "cleaned_command": "Open facebook",
+    "handler": "ComputerRouter",
+    "response": "Opening Facebook in your personal profile, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-13 16:57:46",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "Fallback:Gemini",
+    "response": "You’re welcome, sir. Anything else I can help with right now?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  }
+]

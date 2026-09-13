@@ -89,7 +89,10 @@ class SkillRouter:
                 r"^deadlines?$",
             ]),
             ("reminder", [
-                r"\bremind\s+(me\s+)?(at|to|about|in)\b",
+                r"\bremind\s+(me\s+)?(at|to|about|in|that|of)?\b",
+                r"\b(add|set|put|create)\s+(a\s+)?schedule\b",
+                r"\bschedule\s+(a\s+)?(meeting|event|call|session|task|zoom)\b",
+                r"\badd\s+(this\s+)?to\s+(my\s+)?schedule\b",
                 r"\bset\s+(a\s+)?reminder\b",
                 r"\b(show|list)\s+(my\s+)?reminders?\b",
                 r"\bcancel\s+reminder\b",

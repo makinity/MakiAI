@@ -4,9 +4,23 @@ Central command router. Every voice/text command passes through here.
 Routes to the correct service or skill based on intent.
 """
 
+import os
+import re
+import json
+import threading
+from datetime import datetime
+from pathlib import Path
+from typing import Tuple
+
 from core.state_manager import StateManager, AppState
 from services.computer.computer_router import ComputerRouter
 from services.ai.kiro_service import KiroService
+
+TRAINING_MD_PATH = Path(__file__).resolve().parents[1] / "training.md"
+COMMAND_LOG_PATH = Path(__file__).resolve().parents[1] / "data" / "command_log.json"
+
+# Set to False anytime to turn off training.md auto-logging
+ENABLE_TRAINING_LOGGER = True
 
 # Lightweight system prompt for general conversation — no KB files injected
 # Keeps responses fast for questions outside the knowledge base
@@ -58,13 +72,7 @@ class Orchestrator:
         self.kiro_service = KiroService()
 
     def set_services(self, services: dict) -> None:
-        """
-        Inject all service dependencies after initialization.
-
-        Args:
-            services: A dict of service instances keyed by name.
-                Expected keys: gemini, tts, skill_router, kb_reader, kb_writer, context_builder
-        """
+        """Inject all backend services after initialization."""
         self.gemini_service = services.get("gemini") or services.get("gemini_service")
         self.tts_service = services.get("tts") or services.get("tts_service")
         self.skill_router = services.get("skill_router")
@@ -72,6 +80,7 @@ class Orchestrator:
         self.kb_writer = services.get("kb_writer")
         self.context_builder = services.get("context_builder")
 
+        # Pass Gemini to ComputerRouter for vision/smart features
         if self.gemini_service and self.computer_router:
             self.computer_router.set_ai_service(self.gemini_service)
 
@@ -81,13 +90,8 @@ class Orchestrator:
     def handle_command(self, text: str) -> str:
         """
         Main entry point for all voice/text commands.
-        Transitions state, routes command, gets response, speaks it.
-
-        Args:
-            text: The transcribed or typed command from the user.
-
-        Returns:
-            The response string (also spoken via TTS).
+        Transitions state, routes command, gets response, speaks it,
+        and logs the command to training.md and command_log.json.
         """
         if not text or not text.strip():
             return ""
@@ -96,25 +100,94 @@ class Orchestrator:
         self.state_manager.set_state(AppState.THINKING)
 
         response = ""
+        handler_name = "Unknown"
+        is_fallback = False
+        cleaned_cmd = text.strip()
+
         try:
-            response = self._route(text.strip())
+            response, handler_name, is_fallback, cleaned_cmd = self._route_with_meta(text.strip())
             if response:
                 self._speak(response)
         except Exception as e:
             print(f"[Orchestrator] Error handling command: {e}")
             response = "I encountered an error. Please try again."
+            handler_name = "Error"
+            is_fallback = True
             self._speak(response)
         finally:
+            # Asynchronously log command for self-improvement and training review
+            self._log_command_event(text.strip(), cleaned_cmd, handler_name, response, is_fallback)
+
             # State resets to IDLE after TTS finishes (via tts_service callbacks)
-            # If TTS is stub, reset here
             if not self.tts_service or not self.tts_service.is_speaking():
                 self.state_manager.set_state(AppState.IDLE)
 
         return response
 
+    def _log_command_event(self, raw_text: str, cleaned_text: str, handler_name: str, response: str, is_fallback: bool = False):
+        """Asynchronously appends command execution details to training.md and data/command_log.json."""
+        if not ENABLE_TRAINING_LOGGER:
+            return
+
+        def worker():
+            try:
+                now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                short_time = datetime.now().strftime("%I:%M:%S %p")
+                status_icon = "⚠️ **Fallback / Needs Calibration**" if is_fallback else "✅ **Optimal & Routed**"
+
+                # 1. Update data/command_log.json
+                COMMAND_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+                log_entries = []
+                if COMMAND_LOG_PATH.exists():
+                    try:
+                        with open(COMMAND_LOG_PATH, "r", encoding="utf-8") as f:
+                            log_entries = json.load(f)
+                    except Exception:
+                        log_entries = []
+
+                new_entry = {
+                    "timestamp": now_str,
+                    "raw_command": raw_text,
+                    "cleaned_command": cleaned_text,
+                    "handler": handler_name,
+                    "response": response,
+                    "is_fallback": is_fallback,
+                    "flagged_for_review": is_fallback,
+                }
+                log_entries.append(new_entry)
+                if len(log_entries) > 200:
+                    log_entries = log_entries[-200:]
+
+                with open(COMMAND_LOG_PATH, "w", encoding="utf-8") as f:
+                    json.dump(log_entries, f, indent=2, ensure_ascii=False)
+
+                # 2. Append to training.md
+                if TRAINING_MD_PATH.exists():
+                    md_block = f"""
+### 🔹 Live Session Command — {short_time}
+* **Spoken / Typed Command:** `"{raw_text}"`
+* **Extracted Payload:** `"{cleaned_text}"`
+* **Matched Handler:** `{handler_name}`
+* **Status:** {status_icon}
+* **Maki Spoken Response:** `"{response[:140].replace(chr(10), ' ')}{'...' if len(response) > 140 else ''}"`
+
+---
+"""
+                    with open(TRAINING_MD_PATH, "a", encoding="utf-8") as f:
+                        f.write(md_block)
+            except Exception as e:
+                print(f"[Orchestrator] Command logger error: {e}")
+
+        threading.Thread(target=worker, daemon=True, name="CommandLoggerThread").start()
+
     def _route(self, text: str) -> str:
+        """Compatibility wrapper for _route_with_meta."""
+        res, _, _, _ = self._route_with_meta(text)
+        return res
+
+    def _route_with_meta(self, text: str) -> Tuple[str, str, bool, str]:
         """
-        Route priority:
+        Route priority with metadata capture:
           0. Homework follow-up / Kiro CLI coding requests
           1. KB Skills (good morning, deadlines, etc.)
           2. Computer control (open, volume, shutdown, etc.)
@@ -142,7 +215,7 @@ class Orchestrator:
                 stage_match = re.search(r"(stage\s+\d+|phase\s+\d+|step\s+\d+|[^\w\s].+)", cleaned, flags=re.IGNORECASE)
                 if stage_match:
                     task_spec = f"Focus on implementing {stage_match.group(0).strip()}."
-                return self.kiro_service.launch_interactive_session(initial_prompt=task_spec, project_name=proj_name)
+                return self.kiro_service.launch_interactive_session(initial_prompt=task_spec, project_name=proj_name), "KiroService:Interactive", False, cleaned
             else:
                 # Strip kiro trigger keywords for clean headless instruction
                 instruction = re.sub(r"^(?:t|target)\s*=\s*kiro\s+", "", cleaned, flags=re.IGNORECASE)
@@ -150,44 +223,45 @@ class Orchestrator:
                 kb_ctx = ""
                 if self.context_builder:
                     kb_ctx = self.context_builder.build_topic_context(instruction or cleaned)
-                return self.kiro_service.generate_code(instruction or cleaned, kb_context=kb_ctx)
+                return self.kiro_service.generate_code(instruction or cleaned, kb_context=kb_ctx), "KiroService:Headless", False, cleaned
 
         # 0. Active Project Planning session follow-up
         if self.skill_router:
             new_proj_skill = self.skill_router.get_skill("new_project")
             if new_proj_skill and getattr(new_proj_skill, "is_planning_active", lambda: False)():
                 # If the user is actively planning, send input to the planning engine
-                return new_proj_skill.execute(cleaned)
+                return new_proj_skill.execute(cleaned), "NewProjectSkill:ActivePlanning", False, cleaned
 
         # 0. Homework follow-up — if waiting for instructions after Temp-Guide was opened
         if self._awaiting_homework_instructions and self._homework_skill:
             self._awaiting_homework_instructions = False
-            return self._homework_skill.create_homework(cleaned)
+            return self._homework_skill.create_homework(cleaned), "HomeworkSkill:GenerateDocx", False, cleaned
 
         # 1. KB Skills
         if self.skill_router:
             skill = self.skill_router.detect(cleaned)
             if skill:
-                print(f"[Orchestrator] Skill matched: {skill.__class__.__name__}")
+                skill_name = skill.__class__.__name__
+                print(f"[Orchestrator] Skill matched: {skill_name}")
                 result = skill.execute(cleaned)
                 # If HomeworkSkill — set waiting state for follow-up
-                if skill.__class__.__name__ == "HomeworkSkill":
+                if skill_name == "HomeworkSkill":
                     self._awaiting_homework_instructions = True
                     self._homework_skill = skill
-                return result
+                return result, f"Skill:{skill_name}", False, cleaned
 
         # 2. Computer control
         result = self.computer_router.handle(cleaned)
         if result:
-            return result
+            return result, "ComputerRouter", False, cleaned
 
         # 3. Gemini/Groq fallback — general conversation
         # Inject KB context for project/coding/personal questions
         if self.gemini_service:
             context = self._build_context(cleaned)
-            return self.gemini_service.send(cleaned, context)
+            return self.gemini_service.send(cleaned, context), "Fallback:Gemini", True, cleaned
 
-        return f"I heard: {cleaned}. Full AI will be connected once your API key is set."
+        return f"I heard: {cleaned}. Full AI will be connected once your API key is set.", "Fallback:Stub", True, cleaned
 
     def _match_kiro_intent(self, text: str) -> str | None:
         """Detect if the user is delegating a coding instruction to Kiro."""

@@ -49,6 +49,10 @@ python-docx>=1.1.0
 youtube-transcript-api>=0.6.2
 yt-dlp>=2024.8.6
 
+# ─── Remote & Mobile Bridge ──────────────────────────────────────────────────
+python-telegram-bot>=21.0
+
+
 # ─── Dev Tools ───────────────────────────────────────────────────────────────
 black==24.8.0
 flake8==7.1.1
