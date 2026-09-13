@@ -14,6 +14,7 @@ Can be hot-swapped via update_api_key().
 """
 
 from typing import Optional
+import re
 
 
 MAX_HISTORY_TURNS = 20
@@ -168,15 +169,59 @@ class GeminiService:
 
         return self._stub_response(user_text)
 
+    def _clean_response(self, text: str) -> str:
+        """Strip internal thinking/reasoning tags and tokens from model responses."""
+        if not text:
+            return ""
+
+        # 1. Strip complete <think>...</think> or <thought>...</thought> blocks
+        cleaned = re.sub(r"<(?:think|thought)>.*?</(?:think|thought)>", "", text, flags=re.DOTALL | re.IGNORECASE).strip()
+
+        # 2. If the model put the entire answer INSIDE the <think> tag, extract the draft/response
+        if not cleaned:
+            marker_match = re.search(
+                r"(?:(?:\*\*Draft[^\n]*\*\*|\*\*Final Response[^\n]*\*\*|\*\*Response[^\n]*\*\*|Draft:)\s*)(.*?)(?:</(?:think|thought)>|$)",
+                text,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+            if marker_match:
+                cleaned = marker_match.group(1).strip()
+            else:
+                # Remove all think tags and return whatever text remains
+                cleaned = re.sub(r"</?(?:think|thought)>", "", text, flags=re.IGNORECASE).strip()
+
+        # 3. In case of unclosed <think> tag where the model outputs reasoning and then the answer
+        if re.search(r"<(?:think|thought)>", cleaned, re.IGNORECASE):
+            marker_match = re.search(
+                r"(?:(?:\*\*Draft[^\n]*\*\*|\*\*Final Response[^\n]*\*\*|\*\*Response[^\n]*\*\*|Draft:)\s*)(.*)",
+                cleaned,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+            if marker_match:
+                cleaned = marker_match.group(1)
+            else:
+                trimmed = re.sub(r"<(?:think|thought)>.*", "", cleaned, flags=re.DOTALL | re.IGNORECASE)
+                if trimmed.strip():
+                    cleaned = trimmed
+                else:
+                    cleaned = re.sub(r"<(?:think|thought)>", "", text, flags=re.IGNORECASE)
+
+        # 4. Clean any stray closing tags
+        cleaned = re.sub(r"</(?:think|thought)>", "", cleaned, flags=re.IGNORECASE)
+
+        return cleaned.strip()
+
     def _send_groq(self, user_text: str, system_context: str) -> str:
         """Send via Groq API with streaming for faster response and model rotation on 429."""
         messages = []
-        system_prompt = system_context if system_context else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise. No markdown or bullet points. Just clear natural English.
+        base_prompt = system_context if system_context else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise. No markdown or bullet points. Just clear natural English.
 
 You have full access to:
 - C:\\Knowledge Base\\ — sir's schedule, deadlines, projects, preferences
 - C:\\MakiSync Storage\\ — organized file storage (School, Work, Personal, Freelance, MakiAI with Screenshots/Photos/Recordings in date folders)
 You CAN search, open, and manage files in these locations."""
+        
+        system_prompt = f"{base_prompt}\n\nIMPORTANT: Do NOT output any <think> or internal reasoning tags. Provide only the direct final response."
         messages.append({"role": "system", "content": system_prompt})
 
         for turn in self._history[-(MAX_HISTORY_TURNS * 2):]:
@@ -204,9 +249,7 @@ You CAN search, open, and manage files in these locations."""
                     if delta:
                         answer += delta
 
-                answer = answer.strip()
-                import re
-                answer = re.sub(r"<think>.*?</think>", "", answer, flags=re.DOTALL).strip()
+                answer = self._clean_response(answer)
 
                 if answer:
                     self._groq_model = model_name
@@ -240,7 +283,9 @@ You CAN search, open, and manage files in these locations."""
                 contents=full_prompt,
             )
 
-            answer = response.text.strip()
+            answer = self._clean_response(response.text.strip()) if response.text else ""
+            if not answer:
+                answer = "I'm here, sir."
             self._add_to_history("user", user_text)
             self._add_to_history("model", answer)
             return answer
@@ -311,7 +356,7 @@ You CAN search, open, and manage files in these locations."""
                     model="gemini-3.6-flash",
                     contents=[prompt, pil_img],
                 )
-                answer = response.text.strip() if response.text else "I analyzed the camera frame, sir, but couldn't generate a clear description."
+                answer = self._clean_response(response.text.strip()) if response.text else "I analyzed the camera frame, sir, but couldn't generate a clear description."
                 print(f"[AIService] Vision response: {answer}")
                 self._add_to_history("user", f"[Vision]: {user_text}")
                 self._add_to_history("model", answer)
@@ -345,7 +390,8 @@ You CAN search, open, and manage files in these locations."""
                             max_tokens=600,
                             temperature=0.4,
                         )
-                        answer = response.choices[0].message.content.strip()
+                        raw_ans = response.choices[0].message.content or ""
+                        answer = self._clean_response(raw_ans.strip())
                         self._add_to_history("user", f"[Screen Vision]: {user_text}")
                         self._add_to_history("model", answer)
                         return answer

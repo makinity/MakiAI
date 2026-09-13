@@ -963,7 +963,7 @@ class TelegramRemoteService:
 
             await update.message.reply_text(response)
 
-            # If a Word document was generated during this command, send the file too!
+            # If a Word document or automated script files were generated during this command, send them too!
             if self.skill_router:
                 hw_skill = self.skill_router.get_skill("homework")
                 if hw_skill and getattr(hw_skill, "last_generated_docx", None):
@@ -976,6 +976,18 @@ class TelegramRemoteService:
                                 caption=f"📄 Generated Assignment: {Path(docx_path).name}"
                             )
                         hw_skill.last_generated_docx = None
+
+                interpreter_skill = self.skill_router.get_skill("interpreter")
+                if interpreter_skill and getattr(interpreter_skill, "last_generated_files", None):
+                    for gen_path in interpreter_skill.last_generated_files:
+                        if gen_path and Path(gen_path).exists():
+                            with open(gen_path, "rb") as gf:
+                                await update.message.reply_document(
+                                    document=gf,
+                                    filename=Path(gen_path).name,
+                                    caption=f"📁 Automation Output: {Path(gen_path).name}"
+                                )
+                    interpreter_skill.last_generated_files = []
 
         except Exception as e:
             await update.message.reply_text(f"⚠️ Error executing command: {e}")

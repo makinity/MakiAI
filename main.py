@@ -63,6 +63,7 @@ def bootstrap_maki_services():
     from skills.homework_skill import HomeworkSkill
     from skills.research_skill import ResearchSkill
     from skills.clip_skill import ClipSkill
+    from skills.interpreter_skill import InterpreterSkill
     from gui.ui_bridge import MakiUIApi
 
     # Storage initialization
@@ -126,6 +127,7 @@ def bootstrap_maki_services():
         "homework": HomeworkSkill(*skill_deps),
         "research": ResearchSkill(*skill_deps),
         "clip": ClipSkill(*skill_deps),
+        "interpreter": InterpreterSkill(*skill_deps),
     }
     skill_router = SkillRouter(skills)
 

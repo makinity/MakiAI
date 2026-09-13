@@ -125,6 +125,13 @@ class SkillRouter:
                 r"\b(clip|slice)\s+(?:the\s+)?(?:best\s+moments|highlights|viral\s+moments|latest\s+recording|my\s+video)\b",
                 r"\b(deep\s*clip|deepclip)\b",
             ]),
+            ("interpreter", [
+                r"\b(run|write|execute)\s+(a\s+)?(python|powershell|script|code)\b",
+                r"\b(write|run|execute)\s+(a\s+)?script\s+to\b",
+                r"\b(automate|batch\s+convert|batch\s+resize|calculate\s+data|organize\s+folder)\b",
+                r"\b(parse\s+csv|calculate\s+this\s+in\s+python|merge\s+pdf|resize\s+images?)\b",
+                r"\b(script|python\s+code|run\s+python)\b",
+            ]),
             ("research", [
                 r"https?://[^\s]+",
                 r"\b(search|look\s+up|google|research)\b",

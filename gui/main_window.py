@@ -35,6 +35,9 @@ from skills.reminder_skill import ReminderSkill
 from skills.memory_skill import MemorySkill
 from skills.new_project_skill import NewProjectSkill
 from skills.homework_skill import HomeworkSkill
+from skills.research_skill import ResearchSkill
+from skills.clip_skill import ClipSkill
+from skills.interpreter_skill import InterpreterSkill
 from gui.pages.LoginPage import LoginPage
 from gui.pages.MainPage import MainPage
 from gui.pages.SettingsPage import SettingsPage
@@ -120,6 +123,9 @@ class MainWindow(QMainWindow):
             "memory":       MemorySkill(*skill_deps),
             "new_project":  NewProjectSkill(*skill_deps),
             "homework":     HomeworkSkill(*skill_deps),
+            "research":     ResearchSkill(*skill_deps),
+            "clip":         ClipSkill(*skill_deps),
+            "interpreter":  InterpreterSkill(*skill_deps),
         }
         self.skill_router = SkillRouter(skills)
 
