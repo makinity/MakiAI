@@ -46,11 +46,18 @@ DIRECT_COMMAND_PATTERNS = [
     
     # Information & Knowledge Base
     r"^(?:good\s+morning|good\s+night)\b",
-    r"^(?:what\s+is|what's|show|check|list)\s+(?:my|our)\s+(?:schedule|deadlines?|reminders?|tasks?)\b",
-    r"^(?:remind\s+me\s+(?:to|at|in)|set\s+(?:a\s+)?reminder)\b",
+    r"^(?:can\s+you\s+)?(?:please\s+)?(?:what\s+is|what's|show|check|list|provide|give|tell\s+me|get)\s+(?:a\s+|the\s+|my\s+|our\s+)?(?:list\s+of\s+)?(?:schedule|deadlines?|reminders?|tasks?)\b",
+    r"^(?:can\s+you\s+)?(?:please\s+)?(?:remind\s+me|set\s+(?:a\s+)?reminder|tell\s+me\s+later|alert\s+me|notify\s+me)\b",
     r"^(?:remember\s+that|forget\s+about)\b",
     r"^(?:can\s+you\s+)?(?:just\s+)?(?:remove|delete|cancel|clear|forget)\s+(?:it|this|about\s+the|the)\b",
     r"^(?:cancel|remove|delete)\s+(?:the\s+)?(?:zoom\s+meeting|meeting|schedule|event|reminder|deadline)\b",
+    
+    # Cloud & SaaS Operations (Composio)
+    r"^(?:can\s+you\s+)?(?:please\s+)?(?:check|read|fetch|get|open|view)\s+(?:my\s+)?(?:gmail|emails?|inbox|unread\s+emails?)\b",
+    r"^(?:can\s+you\s+)?(?:please\s+)?(?:send|draft|compose)\s+(?:an?\s+)?(?:email|mail)\b",
+    
+    # Pleasantries & Acknowledgments
+    r"^(?:thank\s+you|thanks|thanks\s+a\s+lot|thank\s+you\s+very\s+much|good\s+job)[.,?!]?$",
     
     # Live Search & URL Reading
     r"^(?:search\s+(?:the\s+web\s+|google\s+|online\s+)?for|google|look\s+up|research)\s+[a-zA-Z0-9_\-\s]+",

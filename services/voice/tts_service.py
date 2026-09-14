@@ -270,7 +270,7 @@ class TTSService:
     def _generate_edge_tts(self, text: str) -> tuple[str | None, bool]:
         """
         Generate audio using Microsoft Edge TTS (free fallback).
-        Uses a deep neural voice similar to Jarvis.
+        Uses a deep neural voice similar to Jarvis (en-US-GuyNeural).
 
         Returns:
             (tmp_file_path, success) tuple.
@@ -278,7 +278,6 @@ class TTSService:
         try:
             import edge_tts
 
-            # Best Jarvis-like voice available in Edge TTS
             voice = "en-US-GuyNeural"
 
             tmp = tempfile.NamedTemporaryFile(

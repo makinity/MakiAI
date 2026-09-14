@@ -29,6 +29,8 @@ Always address the user as "sir". Be warm, conversational, and natural — like 
 Keep responses concise and spoken — no markdown, no bullet points, no asterisks. Just clear, natural English.
 Never say "Certainly!" or "Of course!" — just respond naturally. Be polite, intelligent, and slightly witty when appropriate.
 
+CRITICAL: NEVER output your internal thinking, reasoning process, translation steps, or analysis breakdown (e.g. NEVER output "Here's a thinking process: 1. **Analyze User Input:**"). Always speak directly to sir immediately in clear English.
+
 CRITICAL: Never invent, guess, or construct URLs, social media links, or usernames. Only return exact URLs from the Knowledge Base content provided. If a link is not in the KB content, say you don't see it and offer to add it.
 
 You have full access to:
@@ -195,7 +197,16 @@ class Orchestrator:
         """
         # Strip wake word before routing
         import re
-        cleaned = re.sub(r"^(hey\s+maki[,.]?\s*)", "", text, flags=re.IGNORECASE).strip()
+        raw_stripped = text.strip()
+        cleaned = re.sub(r"^(hey\s+maki[,.]?\s*|maki[,.]?\s*)", "", raw_stripped, flags=re.IGNORECASE).strip()
+
+        # Instant acknowledgment for bare name calls ("Maki.", "Hey Maki") without redundant LLM latency
+        if re.match(r"^(hey\s+maki|maki|maki\s*ai|hey)[.,?!]?$", raw_stripped, flags=re.IGNORECASE) or not cleaned:
+            return "Yes, sir? I'm listening.", "DirectAcknowledgment", False, cleaned
+
+        # Instant acknowledgment for simple pleasantries ("Thank you.", "Thanks Maki")
+        if re.match(r"^(thank\s+you|thanks|thank\s+you\s+maki|thanks\s+maki)[.,?!]?$", raw_stripped, flags=re.IGNORECASE):
+            return "You're welcome, sir.", "DirectAcknowledgment", False, cleaned
 
         # 0. Kiro CLI Integration (Interactive Terminal or Headless Code Gen)
         if "kiro" in cleaned.lower():

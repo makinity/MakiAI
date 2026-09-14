@@ -9,8 +9,14 @@ Handles voice commands like:
   "screenshot the active window"
 """
 
-import pyautogui
-from PIL import Image
+try:
+    import pyautogui
+except ImportError:
+    pyautogui = None
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
 from datetime import datetime
 from pathlib import Path
 

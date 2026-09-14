@@ -90,12 +90,16 @@ class SkillRouter:
             ]),
             ("reminder", [
                 r"\bremind\s+(me\s+)?(at|to|about|in|that|of)?\b",
-                r"\b(add|set|put|create)\s+(a\s+)?schedule\b",
+                r"\b(tell|notify|alert|warn|let)\s+(me\s+)?(later|in\s+\d+|at\s+\d+|when|to|about|that)\b",
+                r"\b(add|set|put|create)\s+(a\s+)?(reminder|schedule)\b",
                 r"\bschedule\s+(a\s+)?(meeting|event|call|session|task|zoom)\b",
                 r"\badd\s+(this\s+)?to\s+(my\s+)?schedule\b",
-                r"\bset\s+(a\s+)?reminder\b",
-                r"\b(show|list)\s+(my\s+)?reminders?\b",
+                r"\b(show|list|view|provide|check|what\s+are|get)\s+(a\s+|the\s+|my\s+)?(list\s+of\s+)?reminders?\b",
+                r"\b(check|search|look\s+(in|at)|read)\s+.*?\breminders?\b",
+                r"\breminders?\s+(in|from|on)\s+(the\s+)?(knowledge\s+base|kb)\b",
+                r"\breminders?\s+list\b",
                 r"\bcancel\s+reminder\b",
+                r"^reminders?$",
             ]),
             ("new_project", [
                 r"\bnew\s+project\b",
@@ -135,7 +139,7 @@ class SkillRouter:
             ("composio", [
                 r"\b(google\s+(doc|docs|sheet|sheets|drive|slides)|gdoc|gsheet)\b",
                 r"\b(google\s+calendar|gcal|my\s+calendar|calendar\s+events?|check\s+(my\s+)?calendar)\b",
-                r"\b(gmail|check\s+(my\s+)?emails?|unread\s+emails?|send\s+(an?\s+)?email|draft\s+(an?\s+)?email)\b",
+                r"\b(check\s+(my\s+)?(gmail|emails?)|unread\s+emails?|send\s+(an?\s+)?email|draft\s+(an?\s+)?email|emails?\s+on\s+gmail|read\s+(my\s+)?(gmail|emails?)|fetch\s+(my\s+)?(gmail|emails?)|inbox\s+emails?)\b",
                 r"\b(notion|trello|github|gitlab|discord|spotify)\b",
                 r"\b(composio|cloud\s+app|connect\s+app)\b",
             ]),
@@ -178,6 +182,10 @@ class SkillRouter:
 
         for pattern, skill_id in self._triggers:
             if pattern.search(cleaned):
+                # If research triggered but command asks to play/watch, pass to ComputerRouter
+                if skill_id == "research" and re.search(r"\b(?:and\s+)?play\b|\bwatch\b|\bstream\b", cleaned, re.IGNORECASE):
+                    continue
+
                 skill = self._skills.get(skill_id)
                 if skill:
                     print(f"[SkillRouter] Matched skill: {skill_id}")

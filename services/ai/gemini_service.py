@@ -178,9 +178,9 @@ class GeminiService:
         cleaned = re.sub(r"<(?:think|thought)>.*?</(?:think|thought)>", "", text, flags=re.DOTALL | re.IGNORECASE).strip()
 
         # 2. If the model put the entire answer INSIDE the <think> tag, extract the draft/response
-        if not cleaned:
+        if not cleaned or re.search(r"<(?:think|thought)>", cleaned, re.IGNORECASE):
             marker_match = re.search(
-                r"(?:(?:\*\*Draft[^\n]*\*\*|\*\*Final Response[^\n]*\*\*|\*\*Response[^\n]*\*\*|Draft:)\s*)(.*?)(?:</(?:think|thought)>|$)",
+                r"(?:(?:\*\*Draft[^\n]*\*\*|\*\*Final Response[^\n]*\*\*|\*\*Response[^\n]*\*\*|Draft:|\*\*Spoken Response[^\n]*\*\*)\s*)(.*?)(?:</(?:think|thought)>|$)",
                 text,
                 flags=re.DOTALL | re.IGNORECASE,
             )
@@ -190,38 +190,105 @@ class GeminiService:
                 # Remove all think tags and return whatever text remains
                 cleaned = re.sub(r"</?(?:think|thought)>", "", text, flags=re.IGNORECASE).strip()
 
-        # 3. In case of unclosed <think> tag where the model outputs reasoning and then the answer
-        if re.search(r"<(?:think|thought)>", cleaned, re.IGNORECASE):
-            marker_match = re.search(
-                r"(?:(?:\*\*Draft[^\n]*\*\*|\*\*Final Response[^\n]*\*\*|\*\*Response[^\n]*\*\*|Draft:)\s*)(.*)",
+        # 3. Clean any stray closing tags
+        cleaned = re.sub(r"</(?:think|thought)>", "", cleaned, flags=re.IGNORECASE)
+
+        # 4. Look for explicit response headers on their own line or markdown block
+        resp_match = re.search(
+            r"(?:^|\n)(?:#{1,4}\s*|\*{1,2}|)(?:Final\s+Response|Spoken\s+Response|Draft\s+Response|My\s+Response|Direct\s+Response|Spoken|Reply)(?:\*{1,2}|)\s*[:\-*]+\s*([\s\S]+)$",
+            cleaned,
+            flags=re.IGNORECASE
+        )
+        if resp_match:
+            cand = resp_match.group(1).strip()
+            if cand and not re.match(r"^(?:Here'?s a thinking|1\.\s*\*\*Analyze|Let's analyze)", cand, re.IGNORECASE):
+                cleaned = cand
+
+        # 5. Check for 'Here's a thinking process:' or 'Thinking Process:' or numbered analysis breakdown
+        thinking_match = re.search(
+            r"(?:^|\b)(?:Here'?s (?:a |the )?thinking process:?|Thinking Process:?|\*\*Thinking Process:\*\*|Let'?s analyze\b|1\.\s*\*\*(?:Analyze|Deconstruct|Context|Understand)[^\*]*\*\*)",
+            cleaned,
+            flags=re.IGNORECASE
+        )
+        if thinking_match:
+            # If there are separate paragraphs, find the final conversational paragraph
+            paragraphs = [p.strip() for p in cleaned.split("\n\n") if p.strip()]
+            valid_paras = []
+            for p in paragraphs:
+                if re.match(r"^(?:Here'?s (?:a |the )?thinking|Thinking Process|Let'?s analyze|\d+\.\s*\*\*|[-*•]\s*(?:User says|Translation|Meaning|This is in|Location:))", p, re.IGNORECASE):
+                    continue
+                if not re.search(r"\b(?:Analyze User Input|Formulate Response|Zamboangueño|Specifically Zamboangueño)\b", p, re.IGNORECASE):
+                    valid_paras.append(p)
+
+            if valid_paras:
+                cleaned = valid_paras[-1]
+            else:
+                lines = [l.strip() for l in cleaned.split("\n") if l.strip()]
+                valid_lines = [
+                    l for l in lines
+                    if not re.match(r"^(?:Here'?s|\d+\.|\*\*|[-*•]|Translation|Full meaning|Meaning|Context|User says|Tone:)", l, re.IGNORECASE)
+                    and not re.search(r"\b(?:Analyze User Input|Formulate Response|Zamboangueño)\b", l, re.IGNORECASE)
+                ]
+                if valid_lines:
+                    cleaned = valid_lines[-1]
+                else:
+                    quote_matches = re.findall(r'"([^"]{5,})"', cleaned)
+                    meaning_match = re.search(r'(?:Full meaning|Translation|Meaning):\s*"([^"]+)"', cleaned, re.IGNORECASE)
+                    if meaning_match:
+                        cleaned = f"Mukhang sinabi ninyo sir: '{meaning_match.group(1)}'. Opo sir!"
+                    elif quote_matches:
+                        last_quote = quote_matches[-1]
+                        if not any(last_quote.lower().startswith(x) for x in ["kila lamu", "http", "location:", "user says"]):
+                            cleaned = f"Mukhang sinabi ninyo sir: '{last_quote}'. Opo sir!"
+                        else:
+                            cleaned = "Naintindihan ko po sir. Kamusta po kayo?"
+                    else:
+                        cleaned = "Naintindihan ko po sir, handa po akong tumulong."
+
+        # 6. Clean meta-planning / third-person monologue headers (e.g. "The user is asking for... I need to...")
+        meta_pattern = r"^(?:The user is (?:asking|saying|requesting)|I need to (?:check|respond|answer)|Let'?s check|AI model running|As an AI|I should respond|The prompt says)\b"
+        if re.search(meta_pattern, cleaned, re.IGNORECASE):
+            draft_match = re.search(
+                r"(?:(?:I will say|I should say|My response:|Response:|Draft:|\*\*Draft[^\n]*\*\*|\*\*Response[^\n]*\*\*)\s*)(.*)",
                 cleaned,
                 flags=re.DOTALL | re.IGNORECASE,
             )
-            if marker_match:
-                cleaned = marker_match.group(1)
+            if draft_match:
+                cleaned = draft_match.group(1).strip()
             else:
-                trimmed = re.sub(r"<(?:think|thought)>.*", "", cleaned, flags=re.DOTALL | re.IGNORECASE)
-                if trimmed.strip():
-                    cleaned = trimmed
+                paragraphs = [p.strip() for p in cleaned.split("\n\n") if p.strip()]
+                candidate_p = [p for p in paragraphs if not re.match(r"^(?:The user|I need to|Let's check|Wait,|AI model|As an AI|I should)\b", p, re.IGNORECASE)]
+                if candidate_p:
+                    cleaned = candidate_p[-1]
                 else:
-                    cleaned = re.sub(r"<(?:think|thought)>", "", text, flags=re.IGNORECASE)
+                    sentences = re.split(r"(?<=[.!?])\s+", cleaned)
+                    valid_s = [
+                        s for s in sentences
+                        if not re.search(r"\b(?:The user is|I need to check|I should respond|I should check|AI model|prompt says|operating system to close|direct access to the user|hallucinating|in character as Maki|as an AI)\b", s, re.IGNORECASE)
+                    ]
+                    cleaned = " ".join(valid_s).strip() if valid_s else "I'm right here, sir. How can I help?"
 
-        # 4. Clean any stray closing tags
-        cleaned = re.sub(r"</(?:think|thought)>", "", cleaned, flags=re.IGNORECASE)
-
+        # Clean residual markdown asterisks and bullet symbols from spoken response
+        cleaned = re.sub(r"\*{1,3}", "", cleaned)
+        cleaned = re.sub(r"^[-*•]\s*", "", cleaned)
         return cleaned.strip()
 
     def _send_groq(self, user_text: str, system_context: str) -> str:
         """Send via Groq API with streaming for faster response and model rotation on 429."""
         messages = []
-        base_prompt = system_context if system_context else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise. No markdown or bullet points. Just clear natural English.
+        base_prompt = system_context if system_context else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise and spoken aloud in clear English. No markdown or bullet points.
 
 You have full access to:
 - C:\\Knowledge Base\\ — sir's schedule, deadlines, projects, preferences
 - C:\\MakiSync Storage\\ — organized file storage (School, Work, Personal, Freelance, MakiAI with Screenshots/Photos/Recordings in date folders)
 You CAN search, open, and manage files in these locations."""
         
-        system_prompt = f"{base_prompt}\n\nIMPORTANT: Do NOT output any <think> or internal reasoning tags. Provide only the direct final response."
+        system_prompt = f"""{base_prompt}
+
+CRITICAL RULES:
+- NEVER output meta-analysis, reasoning steps, translation notes, or third-person commentary about the user (e.g., 'Here's a thinking process: 1. Analyze User Input...').
+- Speak directly to sir in character as Maki immediately in natural English.
+- Do NOT output any <think> tags or reasoning steps."""
         messages.append({"role": "system", "content": system_prompt})
 
         for turn in self._history[-(MAX_HISTORY_TURNS * 2):]:

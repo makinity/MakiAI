@@ -250,6 +250,43 @@ class WindowManager:
 
         return None
 
+    def close_window(self, query: str = "active") -> str:
+        """
+        Close an application window gracefully using WM_CLOSE, or taskkill if process-only.
+        
+        Args:
+            query: Name of the application, website title, or 'active'.
+        """
+        import subprocess
+
+        q = query.strip().lower()
+        if not q or q in ("active", "this", "this window", "this app", "it", "current"):
+            hwnd = user32.GetForegroundWindow()
+            if hwnd:
+                user32.PostMessageW(hwnd, 0x0010, 0, 0)  # WM_CLOSE
+                return "Closing the active window for you, sir."
+            return "No active window found to close, sir."
+
+        # Find window by title or alias
+        target_win = self.find_window(q)
+        if target_win:
+            hwnd = target_win["hwnd"]
+            user32.PostMessageW(hwnd, 0x0010, 0, 0)  # WM_CLOSE
+            clean_title = query.title() if query.lower() in ("youtube", "chrome", "facebook", "browser", "vscode", "spotify", "discord", "notepad") else re.sub(r"^\(\d+\)\s*", "", re.sub(r"[\-_|].*$", "", target_win["title"])).strip()
+            return f"Closing {clean_title or query.title()} for you, sir."
+
+        # Fallback to process termination for known apps
+        from services.computer.app_launcher import APP_MAP
+        exe = APP_MAP.get(q)
+        if exe and not exe.startswith("ms-"):
+            try:
+                subprocess.run(f"taskkill /IM {exe} /F", shell=True, capture_output=True)
+                return f"Closed {query.title()} for you, sir."
+            except Exception:
+                pass
+
+        return f"I couldn't find an open window or app for '{query}', sir."
+
     # ─── Visual Dragging & Relocation Engine ──────────────────────────────────
 
     def move_window_to_monitor(

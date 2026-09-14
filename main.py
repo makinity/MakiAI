@@ -162,6 +162,7 @@ def bootstrap_maki_services():
         hotkey=ptt_hotkey,
         on_ptt_start=lambda: state_manager.set_state(AppState.LISTENING),
         on_ptt_end=lambda: state_manager.set_state(AppState.THINKING),
+        on_empty=lambda: state_manager.set_state(AppState.IDLE),
     )
 
     # 6. Wire Orchestrator

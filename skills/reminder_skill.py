@@ -33,6 +33,25 @@ class ReminderSkill(BaseSkill):
         else:
             return self._add(text)
 
+    def _format_relative_datetime(self, dt: datetime) -> str:
+        """Format datetime into natural conversational time ('8:29 PM today', '9:00 PM tomorrow')."""
+        now = datetime.now()
+        today = now.date()
+        rem_date = dt.date()
+        
+        # Format time without leading zero (e.g. "8:29 PM" instead of "08:29 PM")
+        time_str = dt.strftime("%I:%M %p").lstrip("0")
+        
+        from datetime import timedelta
+        if rem_date == today:
+            return f"{time_str} today"
+        elif rem_date == today + timedelta(days=1):
+            return f"{time_str} tomorrow"
+        elif 0 < (rem_date - today).days < 7:
+            return f"{time_str} this {dt.strftime('%A')}"
+        else:
+            return f"{time_str} on {dt.strftime('%A, %B %d')}"
+
     # ─── Subcommands ─────────────────────────────────────────────────────────
 
     def _add(self, text: str) -> str:
@@ -70,7 +89,7 @@ Return only the JSON — no explanation, no markdown.
             reminder_dt_str = parsed.get("datetime", "")
             reminder_dt = datetime.fromisoformat(reminder_dt_str)
 
-            # Phase 2/3 stub: ReminderService not yet connected
+            # Schedule through ReminderService or persist directly
             if self.reminder_service:
                 self.reminder_service.add(
                     reminder_id=str(uuid.uuid4()),
@@ -78,10 +97,9 @@ Return only the JSON — no explanation, no markdown.
                     dt=reminder_dt,
                 )
             else:
-                # Save directly to reminders.json
                 self._save_reminder(reminder_text, reminder_dt_str)
 
-            friendly_time = reminder_dt.strftime("%I:%M %p on %A, %B %d")
+            friendly_time = self._format_relative_datetime(reminder_dt)
             return f"Got it. I'll remind you to {reminder_text} at {friendly_time}."
 
         except Exception as e:
@@ -89,21 +107,48 @@ Return only the JSON — no explanation, no markdown.
             return "I had trouble understanding that reminder. Could you say it again with a specific time? For example: remind me at 3pm to study."
 
     def _list(self) -> str:
-        """List all pending reminders."""
+        """List all pending reminders with relative dates."""
         reminders = self._load_reminders()
-        pending = [r for r in reminders if r.get("status") == "pending"]
+        now = datetime.now()
+        
+        # Deduplicate and filter active pending reminders
+        seen_keys = set()
+        valid_pending = []
+        needs_save = False
 
-        if not pending:
+        for r in reminders:
+            if r.get("status") == "pending":
+                try:
+                    dt = datetime.fromisoformat(r["datetime"])
+                    if dt <= now:
+                        # Already expired
+                        r["status"] = "fired"
+                        needs_save = True
+                        continue
+                    key = (r.get("text", "").strip().lower(), r.get("datetime"))
+                    if key in seen_keys:
+                        # Duplicate entry
+                        r["status"] = "duplicate"
+                        needs_save = True
+                        continue
+                    seen_keys.add(key)
+                    valid_pending.append((dt, r))
+                except Exception:
+                    continue
+
+        if needs_save:
+            self._save_reminders(reminders)
+
+        if not valid_pending:
             return "You have no pending reminders."
 
-        lines = [f"You have {len(pending)} reminder{'s' if len(pending) > 1 else ''}:"]
-        for r in pending[:5]:    # Speak at most 5
-            try:
-                dt = datetime.fromisoformat(r["datetime"])
-                friendly = dt.strftime("%I:%M %p on %A")
-                lines.append(f"— {r['text']} at {friendly}")
-            except Exception:
-                lines.append(f"— {r.get('text', 'Unknown reminder')}")
+        # Sort chronologically
+        valid_pending.sort(key=lambda x: x[0])
+
+        lines = [f"You have {len(valid_pending)} reminder{'s' if len(valid_pending) > 1 else ''}:"]
+        for dt, r in valid_pending[:5]:    # Speak at most 5
+            friendly = self._format_relative_datetime(dt)
+            lines.append(f"— {r['text']} at {friendly}")
 
         return " ".join(lines)
 

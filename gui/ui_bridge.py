@@ -74,6 +74,7 @@ class MakiUIApi:
                 on_ptt_start=lambda: self.state_manager.set_state(AppState.LISTENING),
                 on_ptt_end=lambda: self.state_manager.set_state(AppState.THINKING),
                 on_result=self.on_ptt_command,
+                on_empty=lambda: self.state_manager.set_state(AppState.IDLE),
             )
 
         # Connect WakeWord callbacks if available

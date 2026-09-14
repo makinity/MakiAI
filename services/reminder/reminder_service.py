@@ -202,8 +202,16 @@ class ReminderService:
             return []
 
     def _save_reminder(self, rid: str, text: str, dt: datetime) -> None:
-        """Add a new reminder entry to reminders.json."""
+        """Add or update a reminder entry in reminders.json."""
         reminders = self._load_all()
+        for r in reminders:
+            if r.get("id") == rid:
+                r["text"] = text
+                r["datetime"] = dt.isoformat()
+                r["status"] = "pending"
+                self._write(reminders)
+                return
+
         reminders.append({
             "id": rid,
             "text": text,
@@ -214,14 +222,13 @@ class ReminderService:
         self._write(reminders)
 
     def _update_status(self, reminder_id: str, status: str) -> bool:
-        """Update the status of a reminder in reminders.json."""
+        """Update the status of all instances of a reminder in reminders.json."""
         reminders = self._load_all()
         found = False
         for r in reminders:
             if r.get("id") == reminder_id:
                 r["status"] = status
                 found = True
-                break
         if found:
             self._write(reminders)
         return found

@@ -10,7 +10,10 @@ Handles voice commands like:
   "analyze what you see" (Gemini Vision)
 """
 
-import cv2
+try:
+    import cv2
+except ImportError:
+    cv2 = None
 import os
 import threading
 from datetime import datetime

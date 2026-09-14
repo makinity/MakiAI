@@ -35,6 +35,7 @@ class PushToTalkService:
         on_ptt_start: Optional[Callable[[], None]] = None,
         on_ptt_end: Optional[Callable[[], None]] = None,
         on_result: Optional[Callable[[str], None]] = None,
+        on_empty: Optional[Callable[[], None]] = None,
         samplerate: int = 16000,
         channels: int = 1,
     ):
@@ -42,6 +43,7 @@ class PushToTalkService:
         self.on_ptt_start = on_ptt_start or (lambda: None)
         self.on_ptt_end = on_ptt_end or (lambda: None)
         self.on_result = on_result or (lambda text: None)
+        self.on_empty = on_empty or (lambda: None)
         self.samplerate = samplerate
         self.channels = channels
 
@@ -61,6 +63,7 @@ class PushToTalkService:
         on_ptt_start: Optional[Callable[[], None]] = None,
         on_ptt_end: Optional[Callable[[], None]] = None,
         on_result: Optional[Callable[[str], None]] = None,
+        on_empty: Optional[Callable[[], None]] = None,
     ) -> None:
         if on_ptt_start:
             self.on_ptt_start = on_ptt_start
@@ -68,6 +71,8 @@ class PushToTalkService:
             self.on_ptt_end = on_ptt_end
         if on_result:
             self.on_result = on_result
+        if on_empty:
+            self.on_empty = on_empty
 
     def _start_audio_stream(self) -> None:
         """Keep a background input stream active to feed the pre-roll ring buffer."""
@@ -169,12 +174,14 @@ class PushToTalkService:
     def _process_audio_frames(self, frames: list[np.ndarray]) -> None:
         """Transcribe audio frames using Groq Whisper with Google STT fallback."""
         if not frames:
+            self.on_empty()
             return
 
         try:
             total_samples = sum(len(f) for f in frames)
             if total_samples < self.samplerate * 0.25:  # Less than 250ms is too brief
                 print("[PTTService] Audio too brief — discarded.")
+                self.on_empty()
                 return
 
             text, provider = self._transcriber.transcribe_numpy_frames(frames, self.samplerate, self.channels)
@@ -185,6 +192,8 @@ class PushToTalkService:
                     self.on_result(text)
             else:
                 print("[PTTService] Could not understand speech in PTT recording.")
+                self.on_empty()
 
         except Exception as e:
             print(f"[PTTService] Audio processing error: {e}")
+            self.on_empty()

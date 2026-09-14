@@ -70,7 +70,9 @@ class ComputerRouter:
 
         # Try each category in order
         result = (
-            self._handle_browser_profile_site(lowered, text)
+            self._handle_close(lowered, text)
+            or self._handle_media(lowered)          # ← Before _handle_browser_profile_site so "open youtube and play..." wins
+            or self._handle_browser_profile_site(lowered, text)
             or self._handle_system_health(lowered)
             or self._handle_physical_camera_vision(lowered, text)
             or self._handle_screen_vision(lowered, text)
@@ -78,7 +80,6 @@ class ComputerRouter:
             or self._handle_auto_tile(lowered, text)
             or self._handle_write_to_file(lowered, text)
             or self._handle_smart_search(lowered)   # ← Before _handle_open so "open last photo/screenshot" wins
-            or self._handle_media(lowered)          # ← Before _handle_open so "open Spotify", "play", "pause" win
             or self._handle_open(lowered, text)
             or self._handle_volume(lowered)
             or self._handle_system(lowered)
@@ -88,6 +89,34 @@ class ComputerRouter:
         )
 
         return result
+
+    # ─── Close / Kill Application & Window Management ────────────────────────
+
+    def _handle_close(self, lowered: str, original: str) -> str | None:
+        """
+        Handle closing desktop applications and browser windows.
+        Examples:
+          - "close YouTube" / "can you close YouTube for me"
+          - "close Chrome" / "close VS Code"
+          - "kill notepad" / "exit discord"
+          - "close this window" / "close the active window"
+        """
+        # Close / kill verbs: close, kill, exit, terminate, shut down
+        cleaned_cmd = re.sub(r"[?!.,]+$", "", lowered.strip()).strip()
+        close_match = re.search(r"^(?:please\s+|can\s+you\s+(?:please\s+|just\s+)?|could\s+you\s+(?:please\s+|just\s+)?|just\s+)?(?:close|kill|terminate|exit)\s+(?:the\s+)?(.+?)(?:\s+for\s+me|\s+please)?$", cleaned_cmd)
+        if not close_match:
+            return None
+
+        target = close_match.group(1).strip()
+        # Clean target query
+        target = re.sub(r"^(the\s+app|the\s+window|this\s+app|this\s+window|app|window)\s*", "", target).strip()
+        target = re.sub(r"\s+(for\s+me|please)$", "", target).strip()
+        if target in ("browser", "the browser", "my browser", "google browser", "chrome browser"):
+            target = "chrome"
+        elif not target or target in ("this", "it", "active", "current"):
+            target = "active"
+
+        return self.window_mgr.close_window(target)
 
     # ─── Chrome Multi-Profile Site Launcher ──────────────────────────────────
 
@@ -461,26 +490,121 @@ class ComputerRouter:
     # ─── Media ───────────────────────────────────────────────────────────────
 
     def _handle_media(self, lowered: str) -> str | None:
-        """Handle media playback commands."""
-        if re.search(r"\bplay\s+pause\b|\btoggle\s+play\b|\bpause\b|\bresume\s+music\b", lowered):
+        """Handle media playback commands for Spotify, YouTube, and system media controls."""
+        import urllib.parse
+
+        # 0. Close / Stop YouTube explicitly
+        if re.search(r"\b(?:close|stop|exit|kill|shut(?:\s+down)?)\s+(?:the\s+)?youtube(?:\s+(?:tab|window|browser|app))?\b", lowered):
+            return self.window_mgr.close_window("youtube")
+
+        # 1. Play / Pause / Resume controls
+        if re.search(r"\b(play\s+pause|toggle\s+play|pause|resume\s+music|unpause)\b", lowered):
             return self.media.play_pause()
 
-        if re.search(r"\bnext\s+(track|song)\b|\bskip\b|\bskip\s+(track|song)\b", lowered):
+        # 2. Next / Skip
+        if re.search(r"\b(next\s+(?:track|song|video)|skip|skip\s+(?:track|song|video))\b", lowered):
             return self.media.next_track()
 
-        if re.search(r"\bprevious\s+(track|song)\b|\bprev\s+(track|song)\b|\bback\s+(track|song)\b", lowered):
+        # 3. Previous / Back
+        if re.search(r"\b(previous\s+(?:track|song)|prev\s+(?:track|song)|back\s+(?:track|song))\b", lowered):
             return self.media.previous_track()
 
-        if re.search(r"\bstop\s+(music|playing|playback)\b", lowered):
+        # 4. Stop playback
+        if re.search(r"\bstop\s+(music|playing|playback|video)\b", lowered):
             return self.media.stop()
 
-        # "play X on Spotify"
+        # 5. Follow-up "now play it", "play it", "go", "open that in browser and play it" (only if no new search term specified)
+        if (
+            re.match(r"^(?:okay\s*,?\s*)?(?:so\s+)?(?:now\s+)?(?:play\s+it|play\s+that|start\s+it|go|let'?s\s+go)[.,?!]?$", lowered.strip())
+            or re.match(r"^(?:so\s+)?open\s+(?:that|it|this)\s+(?:directly\s+)?in\s+(?:the\s+)?browser(?:\s+and\s+play\s+it)?[.,?!]?$", lowered.strip())
+        ):
+            try:
+                from services.browser.chrome_profile_launcher import ChromeProfileLauncher
+                random_yt_url = "https://www.youtube.com/results?search_query=popular+music+videos+mix"
+                ChromeProfileLauncher().launch_site_in_profile("youtube", url_override=random_yt_url)
+                return "Opening YouTube and playing the media for you in your browser, sir."
+            except Exception:
+                pass
+
+        # 6. "play X on Spotify"
         spotify_match = re.search(r"\bplay\s+(.+?)\s+on\s+spotify\b", lowered)
         if spotify_match:
             return self.media.play_on_spotify(spotify_match.group(1))
 
         if re.search(r"\bopen\s+spotify\b", lowered):
             return self.media.open_spotify()
+
+        # 7. Compound "open youtube for me and play X" or "open browser and play X"
+        if re.search(r"\bopen\s+(?:youtube|my\s+browser|the\s+browser|browser)?\s*(?:for\s+me\s+)?(?:and\s+)?(?:search\s+(?:for\s+)?|play|stream)\b", lowered):
+            after_play = re.search(r"\b(?:play|search\s+(?:for\s+)?|stream)\s+(.+?)(?:\s+for\s+me|\s+in\s+browser|\s+on\s+browser|\s+and\s+play\s+it)?$", lowered)
+            q_raw = after_play.group(1).strip() if after_play else ""
+            # Strip trailing comments like "just random", "randomly", "for me"
+            q_candidate = re.sub(r"\b(?:just\s+random|randomly|for\s+me|please)\b", "", q_raw, flags=re.IGNORECASE).strip()
+            q_candidate = re.sub(r"^(?:youtube\s+(?:for\s+me\s+)?(?:and\s+)?|browser\s+(?:and\s+)?)\s*", "", q_candidate).strip()
+            q_candidate = re.sub(r"[?!.,]+", " ", q_candidate).strip()
+            q_candidate = re.sub(r"\s+", " ", q_candidate).strip()
+            if not q_candidate or q_candidate.lower() in ("random", "random music", "random video", "it", "this", "that"):
+                q_candidate = "popular music videos mix"
+            try:
+                from services.browser.chrome_profile_launcher import ChromeProfileLauncher
+                encoded_q = urllib.parse.quote_plus(q_candidate)
+                yt_url = f"https://www.youtube.com/results?search_query={encoded_q}"
+                ChromeProfileLauncher().launch_site_in_profile("youtube", url_override=yt_url)
+                return f"Opening YouTube and playing '{q_candidate}' for you, sir."
+            except Exception as e:
+                print(f"[ComputerRouter] Open and play error: {e}")
+
+        # 8. "search for X and play it" (e.g. "search for Bruno Mars popular music song and play it")
+        search_and_play = re.search(r"(?:i\s+mean\s+)?(?:search\s+(?:for\s+)?|look\s+up\s+|find\s+)(.+?)\s+(?:and\s+play\s+(?:it|that|this)|and\s+play)\b", lowered)
+        if search_and_play:
+            q_candidate = search_and_play.group(1).strip()
+            try:
+                from services.browser.chrome_profile_launcher import ChromeProfileLauncher
+                encoded_q = urllib.parse.quote_plus(q_candidate)
+                yt_url = f"https://www.youtube.com/results?search_query={encoded_q}"
+                ChromeProfileLauncher().launch_site_in_profile("youtube", url_override=yt_url)
+                return f"Searching and playing '{q_candidate}' on YouTube for you, sir."
+            except Exception as e:
+                print(f"[ComputerRouter] Search and play error: {e}")
+
+        # 9. "play random videos / music on youtube" or "random music video"
+        if re.search(r"\b(?:play\s+)?random\s+(?:music|videos?|songs?|tracks?|music\s+videos?)(?:\s+on\s+youtube)?\b", lowered):
+            try:
+                from services.browser.chrome_profile_launcher import ChromeProfileLauncher
+                random_yt_url = "https://www.youtube.com/results?search_query=popular+music+videos+mix"
+                ChromeProfileLauncher().launch_site_in_profile("youtube", url_override=random_yt_url)
+                return "Opening YouTube and playing a music video mix for you, sir."
+            except Exception as e:
+                print(f"[ComputerRouter] YouTube random launch error: {e}")
+
+        # 10. "play X on YouTube" or "can you play X on YouTube"
+        yt_match = re.search(r"^(?:can\s+you\s+)?(?:please\s+)?play\s+(.+?)(?:\s+on\s+youtube|\s+on\s+yt|\s+in\s+youtube)$", lowered.strip())
+        if yt_match:
+            query = yt_match.group(1).strip()
+            query = re.sub(r"\s+for\s+me$", "", query).strip()
+            try:
+                from services.browser.chrome_profile_launcher import ChromeProfileLauncher
+                encoded_q = urllib.parse.quote_plus(query)
+                yt_url = f"https://www.youtube.com/results?search_query={encoded_q}"
+                ChromeProfileLauncher().launch_site_in_profile("youtube", url_override=yt_url)
+                return f"Playing {query} on YouTube in your personal profile, sir."
+            except Exception as e:
+                print(f"[ComputerRouter] YouTube launch error: {e}")
+
+        # 11. Direct "play <title/artist>" (e.g. "play bohemian rhapsody", "play lofi")
+        direct_play_match = re.search(r"^(?:can\s+you\s+)?(?:please\s+)?play\s+(.+?)(?:\s+for\s+me)?$", lowered.strip())
+        if direct_play_match:
+            candidate = direct_play_match.group(1).strip()
+            # Ignore non-media words like "a game", "in ros", "with me", "role"
+            if not any(k in candidate for k in ("game", "ros", "rules", "with", "around", "a role")):
+                try:
+                    from services.browser.chrome_profile_launcher import ChromeProfileLauncher
+                    encoded_q = urllib.parse.quote_plus(candidate)
+                    yt_url = f"https://www.youtube.com/results?search_query={encoded_q}"
+                    ChromeProfileLauncher().launch_site_in_profile("youtube", url_override=yt_url)
+                    return f"Playing '{candidate}' on YouTube for you, sir."
+                except Exception as e:
+                    print(f"[ComputerRouter] Direct play error: {e}")
 
         return None
 
