@@ -365,14 +365,18 @@ class ComputerRouter:
             subprocess.Popen(f'explorer "{kb_dir}"')
             return "Opening your Knowledge Base folder."
 
-        # 3. Match 'open / launch / view / show + target'
+        # 3. Ignore assistant info queries (schedules, reminders, deadlines, meetings)
+        if re.search(r"\b(schedules?|reminders?|deadlines?|meetings?|calendar|appointments?|what\s+to\s+do)\b", cleaned, flags=re.IGNORECASE):
+            return None
+
+        # 4. Match 'open / launch / view / show + target'
         patterns = [
             r"^(?:open|launch|start|run|view|show)\s+(?:the\s+file\s+(?:called\s+|named\s+)?|the\s+document\s+|the\s+)?(.+)$",
         ]
         for pattern in patterns:
             match = re.match(pattern, cleaned)
             if match:
-                target = match.group(1).strip()
+                target = match.group(1).strip().rstrip(".,;!?")
 
                 # A. If target is a well-known app or website, launch it first!
                 if self.launcher.is_known(target):

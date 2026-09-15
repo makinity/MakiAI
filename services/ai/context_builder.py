@@ -132,9 +132,11 @@ class ContextBuilder:
     def _get_saved_memories(self) -> str:
         """
         Load active memories from data/memory.json and format for LLM context injection.
+        Includes recording timestamp so LLMs understand when notes were originally taken.
         """
         try:
             from services.memory.memory_service import MemoryService
+            from datetime import datetime
             mem_service = MemoryService()
             memories = mem_service.get_all()
             if not memories:
@@ -143,11 +145,67 @@ class ContextBuilder:
             for m in memories:
                 k = m.get("key", "").strip()
                 v = m.get("value", "").strip()
+                created = m.get("created_at", "")
+                date_tag = ""
+                if created:
+                    try:
+                        dt = datetime.fromisoformat(created)
+                        date_tag = f"[Recorded on {dt.strftime('%A, %B %d, %Y')}]: "
+                    except Exception:
+                        pass
                 if k or v:
-                    lines.append(f"- {k}: {v}" if k else f"- {v}")
+                    lines.append(f"- {date_tag}{k}: {v}" if k else f"- {date_tag}{v}")
             return "\n".join(lines)
         except Exception as e:
             print(f"[ContextBuilder] Error loading memories: {e}")
+            return ""
+
+    def _get_scheduled_events(self) -> str:
+        """
+        Load pending scheduled events, meetings, appointments, and reminders from data/reminders.json
+        and inject them into LLM context so Maki always knows about upcoming schedules.
+        """
+        try:
+            import json
+            from pathlib import Path
+            from datetime import datetime
+
+            rem_file = Path(__file__).resolve().parents[2] / "data" / "reminders.json"
+            if not rem_file.exists():
+                return ""
+
+            data = json.loads(rem_file.read_text(encoding="utf-8"))
+            reminders = data.get("reminders", [])
+            if not reminders:
+                return ""
+
+            now = datetime.now()
+            active_events = []
+            for r in reminders:
+                dt_str = r.get("datetime")
+                status = r.get("status")
+                text = r.get("text", "").strip()
+                if dt_str and text and status in ("pending", "active", None):
+                    try:
+                        dt = datetime.fromisoformat(dt_str)
+                        # Keep future events or events within past 24 hours
+                        if dt >= now or (now - dt).total_seconds() < 86400:
+                            active_events.append((dt, text, r.get("repeat")))
+                    except Exception:
+                        pass
+
+            if not active_events:
+                return ""
+
+            active_events.sort(key=lambda x: x[0])
+            lines = ["### Active Calendar Schedule, Meetings & Reminders (Philippine Standard Time, UTC+8):"]
+            for dt, text, repeat in active_events:
+                date_str = dt.strftime("%A, %B %d, %Y at %I:%M %p")
+                repeat_tag = f" (Repeats: {repeat})" if repeat else ""
+                lines.append(f"- {date_str}: {text}{repeat_tag}")
+            return "\n".join(lines)
+        except Exception as e:
+            print(f"[ContextBuilder] Error loading scheduled events: {e}")
             return ""
 
     def build_topic_context(self, topic: str = "") -> str:
@@ -182,6 +240,13 @@ class ContextBuilder:
             "preferences/preferences.md",
             "workflows/deadlines.md",
         ]
+
+        # Inject Scheduled Events & Meetings
+        schedule_summary = self._get_scheduled_events()
+        if schedule_summary:
+            parts.append(schedule_summary)
+            parts.append("")
+            total_chars += len(schedule_summary)
 
         # Inject Long-Term Memories & Notes
         memories_summary = self._get_saved_memories()
@@ -334,9 +399,7 @@ class ContextBuilder:
             "preferences/preferences.md",
         }
 
-        parts = [MAKI_PERSONALITY, ""]
-        parts.append(f"## Executing Skill: {skill_name}")
-        parts.append("")
+        parts = [f"## Executing Skill: {skill_name}\n"]
 
         # 1. REQUIRED FILES FIRST — guaranteed to be present for the skill
         parts.append("### Primary Workflow & Skill Files:")
@@ -371,6 +434,9 @@ class ContextBuilder:
         if memories_summary:
             parts.append(memories_summary)
             parts.append("")
+
+        # 4. MAKI PERSONALITY
+        parts.append(MAKI_PERSONALITY)
 
         full = "\n".join(parts).strip()
         if len(full) > MAX_CONTEXT_CHARS:

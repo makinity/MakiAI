@@ -26,13 +26,12 @@ class GeminiService:
     Named GeminiService for backward compatibility with existing code.
     """
 
-    # Models to try in order — first available wins
     GROQ_MODELS = [
-        "openai/gpt-oss-120b",
-        "groq/compound",
-        "qwen/qwen3.6-27b",
-        "openai/gpt-oss-20b",
         "qwen/qwen3.8-27b",
+        "groq/compound-mini",
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+        "groq/compound",
     ]
 
     def __init__(self, api_key: str = "", groq_api_key: str = ""):
@@ -162,8 +161,9 @@ class GeminiService:
         if not self._initialized:
             return self._stub_response(user_text)
 
-        if self._provider == "groq":
-            return self._send_groq(user_text, system_context)
+        if self._provider == "groq" or (self._groq_client and not self._gemini_client):
+            safe_context = system_context[:2500] if len(system_context) > 2500 else system_context
+            return self._send_groq(user_text, safe_context)
         elif self._provider == "gemini":
             return self._send_gemini(user_text, system_context)
 
@@ -273,10 +273,12 @@ class GeminiService:
         cleaned = re.sub(r"^[-*•]\s*", "", cleaned)
         return cleaned.strip()
 
-    def _send_groq(self, user_text: str, system_context: str) -> str:
+    def _send_groq(self, user_text: str, system_context: str, depth: int = 0) -> str:
         """Send via Groq API with streaming for faster response and model rotation on 429."""
+        # Bound system context to 15,000 chars so full workflow tables and KB context fit comfortably
+        bounded_ctx = system_context[:15000] if len(system_context) > 15000 else system_context
         messages = []
-        base_prompt = system_context if system_context else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise and spoken aloud in clear English. No markdown or bullet points.
+        base_prompt = bounded_ctx if bounded_ctx else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise and spoken aloud in clear English. No markdown or bullet points.
 
 You have full access to:
 - C:\\Knowledge Base\\ — sir's schedule, deadlines, projects, preferences
@@ -305,7 +307,7 @@ CRITICAL RULES:
                 stream = self._groq_client.chat.completions.create(
                     model=model_name,
                     messages=messages,
-                    max_tokens=800,
+                    max_tokens=600,
                     temperature=0.7,
                     stream=True,
                 )
@@ -328,45 +330,50 @@ CRITICAL RULES:
                 err_str = str(e).lower()
                 if "429" in err_str or "rate limit" in err_str or "quota" in err_str:
                     print(f"[AIService] Groq model '{model_name}' hit rate limit. Trying alternate model...")
-                    continue
                 else:
                     print(f"[AIService] Groq error on {model_name}: {e}")
-                    break
+                continue
 
-        # Fallback to Gemini if all Groq models fail or are rate limited
-        if self._gemini_client:
+        # Fallback to Gemini if all Groq models fail or are rate limited (one-shot, no loop)
+        if self._gemini_client and depth == 0:
             print("[AIService] Groq unavailable — using Gemini fallback.")
-            return self._send_gemini(user_text, system_context)
+            return self._send_gemini(user_text, bounded_ctx, depth=depth + 1)
 
         return "I had trouble thinking. Please try again."
 
-    def _send_gemini(self, user_text: str, system_context: str) -> str:
-        """Send via Gemini API."""
-        try:
-            full_prompt = f"{system_context}\n\n---\n\nUser: {user_text}" if system_context else user_text
+    def _send_gemini(self, user_text: str, system_context: str, depth: int = 0) -> str:
+        """Send via Gemini API with automatic model rotation on temporary 503/429 errors."""
+        bounded_ctx = system_context[:2500] if len(system_context) > 2500 else system_context
+        full_prompt = f"{bounded_ctx}\n\n---\n\nUser: {user_text}" if bounded_ctx else user_text
+        gemini_models = ["gemini-3.6-flash"]
 
-            response = self._gemini_client.models.generate_content(
-                model="gemini-3.6-flash",
-                contents=full_prompt,
-            )
+        for model_name in gemini_models:
+            try:
+                response = self._gemini_client.models.generate_content(
+                    model=model_name,
+                    contents=full_prompt,
+                )
 
-            answer = self._clean_response(response.text.strip()) if response.text else ""
-            if not answer:
-                answer = "I'm here, sir."
-            self._add_to_history("user", user_text)
-            self._add_to_history("model", answer)
-            return answer
+                answer = self._clean_response(response.text.strip()) if response.text else ""
+                if not answer:
+                    answer = "I'm here, sir."
+                self._add_to_history("user", user_text)
+                self._add_to_history("model", answer)
+                return answer
 
-        except Exception as e:
-            error_str = str(e).lower()
-            print(f"[AIService] Gemini error: {e}")
-            if "quota" in error_str or "rate" in error_str:
-                return "I've hit my quota. Please try again in a moment."
-            if "503" in error_str or "unavailable" in error_str:
-                return "The AI service is busy right now. Please try again shortly."
-            if "404" in error_str or "not found" in error_str:
-                return "The AI model isn't available. Please check your API key settings."
-            return "I had trouble thinking. Please try again."
+            except Exception as e:
+                error_str = str(e).lower()
+                print(f"[AIService] Gemini error on {model_name}: {e}")
+                if "503" in error_str or "unavailable" in error_str or "quota" in error_str or "rate" in error_str or "404" in error_str:
+                    continue
+                break
+
+        # Fallback to Groq if Gemini is unavailable (one-shot, no loop)
+        if self._groq_client and depth == 0:
+            print("[AIService] Gemini unavailable — trying Groq backup...")
+            return self._send_groq(user_text, bounded_ctx, depth=depth + 1)
+
+        return "I had trouble thinking. Please try again."
 
     def send_with_image(self, user_text: str, image_input, system_context: str = "") -> str:
         """

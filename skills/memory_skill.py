@@ -41,15 +41,21 @@ class MemorySkill(BaseSkill):
     def _remember(self, text: str) -> str:
         """
         Extract key-value memory from natural language and store it.
-        Uses Gemini to parse what to remember.
+        Uses Gemini to parse what to remember with current date/time context.
         """
+        now = datetime.now()
+        today_str = now.strftime("%A, %B %d, %Y")
+        time_str = now.strftime("%I:%M %p")
+
         prompt = f"""
 The user said: "{text}"
+Current Date: {today_str}
+Current Time: {time_str} (Philippine Standard Time, UTC+8)
 
 Extract the memory to store and return ONLY a JSON object:
 {{
   "key": "short topic label",
-  "value": "full detail to remember"
+  "value": "full detail to remember (Resolve any relative words like 'tomorrow', 'today', 'next week' into concrete dates/times like 'Wednesday, September 16, 2026 at 1:00 PM')"
 }}
 
 Return only the JSON — no explanation, no markdown fences.

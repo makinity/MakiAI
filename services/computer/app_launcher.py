@@ -132,19 +132,26 @@ class AppLauncher:
         """
         name_lower = app_name.strip().lower()
 
+        name_clean = name_lower.strip().rstrip(".,;!?")
+
         # Try desktop app first
-        result = self._open_app(name_lower)
+        result = self._open_app(name_clean)
         if result:
             return result
 
         # Try as a website
-        result = self._open_website(name_lower)
+        result = self._open_website(name_clean)
         if result:
             return result
 
-        # Try as a raw URL
-        if name_lower.startswith("http") or "." in name_lower:
-            return self.open_url(app_name)
+        # Try as a raw URL — strictly require http:// or valid domain without spaces
+        is_url = bool(
+            name_clean.startswith("http://")
+            or name_clean.startswith("https://")
+            or ("." in name_clean and " " not in name_clean and re.search(r"\.[a-zA-Z]{2,}(/.*)?$", name_clean))
+        )
+        if is_url:
+            return self.open_url(name_clean)
 
         return f"I couldn't find an app or website called '{app_name}'. Try saying the full name."
 

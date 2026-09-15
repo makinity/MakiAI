@@ -6,7 +6,7 @@ Triggered by: "good morning", "what's my schedule today", "morning briefing"
 Reads: time-management.md, carryover.md, deadlines.md
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from skills.base_skill import BaseSkill
 
 
@@ -19,30 +19,113 @@ class GoodMorningSkill(BaseSkill):
         "workflows/deadlines.md",
     ]
 
+    def _get_day_schedule(self, target_day_name: str) -> str:
+        """Extract the exact schedule rows for target_day_name from workflows/time-management.md."""
+        if not self.kb_reader:
+            return ""
+        content = self.kb_reader.read("workflows/time-management.md")
+        if not content:
+            return ""
+
+        lines = content.splitlines()
+        table_lines = []
+        in_table = False
+        headers = []
+        for line in lines:
+            if "| Time |" in line or "|Time|" in line:
+                in_table = True
+                headers = [h.strip().lower() for h in line.split("|")[1:-1]]
+                continue
+            if in_table:
+                if not line.strip().startswith("|"):
+                    break
+                if "---" in line:
+                    continue
+                cols = [c.strip() for c in line.split("|")[1:-1]]
+                if len(cols) == len(headers):
+                    table_lines.append(cols)
+
+        if not table_lines:
+            return ""
+
+        target_col_idx = -1
+        for idx, h in enumerate(headers):
+            if target_day_name.lower() in h:
+                target_col_idx = idx
+                break
+
+        if target_col_idx == -1:
+            return ""
+
+        schedule_rows = [f"### Mark's Planned Schedule for {target_day_name}:"]
+        for row in table_lines:
+            time_slot = row[0]
+            activity = row[target_col_idx]
+            schedule_rows.append(f"- {time_slot}: {activity}")
+
+        return "\n".join(schedule_rows)
+
     def execute(self, text: str) -> str:
-        """Generate the morning briefing from KB workflow files."""
+        """Generate the time-aware schedule briefing from KB workflow files."""
         now = datetime.now()
-        day = now.strftime("%A, %B %d, %Y")
-        time_str = now.strftime("%I:%M %p")
+        lowered = text.lower()
+        is_tomorrow = any(k in lowered for k in ["tomorrow", "bukas"])
 
-        prompt = f"""
-Today is {day}. The current time is {time_str}.
+        if is_tomorrow:
+            target_date = now + timedelta(days=1)
+            day_name = target_date.strftime("%A")
+            date_str = target_date.strftime("%B %d, %Y")
+            day_schedule = self._get_day_schedule(day_name)
 
-Generate a warm, natural spoken morning briefing for sir. Speak like a trusted personal assistant, not a robot.
-Do not use bullet points, markdown, emoji labels, or formatted lists.
-Speak in natural flowing sentences as if you are talking to him directly.
+            prompt = f"""
+The current real-time clock is {now.strftime("%I:%M %p")} on {now.strftime("%A, %B %d, %Y")}.
+The user asked for TOMORROW'S schedule: "{text}"
+Target Date for tomorrow: {day_name}, {date_str}.
 
-Cover these topics naturally in your speech:
-1. A warm good morning greeting with today's date
-2. What sir should be doing right now and what is coming up next in his schedule
-3. His full schedule for today, described naturally in a sentence or two
-4. Any carry-over tasks from yesterday if there are any, or confirm everything is clean
-5. Any upcoming deadlines or saved meetings/notes for today (from Saved Long-Term Memories) — mention them warmly, skip if none
-6. A brief encouraging closing thought about his day
+{day_schedule}
 
-End by asking: "Is there anything you would like to add to your day, sir?"
+Generate a warm, clear spoken schedule briefing for tomorrow for sir:
+1. Greet sir and state that this is the schedule overview for tomorrow ({day_name}, {date_str}).
+2. Summarize the key routine blocks planned for {day_name} (e.g. morning routine, classes/work, coding/study, exercise, evening leisure).
+3. Check for any upcoming deadlines or active calendar appointments on {day_name} from the Knowledge Base or mention if the day looks open.
+4. End warmly: "Let me know if you would like to prepare anything for tomorrow, sir."
 
-Keep the total response under 120 words. Speak warmly and naturally.
+Constraints:
+- Focus on tomorrow ({day_name}, {date_str}). Do NOT confuse it with today's live time block.
+- Speak in natural flowing conversational sentences suitable for TTS (no markdown asterisks, no bullets, no headers).
+- Keep total response concise (under 120 words).
+""".strip()
+        else:
+            day_name = now.strftime("%A")
+            date_str = now.strftime("%B %d, %Y")
+            time_str = now.strftime("%I:%M %p")
+            hour = now.hour
+            day_schedule = self._get_day_schedule(day_name)
+
+            if 5 <= hour < 12:
+                greeting = "Good morning"
+            elif 12 <= hour < 18:
+                greeting = "Good afternoon"
+            else:
+                greeting = "Good evening"
+
+            prompt = f"""
+The current real-time clock is {time_str} ({day_name}, {date_str}) Philippine Standard Time (UTC+8).
+The appropriate time-of-day greeting is "{greeting}".
+The user asked: "{text}"
+
+{day_schedule}
+
+Generate a warm, natural spoken briefing for sir:
+1. Start with the greeting ("{greeting}, sir.") and state the current time ({time_str} PHT).
+2. Using the schedule table above for {day_name}, accurately state his EXACT active activity block right now at {time_str} (e.g., if it is between 10:00 PM and 11:00 PM, state that it is his gaming/free time block).
+3. Mention what is coming up next (e.g., wind down at 11:00 PM, sleep at midnight).
+4. End warmly: "Is there anything you would like to add to your day, sir?"
+
+Constraints:
+- Always respect the current live clock ({time_str}).
+- Speak in natural flowing conversational sentences suitable for TTS (no markdown asterisks, no bullets, no headers).
+- Keep total response concise (under 120 words).
 """.strip()
 
         return self._ask_gemini(prompt)

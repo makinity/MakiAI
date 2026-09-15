@@ -94,7 +94,7 @@ class NewProjectSkill(BaseSkill):
         cleaned = text.strip()
 
         # Check for cancellation
-        if re.search(r"\b(cancel|stop|abort)\s+(planning|project)\b", cleaned, flags=re.IGNORECASE):
+        if re.search(r"\b(cancel|stop|abort|exit|quit|nevermind|never\s+mind)\b", cleaned, flags=re.IGNORECASE):
             self.reset()
             return "Project planning session cancelled, sir. Let me know when you'd like to start anew."
 

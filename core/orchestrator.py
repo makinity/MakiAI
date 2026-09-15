@@ -240,7 +240,22 @@ class Orchestrator:
         if self.skill_router:
             new_proj_skill = self.skill_router.get_skill("new_project")
             if new_proj_skill and getattr(new_proj_skill, "is_planning_active", lambda: False)():
-                # If the user is actively planning, send input to the planning engine
+                # Check for explicit cancellation
+                if re.search(r"\b(cancel|stop|abort|exit|quit|nevermind|never\s+mind)\b", cleaned, flags=re.IGNORECASE):
+                    new_proj_skill.reset()
+                    return "Project planning session cancelled, sir.", "NewProjectSkill:ActivePlanning", False, cleaned
+
+                # If the user issues a distinct skill command or computer control, route it properly without being trapped
+                other_skill = self.skill_router.detect(cleaned)
+                if other_skill and getattr(other_skill, "SKILL_ID", "") != "new_project":
+                    skill_name = other_skill.__class__.__name__
+                    return other_skill.execute(cleaned), f"Skill:{skill_name}", False, cleaned
+
+                comp_res = self.computer_router.handle(cleaned)
+                if comp_res:
+                    return comp_res, "ComputerRouter", False, cleaned
+
+                # Otherwise send input to the planning engine
                 return new_proj_skill.execute(cleaned), "NewProjectSkill:ActivePlanning", False, cleaned
 
         # 0. Homework follow-up — if waiting for instructions after Temp-Guide was opened

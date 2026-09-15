@@ -48,15 +48,20 @@ class SkillRouter:
             # (skill_id, [keyword patterns])
             ("goodmorning", [
                 r"\bgood\s*morning\b",
-                r"\bwhat'?s?\s+my\s+schedule\b",
                 r"\bmorning\s+briefing\b",
-                r"\bshow\s+(me\s+)?my\s+schedule\b",
+                r"\b(show|view|check|list|get|tell\s+me)\s+(me\s+)?(my\s+|our\s+)?(upcoming\s+|active\s+|current\s+|today'?s?\s+|tomorrow'?s?\s+)?schedules?\b",
+                r"\bwhat\s+(is|are|was|'s)\s+(my|our|the)\s+(upcoming\s+|active\s+|current\s+|today'?s?\s+|tomorrow'?s?\s+)?schedules?\b",
+                r"\b(what'?s?\s+(my\s+)?agenda|agenda\s+(for\s+today|today|for\s+the\s+day))\b",
+                r"\b(ano|ano\s+ang|anong)\s+(mga\s+)?(schedule|sked|agenda|gagawin|plano)\b",
+                r"\b(ano|anong)\s+schedule\s+ko\b",
+                r"\bschedule\s+ko\s+(today|bukas|ngayon)\b",
             ]),
             ("goodnight", [
                 r"\bgood\s*night\b",
                 r"\bwrap\s+up\s+my\s+day\b",
                 r"\bend\s+of\s+(the\s+)?day\b",
                 r"\bday\s+wrap\s*up\b",
+                r"\b(matutulog|tulog)\s+na\s+ako\b",
             ]),
             ("hello", [
                 r"^(hey\s+maki[,.]?\s*)?(hello|hey|hi)\b",
@@ -64,10 +69,9 @@ class SkillRouter:
                 r"\bwhat\s+time\s+is\s+it\b",
                 r"\bwhat'?s?\s+(the\s+)?(time|current\s+time)\b",
                 r"\b(current|philippine)\s+time\b",
-                r"\bwhat\s+is\s+(our|my)\s+schedule\b",
-                r"\bwhat'?s?\s+(our|my)\s+schedule\b",
                 r"\bwhat'?s?\s+next\b",
                 r"\bcheck.?in\b",
+                r"\banong\s+oras\s+na\b",
             ]),
             ("memory", [
                 r"\bremember\s+that\b",
@@ -78,28 +82,35 @@ class SkillRouter:
                 r"\bwhat\s+did\s+i\s+(say|tell\s+you)\b",
                 r"\b(do\s+you\s+)?recall\b",
                 r"\b(forget|delete|remove|clear)\b",
+                r"\btandaan\s+mo\b",
+                r"\bnaaalala\s+mo\s+ba\b",
             ]),
             ("deadline", [
                 r"\badd\s+(a\s+)?deadline\b",
                 r"\bset\s+(a\s+)?deadline\b",
                 r"\bnew\s+deadline\b",
                 r"\b(show|list|view|what\s+are|check)\s+(my\s+)?deadlines?\b",
+                r"\b(do\s+(?:i|we)\s+have\s+(?:any\s+)?deadlines?|any\s+deadlines?\s+(?:coming\s+up|soon)|upcoming\s+deadlines?)\b",
                 r"\bdeadline\s+(done|complete|completed|finished)\b",
                 r"\b(mark|complete)\s+deadline\b",
                 r"^deadlines?$",
+                r"\b(may\s+deadline\s+ba|anong\s+deadline|mga\s+deadline)\b",
+                r"\bdeadline\s+(this\s+week|today|tomorrow|ngayong\s+linggo)\b",
             ]),
             ("reminder", [
                 r"\bremind\s+(me\s+)?(at|to|about|in|that|of)?\b",
                 r"\b(tell|notify|alert|warn|let)\s+(me\s+)?(later|in\s+\d+|at\s+\d+|when|to|about|that)\b",
-                r"\b(add|set|put|create)\s+(a\s+)?(reminder|schedule)\b",
-                r"\bschedule\s+(a\s+)?(meeting|event|call|session|task|zoom)\b",
-                r"\badd\s+(this\s+)?to\s+(my\s+)?schedule\b",
-                r"\b(show|list|view|provide|check|what\s+are|get)\s+(a\s+|the\s+|my\s+)?(list\s+of\s+)?reminders?\b",
+                r"\b(add|set|put|create)\s+(a\s+|an\s+)?(reminder|schedule|meeting|interview|appointment)\b",
+                r"\bschedule\s+(an?\s+)?(meeting|event|call|session|task|zoom|interview|appointment)\b",
+                r"\badd\s+(this\s+)?to\s+(my\s+)?(schedule|calendar)\b",
+                r"\b(show|list|view|provide|check|what\s+are|get|do\s+(i|we)\s+have)\s+(a\s+|the\s+|my\s+|our\s+|any\s+)?(list\s+of\s+|scheduled\s+|upcoming\s+|active\s+)?(reminders?|meetings?|interviews?|appointments?|calendar|events?|schedules?)\b",
+                r"\b(check|see)\s+if\s+(i|we)\s+have\s+(any\s+)?(meetings?|reminders?|appointments?|interviews?)\b",
                 r"\b(check|search|look\s+(in|at)|read)\s+.*?\breminders?\b",
                 r"\breminders?\s+(in|from|on)\s+(the\s+)?(knowledge\s+base|kb)\b",
                 r"\breminders?\s+list\b",
-                r"\bcancel\s+reminder\b",
+                r"\bcancel\s+(reminder|meeting|interview)\b",
                 r"^reminders?$",
+                r"\b(paalala|paalalahanan|ipaalala|paalala\s+mamaya)\b",
             ]),
             ("new_project", [
                 r"\bnew\s+project\b",
@@ -110,6 +121,7 @@ class SkillRouter:
                 r"\bwe\s+have\s+a\s+new\s+project\b",
                 r"\blet'?s\s+build\b",
                 r"\bnew\s+(app|website|system|tool)\b",
+                r"\b(may\s+bago\s+akong\s+project|may\s+project\s+idea\s+ako|naisip\s+na\s+project)\b",
             ]),
             ("homework", [
                 r"\bcreate\s+(my\s+)?homework\b",
@@ -123,6 +135,7 @@ class SkillRouter:
                 r"\bwrite\s+(my\s+)?assignment\b",
                 r"\bfinish\s+(my\s+)?homework\b",
                 r"\bhomework\s+help\b",
+                r"\b(gawa\s+tayo\s+ng\s+homework|tulungan\s+mo\s+ako\s+sa\s+homework|assignment|homework)\b",
             ]),
             ("clip", [
                 r"\b(find\s+clips?|create\s+clips?|make\s+clips?|clip\s+this|clip\s+(?:the\s+)?video|extract\s+clips?|viral\s+shorts?)\b",
@@ -151,6 +164,7 @@ class SkillRouter:
                 r"\b(read|check|summarize)\s+(this\s+)?(link|url|website|page|article)\b",
                 r"\bwhat\s+is\s+the\s+latest\s+on\b",
                 r"\bwho\s+won\s+the\b",
+                r"\b(mag\s*research|magsaliksik|hanapin\s+sa\s+internet)\b",
             ]),
         ]
 
@@ -182,8 +196,16 @@ class SkillRouter:
 
         for pattern, skill_id in self._triggers:
             if pattern.search(cleaned):
-                # If research triggered but command asks to play/watch, pass to ComputerRouter
+                # 1. If research triggered but command asks to play/watch, pass to ComputerRouter
                 if skill_id == "research" and re.search(r"\b(?:and\s+)?play\b|\bwatch\b|\bstream\b", cleaned, re.IGNORECASE):
+                    continue
+
+                # 2. Collision Shield: "open google chrome", "launch chrome", "open browser" -> let ComputerRouter handle it
+                if skill_id == "research" and re.search(r"^(?:open|launch|start|run)\s+(?:google\s+)?(?:chrome|browser)\b", cleaned, re.IGNORECASE):
+                    continue
+
+                # 3. Collision Shield: "open github", "launch notion", "open discord", "open spotify" -> let ComputerRouter handle it
+                if skill_id == "composio" and re.search(r"^(?:open|launch|start|go\s+to)\s+(?:github|notion|discord|spotify|trello|gitlab)\b", cleaned, re.IGNORECASE):
                     continue
 
                 skill = self._skills.get(skill_id)
@@ -192,6 +214,8 @@ class SkillRouter:
                     return skill
                 else:
                     print(f"[SkillRouter] Skill '{skill_id}' matched but not registered.")
+
+        return None
 
         return None
 

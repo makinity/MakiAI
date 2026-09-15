@@ -20,14 +20,17 @@ This document contains the verified, conflict-free open-source repositories sele
 
 ---
 
-## 🎬 3. Video Editing & Content Creation Suite
+## 🎬 3. Content Creation, Video Suite & Social Media Publishing
 * **Repository 1:** [m-bain/whisperX](https://github.com/m-bain/whisperX)
   * **Role:** **Word-Level Subtitle Alignment (`services/media/subtitle_service.py`)**
   * **Capability:** Generates exact millisecond timestamps for karaoke-style animated captions on clips.
 * **Repository 2:** [remotion-dev/remotion](https://github.com/remotion-dev/remotion)
   * **Role:** **Programmatic Motion Graphics & Video Rendering**
   * **Capability:** Programmatically renders video intros, kinetic titles, and animated text overlays via React & Node.js.
-* **Conflict Status:** **Conflict-Free ✅** (Used strictly in the post-processing pipeline of `DeepClip`).
+* **Repository 3:** [gitroomhq/postiz-app](https://github.com/gitroomhq/postiz-app)
+  * **Role:** **Social Media Management & Multi-Platform Publisher (`skills/social_media_skill.py`)**
+  * **Capability:** Open-source AI social media scheduler and cross-posting platform. Connects to 14+ channels (Facebook, Instagram, TikTok, YouTube, LinkedIn, X/Twitter, Threads, Pinterest, Reddit). Enables MakiAI to schedule client posts, manage content calendars, and publish rendered clips across multiple accounts with zero monthly SaaS fees.
+* **Conflict Status:** **Conflict-Free ✅** (Completes the end-to-end content workflow: `WhisperX` captions -> `Remotion` renders -> `Postiz` schedules and publishes via REST API/CLI).
 
 ---
 
@@ -55,5 +58,22 @@ This document contains the verified, conflict-free open-source repositories sele
 * **Designated Role in MakiAI:** **Cloud SaaS & Google Workspace Engine (`skills/composio_skill.py`)**
 * **Capability:** Connects MakiAI to 500+ cloud services (Google Docs, Google Sheets, Google Calendar, Gmail, Notion, GitHub, Discord, Spotify, Trello) with zero OAuth setup.
 * **Conflict Status:** **Conflict-Free ✅** (Independent cloud toolset that communicates over HTTPS REST APIs without interfering with local Win32/file operations).
+
+---
+
+## 🤖 7. Autonomous Mobile Device Automation (Under Evaluation)
+* **Repository:** [google/artemis](https://github.com/google/artemis) *(by Google)*
+* **Designated Role in MakiAI:** **Android Mobile Agent & Device Bridge (`services/remote/artemis_service.py` / MCP)**
+* **Capability:** Converts natural language instructions into autonomous multi-step actions on physical Android devices (or emulators) via ADB & multimodal vision. Automates mobile-only apps (GCash, Grab, Maya, banking, OTP extraction, SMS via local SIM, mobile QA testing) with 99%+ SOTA success on AndroidWorld.
+* **Evaluation Notes:** Under consideration for Android phone integration. Can be driven natively via Model Context Protocol (MCP) or ADB without conflicting with desktop Windows controls.
+* **Conflict Status:** **Conflict-Free ✅** (Operates independently over USB/Wireless ADB without touching local Windows UI hooks).
+
+---
+
+## 🌐 8. Free Public APIs & Live Data Streams
+* **Repository:** [public-apis/public-apis](https://github.com/public-apis/public-apis)
+* **Designated Role in MakiAI:** **Live Micro-Services & Real-Time Data Catalog (`services/research/api_catalog.py`)**
+* **Capability:** Master index of 1,500+ free, keyless, and open APIs covering currency/crypto rates (PHP/USD), live weather forecasts (Open-Meteo), dictionary definitions, news headlines, and network telemetry. Allows MakiAI to answer real-time factual queries in sub-100ms without slow web scraping or paid subscriptions.
+* **Conflict Status:** **Conflict-Free ✅** (Stateless HTTP REST fetchers invoked on demand).
 
 ---

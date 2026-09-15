@@ -1,11 +1,18 @@
 {
   "memories": [
     {
-      "id": "4d80827f-b5a9-45e7-917a-0faa9400574b",
-      "key": "AI Ad Video deadline",
-      "value": "Tomorrow at 1:00 PM we have an urgent deadline for the AI Ad Video.",
-      "created_at": "2026-09-12T14:32:27.854239",
-      "updated_at": "2026-09-12T14:32:27.854239"
+      "id": "cb26db47-24a4-483c-a054-2e269afb9896",
+      "key": "dog_name",
+      "value": "The user's dog's name is Cooper",
+      "created_at": "2026-09-15T20:59:48.263114",
+      "updated_at": "2026-09-15T22:13:59.354764"
+    },
+    {
+      "id": "6be3d046-f732-4a5d-a9bf-3dae8b5b99f0",
+      "key": "dog's name",
+      "value": "The user's dog's name is Cooper",
+      "created_at": "2026-09-15T21:27:28.766336",
+      "updated_at": "2026-09-15T21:27:28.766336"
     }
   ]
 }
