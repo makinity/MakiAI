@@ -27,12 +27,33 @@ class ClipSkill(BaseSkill):
     def __init__(self, gemini_service, context_builder, kb_reader, kb_writer):
         super().__init__(gemini_service, context_builder, kb_reader, kb_writer)
         self.clip_service = ClipService(ai_service=gemini_service)
+        self.ui_bridge = None
+
+    def set_ui_bridge(self, ui_bridge) -> None:
+        """Connect UI bridge to trigger interactive DeepClip modal."""
+        self.ui_bridge = ui_bridge
 
     def execute(self, text: str) -> str:
         """
         Main execution flow: parse command, extract transcript, rank moments, slice clips, and open folder.
         """
         cleaned = text.strip()
+
+        # If UI bridge is connected, open the interactive DeepClip Slicer Modal
+        if hasattr(self, "ui_bridge") and self.ui_bridge:
+            latest_vid = self.clip_service.get_latest_recording()
+            source_file = str(latest_vid) if latest_vid else "C:\\MakiSync Storage\\MakiAI\\Recordings\\latest.mp4"
+            import time
+            draft = {
+                "id": f"clip_{int(time.time())}",
+                "source_path": source_file,
+                "start_time": "00:00",
+                "end_time": "00:45",
+                "title": "Viral Highlight Clip",
+                "ratio": "9:16",
+            }
+            self.ui_bridge.set_active_modal("clip", draft)
+            return "I've opened the DeepClip video slicer on your screen, sir. Please adjust the timestamps and ratio to render your clip."
 
         # 1. Determine Layout preference
         layout = "vertical-blur"

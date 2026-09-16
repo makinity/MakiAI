@@ -2732,3 +2732,813 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"You are currently pursuing your Bachelor of Science in Information Technology at the University of Mindanao, sir."`
 
 ---
+
+### 🔹 Live Session Command — 11:21:59 PM
+* **Spoken / Typed Command:** `"Maki, check if there are any new messages on my MakiSync Page"`
+* **Extracted Payload:** `"check if there are any new messages on my MakiSync Page"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I can’t directly access your MakiSync page or check for new messages from here, sir. I don’t have live access to external websites or your d..."`
+
+---
+
+### 🔹 Live Session Command — 11:22:19 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:28:11 PM
+* **Spoken / Typed Command:** `"MakiAva's"`
+* **Extracted Payload:** `"Ava's"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Could you clarify what you are referring to, sir? I don't have any information about "Ava" in your Knowledge Base or recent conversations."`
+
+---
+
+### 🔹 Live Session Command — 11:28:12 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:28:23 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:28:24 PM
+* **Spoken / Typed Command:** `"Maki, check if there are any new messages on my MakiSync Page."`
+* **Extracted Payload:** `"check if there are any new messages on my MakiSync Page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, I've checked your MakiSync Page inbox: • **MakiSync**: "Tae Na blue" • **MakiSync**: "https://www.facebook.com/share/1DSixxoY3b/?mibext..."`
+
+---
+
+### 🔹 Live Session Command — 11:28:49 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:29:45 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:29:54 PM
+* **Spoken / Typed Command:** `"Maki, check if there are any new messages on my MakiSync Page."`
+* **Extracted Payload:** `"check if there are any new messages on my MakiSync Page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, I've checked your MakiSync Page inbox: • **Mark Liones Juntilla**: "Test" • **MakiSync**: "Tae Na blue" • **MakiSync**: "https://www.fa..."`
+
+---
+
+### 🔹 Live Session Command — 11:33:53 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 11:33:54 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:34:10 PM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. Could you let me know what you’d like to see or check?"`
+
+---
+
+### 🔹 Live Session Command — 11:34:14 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:34:22 PM
+* **Spoken / Typed Command:** `"Maki assistant for Maki."`
+* **Extracted Payload:** `"assistant for Maki."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"{   "app": "facebook",   "action": "FACEBOOK_GET_PAGE_CONVERSATIONS",   "arguments": {} }"`
+
+---
+
+### 🔹 Live Session Command — 11:34:26 PM
+* **Spoken / Typed Command:** `"Maki, check if there are any new messages on my MakiSync Page."`
+* **Extracted Payload:** `"check if there are any new messages on my MakiSync Page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, the most recent message on your MakiSync page is from Mark Liones Juntilla—they just shared a link. Would you like me to open it or dra..."`
+
+---
+
+### 🔹 Live Session Command — 11:34:35 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:34:43 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 11:34:52 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:34:53 PM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. Anything else you’d like me to handle?"`
+
+---
+
+### 🔹 Live Session Command — 11:34:54 PM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure thing, sir. The latest activity on your MakiSync Facebook page shows a few recent posts:  - Mark Liones Juntilla sent a message saying ..."`
+
+---
+
+### 🔹 Live Session Command — 11:35:03 PM
+* **Spoken / Typed Command:** `"Maki, check my recent emails on Gmail."`
+* **Extracted Payload:** `"check my recent emails on Gmail."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, you have a total of one hundred new emails, and the most recent one is from an unknown sender with the subject “No subject.” Would you ..."`
+
+---
+
+### 🔹 Live Session Command — 11:35:26 PM
+* **Spoken / Typed Command:** `"I want you to read it."`
+* **Extracted Payload:** `"I want you to read it."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"{   "app": "gmail",   "action": "GMAIL_GET_MESSAGE",   "arguments": {     "messageId": "latest"   } }"`
+
+---
+
+### 🔹 Live Session Command — 11:35:46 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:37:36 PM
+* **Spoken / Typed Command:** `"check my recent emails"`
+* **Extracted Payload:** `"check my recent emails"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I'm not connected yet. Please add a Groq or Gemini API key in your .env file."`
+
+---
+
+### 🔹 Live Session Command — 11:39:00 PM
+* **Spoken / Typed Command:** `"check my recent emails."`
+* **Extracted Payload:** `"check my recent emails."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure thing, sir. Which email account or client would you like me to open and review for you?"`
+
+---
+
+### 🔹 Live Session Command — 11:39:14 PM
+* **Spoken / Typed Command:** `"I want the hundqiyakingmaki.gmail.com."`
+* **Extracted Payload:** `"I want the hundqiyakingmaki.gmail.com."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I’m not able to access that Gmail account directly, sir. If you’d like me to open Gmail for you, I’ll need the login details or you can sign..."`
+
+---
+
+### 🔹 Live Session Command — 11:39:34 PM
+* **Spoken / Typed Command:** `"Maki, check medicine emails."`
+* **Extracted Payload:** `"check medicine emails."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. I’ll open Gmail for you now. Please sign in to the account you use for your medicine correspondence, and let me know once y..."`
+
+---
+
+### 🔹 Live Session Command — 11:39:47 PM
+* **Spoken / Typed Command:** `"Maki, check my recent emails."`
+* **Extracted Payload:** `"check my recent emails."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure thing, sir. I’ll launch Gmail in your browser now. Once the sign‑in page appears, please log into the account you use for your medicine..."`
+
+---
+
+### 🔹 Live Session Command — 11:40:02 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:40:25 PM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page."`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, the most recent message on your Facebook page is from Mark Liones Juntilla—they just shared a link. Would you like me to open it or dra..."`
+
+---
+
+### 🔹 Live Session Command — 11:40:42 PM
+* **Spoken / Typed Command:** `"Drop or reply and send it directly."`
+* **Extracted Payload:** `"Drop or reply and send it directly."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure thing, sir. Would you like me to delete that message, or should I send a reply? If you’d like a reply, just let me know the text you’d ..."`
+
+---
+
+### 🔹 Live Session Command — 11:40:51 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:41:01 PM
+* **Spoken / Typed Command:** `"Just said hello."`
+* **Extracted Payload:** `"Just said hello."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I couldn't determine which cloud action to take for that request, sir. Could you clarify if you'd like to use Google Docs, Calendar, Gmail, ..."`
+
+---
+
+### 🔹 Live Session Command — 11:41:21 PM
+* **Spoken / Typed Command:** `"What I meant is just reply a hello world."`
+* **Extracted Payload:** `"What I meant is just reply a hello world."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I couldn't determine which cloud action to take for that request, sir. Could you clarify if you'd like to use Google Docs, Calendar, Gmail, ..."`
+
+---
+
+### 🔹 Live Session Command — 11:41:28 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:41:55 PM
+* **Spoken / Typed Command:** `"Maki, check my recent emails"`
+* **Extracted Payload:** `"check my recent emails"`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, you have one new email from Calendly regarding an informational meeting with Todd Norton. Would you like me to read the details or help..."`
+
+---
+
+### 🔹 Live Session Command — 11:42:15 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:42:23 PM
+* **Spoken / Typed Command:** `"Read the details."`
+* **Extracted Payload:** `"Read the details."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, the email from Calendly regarding "Informational Meeting with Todd Norton" reads: "Hi Mark, Here's a message from your event organizer:..."`
+
+---
+
+### 🔹 Live Session Command — 11:42:49 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:42:55 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:43:02 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:43:06 PM
+* **Spoken / Typed Command:** `"Maki, check my recent message on my facebook page"`
+* **Extracted Payload:** `"check my recent message on my facebook page"`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, the newest message on your Facebook page is from Mark Liones Juntilla, who just shared a link. Would you like to respond to it?"`
+
+---
+
+### 🔹 Live Session Command — 11:43:18 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:43:24 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:43:30 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:43:42 PM
+* **Spoken / Typed Command:** `"Reply with "What is that""`
+* **Extracted Payload:** `"Reply with "What is that""`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I had trouble executing the Facebook action, sir: Invalid request data provided - Following fields are missing:"`
+
+---
+
+### 🔹 Live Session Command — 11:43:57 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:43:59 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:46:25 PM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page."`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, you have a recent message on your MakiSync Page from Mark Liones Juntilla saying: "Testing hehehhee". Would you like me to draft a resp..."`
+
+---
+
+### 🔹 Live Session Command — 11:48:21 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 11:48:23 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:48:33 PM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page."`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, I’ve checked your Facebook page messages. The most recent activity is from Mark Liones Juntilla, who sent a test message and shared a l..."`
+
+---
+
+### 🔹 Live Session Command — 11:48:35 PM
+* **Spoken / Typed Command:** `"MakiBak."`
+* **Extracted Payload:** `"Bak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. Just let me know what you'd like to do next."`
+
+---
+
+### 🔹 Live Session Command — 11:48:50 PM
+* **Spoken / Typed Command:** `"Reply saying hello world."`
+* **Extracted Payload:** `"Reply saying hello world."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I've published your response "saying hello world" to your MakiSync Page, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:51:11 PM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page."`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, you have a recent message on your MakiSync Page from MakiSync saying: "Hello world! MakiAI here.". Would you like me to draft a respons..."`
+
+---
+
+### 🔹 Live Session Command — 11:52:31 PM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page."`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, the latest message on your Facebook page is from Mark Liones Juntilla, saying “Test.” Would you like to reply?"`
+
+---
+
+### 🔹 Live Session Command — 11:52:46 PM
+* **Spoken / Typed Command:** `"Reply saying hello world."`
+* **Extracted Payload:** `"Reply saying hello world."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I've sent your reply "saying hello world" directly to Mark Liones Juntilla on Facebook Messenger, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:53:00 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:53:07 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:53:18 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:53:29 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:54:21 PM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page."`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, you have a recent message on your MakiSync Page from MakiSync saying: "saying hello world". Would you like me to draft a response?"`
+
+---
+
+### 🔹 Live Session Command — 11:54:58 PM
+* **Spoken / Typed Command:** `"."`
+* **Extracted Payload:** `"."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good evening, sir. How can I assist you right now?"`
+
+---
+
+### 🔹 Live Session Command — 11:55:08 PM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page"`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page"`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Your latest Facebook page message is from MakiSync saying “hello world.” Would you like to reply, sir?"`
+
+---
+
+### 🔹 Live Session Command — 11:55:20 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:55:24 PM
+* **Spoken / Typed Command:** `"Reply saying welcome to MakiAI."`
+* **Extracted Payload:** `"Reply saying welcome to MakiAI."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I've sent your reply "welcome to MakiAI" directly to Mark Liones Juntilla on Facebook Messenger, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:55:41 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:55:50 PM
+* **Spoken / Typed Command:** `"Tis, Tis, Tis, Tis."`
+* **Extracted Payload:** `"Tis, Tis, Tis, Tis."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. Would you like me to send “Tis, Tis, Tis, Tis.” as a reply to the latest message, or is there something else I can help wit..."`
+
+---
+
+### 🔹 Live Session Command — 11:56:02 PM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure thing, sir. Would you like me to open your Facebook page, or should I display the recent messages again?"`
+
+---
+
+### 🔹 Live Session Command — 11:58:11 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:58:20 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 11:58:28 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:58:36 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:58:42 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:58:47 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:58:54 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 11:58:59 PM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page."`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, you’ve received a few recent messages from Mark Liones Juntilla, which appear to be quick tests like "Tae na blue" and "Testing hehehhe..."`
+
+---
+
+### 🔹 Live Session Command — 11:59:25 PM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page."`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, the latest message on your page is from Mark Liones Juntilla and simply says “Test.” Would you like me to draft a reply for him?"`
+
+---
+
+### 🔹 Live Session Command — 12:04:29 AM
+* **Spoken / Typed Command:** `"Check the recent messages on my Facebook page."`
+* **Extracted Payload:** `"Check the recent messages on my Facebook page."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, the newest message on your Facebook page is from Mark Liones Juntilla, who wrote “Taena neto.” Would you like to reply?"`
+
+---
+
+### 🔹 Live Session Command — 12:04:43 AM
+* **Spoken / Typed Command:** `"Reply saying yawaaa ka"`
+* **Extracted Payload:** `"Reply saying yawaaa ka"`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I've sent your reply "yawaaa ka" directly to Mark Liones Juntilla on Facebook Messenger, sir."`
+
+---
+
+### 🔹 Live Session Command — 12:05:11 AM
+* **Spoken / Typed Command:** `"Create a new post success"`
+* **Extracted Payload:** `"Create a new post success"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure thing, sir. I’ll draft a Facebook post that simply says “success.” Should I go ahead and publish it now?"`
+
+---
+
+### 🔹 Live Session Command — 12:05:24 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 12:06:07 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 12:06:17 AM
+* **Spoken / Typed Command:** `"Go ahead, publish it"`
+* **Extracted Payload:** `"Go ahead, publish it"`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"{   "app": "gmail",   "action": "GMAIL_LIST_MESSAGES",   "arguments": {     "maxResults": 1   } }"`
+
+---
+
+### 🔹 Live Session Command — 12:06:18 AM
+* **Spoken / Typed Command:** `"Check the latest message on our Gmail."`
+* **Extracted Payload:** `"Check the latest message on our Gmail."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, you have one new email—a message from an unknown sender with no subject. Would you like me to read it or compose a reply?"`
+
+---
+
+### 🔹 Live Session Command — 12:06:33 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 12:06:40 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 12:06:51 AM
+* **Spoken / Typed Command:** `"Lee, Cyril, E."`
+* **Extracted Payload:** `"Lee, Cyril, E."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, there are no emails from Lee, Cyril, E. in your Gmail inbox. Would you like me to look for messages from a different sender or check an..."`
+
+---
+
+### 🔹 Live Session Command — 12:07:09 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 12:07:15 AM
+* **Spoken / Typed Command:** `"What i meant is read the latest message from gmail"`
+* **Extracted Payload:** `"What i meant is read the latest message from gmail"`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"{   "app": "gmail",   "action": "GMAIL_GET_MESSAGE",   "arguments": {     "messageId": "latest"   } }"`
+
+---

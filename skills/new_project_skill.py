@@ -54,6 +54,11 @@ class NewProjectSkill(BaseSkill):
         self._current_stage: int = 1
         self._project_data: Dict[str, Any] = self._empty_project_data()
         self._history: List[Dict[str, str]] = []
+        self.ui_bridge = None
+
+    def set_ui_bridge(self, ui_bridge) -> None:
+        """Connect UI bridge to trigger interactive project scaffolding modal."""
+        self.ui_bridge = ui_bridge
 
     def _empty_project_data(self) -> Dict[str, Any]:
         return {
@@ -139,6 +144,19 @@ Keep response concise and conversational (spoken by personal assistant).
             cand = re.search(r"\b(?:called|named|build|project)\s+([A-Za-z0-9_\-]+)", text, flags=re.IGNORECASE)
             if cand and cand.group(1).lower() not in ("a", "an", "new", "this", "my"):
                 self._project_data["name"] = cand.group(1).capitalize()
+
+        # If UI bridge is connected, launch interactive Scaffolding Modal
+        if hasattr(self, "ui_bridge") and self.ui_bridge:
+            proj_name = self._project_data["name"]
+            draft = {
+                "id": f"proj_{int(datetime.now().timestamp())}",
+                "name": proj_name,
+                "vision": f"Modern application architecture for {proj_name}",
+                "stack": "Next.js + Tailwind",
+                "target_path": "c:\\development\\NextJS",
+            }
+            self.ui_bridge.set_active_modal("new_project", draft)
+            return f"I've initiated the project configuration for {proj_name}, sir. You can select your preferred tech stack and target folder directly on your screen."
 
         return response
 

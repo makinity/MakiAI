@@ -21,6 +21,11 @@ class ReminderSkill(BaseSkill):
     def __init__(self, gemini_service, context_builder, kb_reader, kb_writer, reminder_service=None):
         super().__init__(gemini_service, context_builder, kb_reader, kb_writer)
         self.reminder_service = reminder_service  # Injected in Phase 8
+        self.ui_bridge = None
+
+    def set_ui_bridge(self, ui_bridge) -> None:
+        """Connect UI bridge to trigger interactive reminder modal."""
+        self.ui_bridge = ui_bridge
 
     def execute(self, text: str) -> str:
         """Route to add, query/list, or cancel subcommand."""
@@ -175,8 +180,27 @@ Rules:
             # Clean and parse ISO string
             reminder_dt_str = reminder_dt_str.strip()
             reminder_dt = datetime.fromisoformat(reminder_dt_str)
+            friendly_time = self._format_relative_datetime(reminder_dt)
 
-            # Schedule through ReminderService or persist directly
+            # 1. If UI bridge is connected, open interactive modal for confirmation
+            if hasattr(self, "ui_bridge") and self.ui_bridge:
+                try:
+                    category = "Meeting" if any(k in reminder_text.lower() for k in ["meeting", "call", "interview", "zoom", "session"]) else (
+                        "Personal" if any(k in reminder_text.lower() for k in ["workout", "gym", "doctor", "medicine", "water", "sleep"]) else "Task"
+                    )
+                    draft = {
+                        "id": f"rem_{int(datetime.now().timestamp())}",
+                        "title": reminder_text,
+                        "category": category,
+                        "target_date": reminder_dt.strftime("%Y-%m-%d"),
+                        "target_time": reminder_dt.strftime("%H:%M"),
+                    }
+                    self.ui_bridge.set_active_modal("reminder", draft)
+                    return f"I've drafted that reminder for {reminder_text} at {friendly_time}, sir. Please confirm or adjust on your screen."
+                except Exception as e:
+                    print(f"[ReminderSkill] Modal warning: {e}")
+
+            # 2. Fallback / Direct schedule
             if self.reminder_service:
                 self.reminder_service.add(
                     reminder_id=str(uuid.uuid4()),
@@ -186,7 +210,6 @@ Rules:
             else:
                 self._save_reminder(reminder_text, reminder_dt_str)
 
-            friendly_time = self._format_relative_datetime(reminder_dt)
             return f"Got it, sir. I have added {reminder_text} for {friendly_time}."
 
         except Exception as e:

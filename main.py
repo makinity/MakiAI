@@ -193,8 +193,10 @@ def bootstrap_maki_services():
         reminder_service=reminder_service,
     )
 
-    if "deadline" in skills and hasattr(skills["deadline"], "set_ui_bridge"):
-        skills["deadline"].set_ui_bridge(ui_api)
+    # Connect UI Bridge to all interactive skills
+    for skill_name, skill_inst in skills.items():
+        if hasattr(skill_inst, "set_ui_bridge"):
+            skill_inst.set_ui_bridge(ui_api)
 
     # 8. Telegram Mobile Remote Bridge (24/7 Phone Access)
     try:

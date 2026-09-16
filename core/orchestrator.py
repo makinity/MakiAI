@@ -306,7 +306,16 @@ class Orchestrator:
         # Inject KB context for project/coding/personal questions
         if self.gemini_service:
             context = self._build_context(cleaned)
-            return self.gemini_service.send(cleaned, context), "Fallback:Gemini", True, cleaned
+            raw_ai_res = self.gemini_service.send(cleaned, context)
+
+            # Safety intercept: If the LLM returned a raw tool JSON (e.g. {"app": "gmail", ...})
+            if raw_ai_res and "{" in raw_ai_res and ("\"app\":" in raw_ai_res or "'app':" in raw_ai_res or "\"action\":" in raw_ai_res):
+                if self.skill_router:
+                    comp_skill = self.skill_router.get_skill("composio")
+                    if comp_skill:
+                        return comp_skill.execute(cleaned), "Skill:ComposioSkill", False, cleaned
+
+            return raw_ai_res, "Fallback:Gemini", True, cleaned
 
         return f"I heard: {cleaned}. Full AI will be connected once your API key is set.", "Fallback:Stub", True, cleaned
 

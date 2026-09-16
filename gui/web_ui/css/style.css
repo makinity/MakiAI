@@ -1005,3 +1005,35 @@ body::before {
     font-weight: 600;
 }
 
+.form-textarea {
+    resize: vertical;
+    min-height: 5rem;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.quick-chip {
+    background: rgba(118, 215, 255, 0.08);
+    border: 1px solid rgba(118, 215, 255, 0.2);
+    color: var(--accent);
+    padding: 0.25rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.quick-chip:hover {
+    background: rgba(118, 215, 255, 0.22);
+    border-color: var(--accent);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+

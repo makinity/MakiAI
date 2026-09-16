@@ -33,15 +33,39 @@ class HomeworkSkill(BaseSkill):
     SKILL_ID = "homework"
     REQUIRED_FILES = []  # No KB files needed — reads Temp-Guide directly
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ui_bridge = None
+
+    def set_ui_bridge(self, ui_bridge) -> None:
+        """Connect UI bridge to trigger interactive homework modal."""
+        self.ui_bridge = ui_bridge
+
     def execute(self, text: str) -> str:
         """
         Step 1: Open Temp-Guide folder and ask for guide files + instructions.
-        The actual generation happens in execute_with_instructions().
+        If UI bridge is available, pop up the Homework Generator Modal.
         """
         # Ensure Temp-Guide exists
         TEMP_GUIDE_PATH.mkdir(parents=True, exist_ok=True)
 
-        # Open Temp-Guide in File Explorer
+        # Extract possible subject title from text
+        import re
+        clean = re.sub(r"^(?:hey\s+maki,?|maki,?|please\s+|can\s+you\s+)?(?:create|do|make|write|generate)?\s*(?:my\s+)?(?:homework|assignment)?\s*(?:for|about|on)?", "", text, flags=re.IGNORECASE).strip()
+        subject_title = clean if len(clean) > 2 else "Academic Assignment"
+
+        if hasattr(self, "ui_bridge") and self.ui_bridge:
+            draft = {
+                "id": f"hw_{int(datetime.now().timestamp())}",
+                "subject": subject_title,
+                "instructions": f"Cover essential concepts, definitions, and key topics for {subject_title}.",
+                "format": "Standard Academic",
+                "output_path": str(ASSIGNMENTS_PATH),
+            }
+            self.ui_bridge.set_active_modal("homework", draft)
+            return f"I've drafted the homework generator for {subject_title}, sir. Please review the topics and format style on your screen."
+
+        # Fallback for headless CLI: Open Temp-Guide in File Explorer
         subprocess.Popen(f'explorer "{TEMP_GUIDE_PATH}"')
 
         return (

@@ -62,16 +62,65 @@
         elements.settingTtsFallback = document.getElementById("setting-tts-fallback");
         elements.settingKbPath = document.getElementById("setting-kb-path");
 
-        // Interactive Modal elements
+        // Situational Interactive Modal elements
         elements.modalOverlay = document.getElementById("interactive-modal-overlay");
+        elements.modalHeading = document.getElementById("modal-heading");
+        elements.modalKicker = document.getElementById("modal-kicker");
+        elements.modalHeaderIconWrap = document.getElementById("modal-header-icon-wrap");
         elements.modalCloseBtn = document.getElementById("modal-close-btn");
-        elements.modalCancelBtn = document.getElementById("modal-cancel-btn");
-        elements.modalSaveBtn = document.getElementById("modal-save-btn");
-        elements.modalTitleInput = document.getElementById("modal-deadline-title");
-        elements.modalDateInput = document.getElementById("modal-deadline-date");
-        elements.modalTimeInput = document.getElementById("modal-deadline-time");
-        elements.categoryPills = Array.from(document.querySelectorAll(".category-pill"));
-        elements.priorityRadios = Array.from(document.querySelectorAll("input[name='deadline-priority']"));
+        elements.modalCancelBtns = Array.from(document.querySelectorAll(".modal-btn-cancel"));
+
+        // Forms
+        elements.modalFormDeadline = document.getElementById("modal-form-deadline");
+        elements.modalFormReminder = document.getElementById("modal-form-reminder");
+        elements.modalFormHomework = document.getElementById("modal-form-homework");
+        elements.modalFormProject = document.getElementById("modal-form-project");
+        elements.modalFormEmail = document.getElementById("modal-form-email");
+        elements.modalFormClip = document.getElementById("modal-form-clip");
+
+        // Deadline inputs
+        elements.modalDeadlineSaveBtn = document.getElementById("modal-deadline-save-btn");
+        elements.modalDeadlineTitle = document.getElementById("modal-deadline-title");
+        elements.modalDeadlineDate = document.getElementById("modal-deadline-date");
+        elements.modalDeadlineTime = document.getElementById("modal-deadline-time");
+        elements.deadlineCategoryPills = Array.from(document.querySelectorAll("#deadline-category-pills .category-pill"));
+        elements.deadlinePriorityRadios = Array.from(document.querySelectorAll("input[name='deadline-priority']"));
+
+        // Reminder inputs
+        elements.modalReminderSaveBtn = document.getElementById("modal-reminder-save-btn");
+        elements.modalReminderText = document.getElementById("modal-reminder-text");
+        elements.modalReminderDate = document.getElementById("modal-reminder-date");
+        elements.modalReminderTime = document.getElementById("modal-reminder-time");
+        elements.reminderCategoryPills = Array.from(document.querySelectorAll("#reminder-category-pills .category-pill"));
+        elements.reminderQuickChips = Array.from(document.querySelectorAll(".quick-chip"));
+
+        // Homework inputs
+        elements.modalHomeworkGenBtn = document.getElementById("modal-homework-gen-btn");
+        elements.modalHomeworkTitle = document.getElementById("modal-homework-title");
+        elements.modalHomeworkInstructions = document.getElementById("modal-homework-instructions");
+        elements.modalHomeworkPath = document.getElementById("modal-homework-path");
+        elements.homeworkFormatPills = Array.from(document.querySelectorAll("#homework-format-pills .category-pill"));
+
+        // Project inputs
+        elements.modalProjectScaffoldBtn = document.getElementById("modal-project-scaffold-btn");
+        elements.modalProjectName = document.getElementById("modal-project-name");
+        elements.modalProjectVision = document.getElementById("modal-project-vision");
+        elements.modalProjectPath = document.getElementById("modal-project-path");
+        elements.projectStackPills = Array.from(document.querySelectorAll("#project-stack-pills .category-pill"));
+
+        // Email inputs
+        elements.modalEmailSendBtn = document.getElementById("modal-email-send-btn");
+        elements.modalEmailTo = document.getElementById("modal-email-to");
+        elements.modalEmailSubject = document.getElementById("modal-email-subject");
+        elements.modalEmailBody = document.getElementById("modal-email-body");
+
+        // Clip inputs
+        elements.modalClipRenderBtn = document.getElementById("modal-clip-render-btn");
+        elements.modalClipSource = document.getElementById("modal-clip-source");
+        elements.modalClipStart = document.getElementById("modal-clip-start");
+        elements.modalClipEnd = document.getElementById("modal-clip-end");
+        elements.modalClipTitle = document.getElementById("modal-clip-title");
+        elements.clipFormatPills = Array.from(document.querySelectorAll("#clip-format-pills .category-pill"));
     }
 
     function bindEvents() {
@@ -93,25 +142,52 @@
             elements.saveSettingsBtn.addEventListener("click", handleSaveSettings);
         }
 
-        // Modal category pill clicks
-        if (elements.categoryPills) {
-            elements.categoryPills.forEach((pill) => {
+        // Generic Category / Format / Stack Pill bindings
+        document.querySelectorAll(".category-pills").forEach((group) => {
+            group.querySelectorAll(".category-pill").forEach((pill) => {
                 pill.addEventListener("click", () => {
-                    elements.categoryPills.forEach((p) => p.classList.remove("active"));
+                    group.querySelectorAll(".category-pill").forEach((p) => p.classList.remove("active"));
                     pill.classList.add("active");
+                });
+            });
+        });
+
+        // Quick Preset Chips for Reminders
+        if (elements.reminderQuickChips) {
+            elements.reminderQuickChips.forEach((chip) => {
+                chip.addEventListener("click", () => {
+                    const offset = chip.dataset.offset;
+                    applyReminderQuickPreset(offset);
                 });
             });
         }
 
-        // Modal action buttons
+        // Modal Action & Dismiss Handlers
         if (elements.modalCloseBtn) {
             elements.modalCloseBtn.addEventListener("click", handleDismissModal);
         }
-        if (elements.modalCancelBtn) {
-            elements.modalCancelBtn.addEventListener("click", handleDismissModal);
+        if (elements.modalCancelBtns) {
+            elements.modalCancelBtns.forEach((btn) => btn.addEventListener("click", handleDismissModal));
         }
-        if (elements.modalSaveBtn) {
-            elements.modalSaveBtn.addEventListener("click", handleSaveDeadlineModal);
+
+        // Save / Trigger Buttons for all 6 modals
+        if (elements.modalDeadlineSaveBtn) {
+            elements.modalDeadlineSaveBtn.addEventListener("click", handleSaveDeadlineModal);
+        }
+        if (elements.modalReminderSaveBtn) {
+            elements.modalReminderSaveBtn.addEventListener("click", handleSaveReminderModal);
+        }
+        if (elements.modalHomeworkGenBtn) {
+            elements.modalHomeworkGenBtn.addEventListener("click", handleGenerateHomeworkModal);
+        }
+        if (elements.modalProjectScaffoldBtn) {
+            elements.modalProjectScaffoldBtn.addEventListener("click", handleScaffoldProjectModal);
+        }
+        if (elements.modalEmailSendBtn) {
+            elements.modalEmailSendBtn.addEventListener("click", handleSendEmailModal);
+        }
+        if (elements.modalClipRenderBtn) {
+            elements.modalClipRenderBtn.addEventListener("click", handleRenderClipModal);
         }
 
         // Password visibility toggles
@@ -471,38 +547,14 @@
         }
 
         // Handle Situational Interactive Modals
-        if (payload.active_modal && payload.active_modal.type === "deadline") {
+        if (payload.active_modal && payload.active_modal.type) {
+            const modalType = payload.active_modal.type;
             const modalData = payload.active_modal.data || {};
             const isNewModal = !state.activeModal || (state.activeModal.data && state.activeModal.data.id !== modalData.id);
 
             if (isNewModal) {
                 state.activeModal = payload.active_modal;
-                if (elements.modalTitleInput) elements.modalTitleInput.value = modalData.title || "";
-                if (elements.modalDateInput) elements.modalDateInput.value = modalData.due_date || "";
-                if (elements.modalTimeInput) elements.modalTimeInput.value = modalData.due_time || "23:59";
-
-                // Category pill selection
-                const targetCat = modalData.category || "School";
-                if (elements.categoryPills) {
-                    elements.categoryPills.forEach((p) => {
-                        p.classList.toggle("active", p.dataset.category === targetCat);
-                    });
-                }
-
-                // Priority radio selection
-                const targetPriority = modalData.priority || "Normal";
-                if (elements.priorityRadios) {
-                    elements.priorityRadios.forEach((r) => {
-                        r.checked = (r.value === targetPriority);
-                    });
-                }
-
-                if (elements.modalOverlay) {
-                    elements.modalOverlay.hidden = false;
-                    window.setTimeout(() => {
-                        if (elements.modalTitleInput) elements.modalTitleInput.focus();
-                    }, 120);
-                }
+                showSituationalModal(modalType, modalData);
             }
         } else if (!payload.active_modal && state.activeModal) {
             state.activeModal = null;
@@ -512,46 +564,340 @@
         }
     }
 
-    // ─── Modal Actions ────────────────────────────────────────────────────────
+    function showSituationalModal(type, data) {
+        // Hide all forms first
+        const allForms = [
+            elements.modalFormDeadline,
+            elements.modalFormReminder,
+            elements.modalFormHomework,
+            elements.modalFormProject,
+            elements.modalFormEmail,
+            elements.modalFormClip
+        ];
+        allForms.forEach((f) => { if (f) f.hidden = true; });
+
+        if (type === "deadline") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "Add / Edit Deadline";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Deadlines Workflow";
+            if (elements.modalDeadlineTitle) elements.modalDeadlineTitle.value = data.title || "";
+            if (elements.modalDeadlineDate) elements.modalDeadlineDate.value = data.due_date || "";
+            if (elements.modalDeadlineTime) elements.modalDeadlineTime.value = data.due_time || "23:59";
+
+            const targetCat = data.category || "School";
+            if (elements.deadlineCategoryPills) {
+                elements.deadlineCategoryPills.forEach((p) => {
+                    p.classList.toggle("active", p.dataset.category === targetCat);
+                });
+            }
+            const targetPriority = data.priority || "Normal";
+            if (elements.deadlinePriorityRadios) {
+                elements.deadlinePriorityRadios.forEach((r) => {
+                    r.checked = (r.value === targetPriority);
+                });
+            }
+            if (elements.modalFormDeadline) elements.modalFormDeadline.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
+            window.setTimeout(() => elements.modalDeadlineTitle && elements.modalDeadlineTitle.focus(), 120);
+
+        } else if (type === "reminder") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "Set Reminder / Schedule";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Voice Reminders";
+            if (elements.modalReminderText) elements.modalReminderText.value = data.title || data.text || "";
+            if (elements.modalReminderDate) elements.modalReminderDate.value = data.target_date || data.due_date || getTodayDateStr();
+            if (elements.modalReminderTime) elements.modalReminderTime.value = data.target_time || data.due_time || "12:00";
+
+            const targetCat = data.category || "Task";
+            if (elements.reminderCategoryPills) {
+                elements.reminderCategoryPills.forEach((p) => {
+                    p.classList.toggle("active", p.dataset.category === targetCat);
+                });
+            }
+            if (elements.modalFormReminder) elements.modalFormReminder.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
+            window.setTimeout(() => elements.modalReminderText && elements.modalReminderText.focus(), 120);
+
+        } else if (type === "homework") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "Generate Academic Document";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Homework Engine (.docx)";
+            if (elements.modalHomeworkTitle) elements.modalHomeworkTitle.value = data.subject || data.title || "";
+            if (elements.modalHomeworkInstructions) elements.modalHomeworkInstructions.value = data.instructions || data.outline || "";
+            if (elements.modalHomeworkPath) elements.modalHomeworkPath.value = data.output_path || "C:\\MakiSync Storage\\School";
+
+            const targetFormat = data.format || "Standard Academic";
+            if (elements.homeworkFormatPills) {
+                elements.homeworkFormatPills.forEach((p) => {
+                    p.classList.toggle("active", p.dataset.format === targetFormat);
+                });
+            }
+            if (elements.modalFormHomework) elements.modalFormHomework.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
+            window.setTimeout(() => elements.modalHomeworkTitle && elements.modalHomeworkTitle.focus(), 120);
+
+        } else if (type === "new_project") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "Scaffold New Project";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Project Architecture";
+            if (elements.modalProjectName) elements.modalProjectName.value = data.name || data.title || "";
+            if (elements.modalProjectVision) elements.modalProjectVision.value = data.vision || data.description || "";
+            if (elements.modalProjectPath) elements.modalProjectPath.value = data.target_path || "c:\\development\\Python";
+
+            const targetStack = data.stack || "Vite + React";
+            if (elements.projectStackPills) {
+                elements.projectStackPills.forEach((p) => {
+                    p.classList.toggle("active", p.dataset.stack === targetStack);
+                });
+            }
+            if (elements.modalFormProject) elements.modalFormProject.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
+            window.setTimeout(() => elements.modalProjectName && elements.modalProjectName.focus(), 120);
+
+        } else if (type === "composio_email") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "Compose Email (Gmail)";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Cloud Workspace";
+            if (elements.modalEmailTo) elements.modalEmailTo.value = data.to || "";
+            if (elements.modalEmailSubject) elements.modalEmailSubject.value = data.subject || "";
+            if (elements.modalEmailBody) elements.modalEmailBody.value = data.body || "";
+
+            if (elements.modalFormEmail) elements.modalFormEmail.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
+            window.setTimeout(() => elements.modalEmailTo && elements.modalEmailTo.focus(), 120);
+
+        } else if (type === "clip") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "DeepClip Video Slicer";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Video Intelligence";
+            if (elements.modalClipSource) elements.modalClipSource.value = data.source_path || "C:\\MakiSync Storage\\MakiAI\\Recordings\\latest.mp4";
+            if (elements.modalClipStart) elements.modalClipStart.value = data.start_time || "00:00";
+            if (elements.modalClipEnd) elements.modalClipEnd.value = data.end_time || "00:45";
+            if (elements.modalClipTitle) elements.modalClipTitle.value = data.title || "Viral Clip 01";
+
+            const targetRatio = data.ratio || "9:16";
+            if (elements.clipFormatPills) {
+                elements.clipFormatPills.forEach((p) => {
+                    p.classList.toggle("active", p.dataset.ratio === targetRatio);
+                });
+            }
+            if (elements.modalFormClip) elements.modalFormClip.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
+            window.setTimeout(() => elements.modalClipTitle && elements.modalClipTitle.focus(), 120);
+        }
+    }
+
+    function applyReminderQuickPreset(offset) {
+        const now = new Date();
+        if (offset === "15m") {
+            now.setMinutes(now.getMinutes() + 15);
+        } else if (offset === "30m") {
+            now.setMinutes(now.getMinutes() + 30);
+        } else if (offset === "1h") {
+            now.setHours(now.getHours() + 1);
+        } else if (offset === "tonight") {
+            now.setHours(20, 0, 0, 0);
+        } else if (offset === "tomorrow") {
+            now.setDate(now.getDate() + 1);
+            now.setHours(9, 0, 0, 0);
+        }
+
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const dd = String(now.getDate()).padStart(2, "0");
+        const hh = String(now.getHours()).padStart(2, "0");
+        const min = String(now.getMinutes()).padStart(2, "0");
+
+        if (elements.modalReminderDate) elements.modalReminderDate.value = `${yyyy}-${mm}-${dd}`;
+        if (elements.modalReminderTime) elements.modalReminderTime.value = `${hh}:${min}`;
+    }
+
+    function getTodayDateStr() {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const dd = String(now.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // ─── Modal Submissions ───────────────────────────────────────────────────
 
     async function handleSaveDeadlineModal() {
         if (!state.bridge || typeof state.bridge.save_deadline !== "function") {
-            if (elements.modalOverlay) elements.modalOverlay.hidden = true;
-            state.activeModal = null;
+            handleDismissModal();
             return;
         }
 
-        const activePill = elements.categoryPills ? elements.categoryPills.find((p) => p.classList.contains("active")) : null;
+        const activePill = elements.deadlineCategoryPills ? elements.deadlineCategoryPills.find((p) => p.classList.contains("active")) : null;
         const category = activePill ? activePill.dataset.category : "School";
-
-        const selectedPriority = elements.priorityRadios ? (elements.priorityRadios.find((r) => r.checked)?.value || "Normal") : "Normal";
+        const selectedPriority = elements.deadlinePriorityRadios ? (elements.deadlinePriorityRadios.find((r) => r.checked)?.value || "Normal") : "Normal";
 
         const payload = {
-            title: elements.modalTitleInput ? elements.modalTitleInput.value.trim() : "New Task",
+            title: elements.modalDeadlineTitle ? elements.modalDeadlineTitle.value.trim() : "New Task",
             category: category,
-            due_date: elements.modalDateInput ? elements.modalDateInput.value.trim() : "",
-            due_time: elements.modalTimeInput ? elements.modalTimeInput.value.trim() : "23:59",
+            due_date: elements.modalDeadlineDate ? elements.modalDeadlineDate.value.trim() : "",
+            due_time: elements.modalDeadlineTime ? elements.modalDeadlineTime.value.trim() : "23:59",
             priority: selectedPriority,
         };
 
-        if (elements.modalSaveBtn) {
-            elements.modalSaveBtn.disabled = true;
-        }
+        if (elements.modalDeadlineSaveBtn) elements.modalDeadlineSaveBtn.disabled = true;
 
         try {
             const res = await state.bridge.save_deadline(payload);
             applyBackendState(res);
-            if (elements.modalOverlay) {
-                elements.modalOverlay.hidden = true;
-            }
+            if (elements.modalOverlay) elements.modalOverlay.hidden = true;
             state.activeModal = null;
             renderAll();
         } catch (err) {
             console.error("[Modal] Save deadline error:", err);
         } finally {
-            if (elements.modalSaveBtn) {
-                elements.modalSaveBtn.disabled = false;
-            }
+            if (elements.modalDeadlineSaveBtn) elements.modalDeadlineSaveBtn.disabled = false;
+        }
+    }
+
+    async function handleSaveReminderModal() {
+        if (!state.bridge || typeof state.bridge.save_reminder !== "function") {
+            handleDismissModal();
+            return;
+        }
+
+        const activePill = elements.reminderCategoryPills ? elements.reminderCategoryPills.find((p) => p.classList.contains("active")) : null;
+        const category = activePill ? activePill.dataset.category : "Task";
+
+        const payload = {
+            title: elements.modalReminderText ? elements.modalReminderText.value.trim() : "Reminder",
+            category: category,
+            target_date: elements.modalReminderDate ? elements.modalReminderDate.value.trim() : "",
+            target_time: elements.modalReminderTime ? elements.modalReminderTime.value.trim() : "12:00",
+        };
+
+        if (elements.modalReminderSaveBtn) elements.modalReminderSaveBtn.disabled = true;
+
+        try {
+            const res = await state.bridge.save_reminder(payload);
+            applyBackendState(res);
+            if (elements.modalOverlay) elements.modalOverlay.hidden = true;
+            state.activeModal = null;
+            renderAll();
+        } catch (err) {
+            console.error("[Modal] Save reminder error:", err);
+        } finally {
+            if (elements.modalReminderSaveBtn) elements.modalReminderSaveBtn.disabled = false;
+        }
+    }
+
+    async function handleGenerateHomeworkModal() {
+        if (!state.bridge || typeof state.bridge.generate_homework !== "function") {
+            handleDismissModal();
+            return;
+        }
+
+        const activePill = elements.homeworkFormatPills ? elements.homeworkFormatPills.find((p) => p.classList.contains("active")) : null;
+        const format = activePill ? activePill.dataset.format : "Standard Academic";
+
+        const payload = {
+            subject: elements.modalHomeworkTitle ? elements.modalHomeworkTitle.value.trim() : "Assignment",
+            instructions: elements.modalHomeworkInstructions ? elements.modalHomeworkInstructions.value.trim() : "",
+            format: format,
+            output_path: elements.modalHomeworkPath ? elements.modalHomeworkPath.value.trim() : "C:\\MakiSync Storage\\School",
+        };
+
+        if (elements.modalHomeworkGenBtn) elements.modalHomeworkGenBtn.disabled = true;
+
+        try {
+            const res = await state.bridge.generate_homework(payload);
+            applyBackendState(res);
+            if (elements.modalOverlay) elements.modalOverlay.hidden = true;
+            state.activeModal = null;
+            renderAll();
+        } catch (err) {
+            console.error("[Modal] Homework gen error:", err);
+        } finally {
+            if (elements.modalHomeworkGenBtn) elements.modalHomeworkGenBtn.disabled = false;
+        }
+    }
+
+    async function handleScaffoldProjectModal() {
+        if (!state.bridge || typeof state.bridge.scaffold_project !== "function") {
+            handleDismissModal();
+            return;
+        }
+
+        const activePill = elements.projectStackPills ? elements.projectStackPills.find((p) => p.classList.contains("active")) : null;
+        const stack = activePill ? activePill.dataset.stack : "Vite + React";
+
+        const payload = {
+            name: elements.modalProjectName ? elements.modalProjectName.value.trim() : "NewProject",
+            vision: elements.modalProjectVision ? elements.modalProjectVision.value.trim() : "",
+            stack: stack,
+            target_path: elements.modalProjectPath ? elements.modalProjectPath.value.trim() : "c:\\development\\Python",
+        };
+
+        if (elements.modalProjectScaffoldBtn) elements.modalProjectScaffoldBtn.disabled = true;
+
+        try {
+            const res = await state.bridge.scaffold_project(payload);
+            applyBackendState(res);
+            if (elements.modalOverlay) elements.modalOverlay.hidden = true;
+            state.activeModal = null;
+            renderAll();
+        } catch (err) {
+            console.error("[Modal] Project scaffold error:", err);
+        } finally {
+            if (elements.modalProjectScaffoldBtn) elements.modalProjectScaffoldBtn.disabled = false;
+        }
+    }
+
+    async function handleSendEmailModal() {
+        if (!state.bridge || typeof state.bridge.send_email !== "function") {
+            handleDismissModal();
+            return;
+        }
+
+        const payload = {
+            to: elements.modalEmailTo ? elements.modalEmailTo.value.trim() : "",
+            subject: elements.modalEmailSubject ? elements.modalEmailSubject.value.trim() : "No Subject",
+            body: elements.modalEmailBody ? elements.modalEmailBody.value.trim() : "",
+        };
+
+        if (elements.modalEmailSendBtn) elements.modalEmailSendBtn.disabled = true;
+
+        try {
+            const res = await state.bridge.send_email(payload);
+            applyBackendState(res);
+            if (elements.modalOverlay) elements.modalOverlay.hidden = true;
+            state.activeModal = null;
+            renderAll();
+        } catch (err) {
+            console.error("[Modal] Send email error:", err);
+        } finally {
+            if (elements.modalEmailSendBtn) elements.modalEmailSendBtn.disabled = false;
+        }
+    }
+
+    async function handleRenderClipModal() {
+        if (!state.bridge || typeof state.bridge.render_clip !== "function") {
+            handleDismissModal();
+            return;
+        }
+
+        const activePill = elements.clipFormatPills ? elements.clipFormatPills.find((p) => p.classList.contains("active")) : null;
+        const ratio = activePill ? activePill.dataset.ratio : "9:16";
+
+        const payload = {
+            source_path: elements.modalClipSource ? elements.modalClipSource.value.trim() : "",
+            start_time: elements.modalClipStart ? elements.modalClipStart.value.trim() : "00:00",
+            end_time: elements.modalClipEnd ? elements.modalClipEnd.value.trim() : "00:45",
+            title: elements.modalClipTitle ? elements.modalClipTitle.value.trim() : "Highlight Clip",
+            ratio: ratio,
+        };
+
+        if (elements.modalClipRenderBtn) elements.modalClipRenderBtn.disabled = true;
+
+        try {
+            const res = await state.bridge.render_clip(payload);
+            applyBackendState(res);
+            if (elements.modalOverlay) elements.modalOverlay.hidden = true;
+            state.activeModal = null;
+            renderAll();
+        } catch (err) {
+            console.error("[Modal] Render clip error:", err);
+        } finally {
+            if (elements.modalClipRenderBtn) elements.modalClipRenderBtn.disabled = false;
         }
     }
 
