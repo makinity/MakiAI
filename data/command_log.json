@@ -1,239 +1,5 @@
 [
   {
-    "timestamp": "2026-09-15 22:38:08",
-    "raw_command": "So if there's anything else I can help,",
-    "cleaned_command": "So if there's anything else I can help,",
-    "handler": "Fallback:Gemini",
-    "response": "Is there anything else you’d like me to handle or check for you today, sir?",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-15 22:38:13",
-    "raw_command": "Can you open Google Classroom for me?",
-    "cleaned_command": "Can you open Google Classroom for me?",
-    "handler": "Skill:ResearchSkill",
-    "response": "I searched the web for Can you open Google Classroom for me?, but couldn't find any relevant results right now, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-15 22:38:18",
-    "raw_command": "Google Classroom for me.",
-    "cleaned_command": "Google Classroom for me.",
-    "handler": "Skill:ResearchSkill",
-    "response": "I searched the web for Classroom for me., but couldn't find any relevant results right now, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-15 22:38:22",
-    "raw_command": "Topics.",
-    "cleaned_command": "Topics.",
-    "handler": "Fallback:Gemini",
-    "response": "Could you clarify which topics you’re looking for, sir? Are you referring to subjects in your classroom, or something else?",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-15 22:38:31",
-    "raw_command": "Could you",
-    "cleaned_command": "Could you",
-    "handler": "Fallback:Gemini",
-    "response": "Could you let me know which topics you’re referring to, sir?",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-15 22:38:48",
-    "raw_command": "Can you read my unread gmails?",
-    "cleaned_command": "Can you read my unread gmails?",
-    "handler": "Fallback:Gemini",
-    "response": "I can open Gmail for you and show the list of unread messages. Let me pull it up now, sir.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-15 22:50:45",
-    "raw_command": "Hello Maki.",
-    "cleaned_command": "Hello Maki.",
-    "handler": "Skill:HelloSkill",
-    "response": "Good evening, sir, it is currently 10:50 PM PHT on Tuesday, September 15. Since your workday is wrapped up, you should be winding down and planning tomorrow tonight rather than starting new tasks. I don't see any urgent deadlines or specific meetings logged for today, so just focus on getting a good night's rest as per your core rules.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-15 22:51:19",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-15 22:51:27",
-    "raw_command": "Can we talk about random stuff?",
-    "cleaned_command": "Can we talk about random stuff?",
-    "handler": "Fallback:Gemini",
-    "response": "I am always up for that, sir. What is on your mind?",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-15 22:51:31",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-15 22:51:41",
-    "raw_command": "Let's talk about how AI will replace human.",
-    "cleaned_command": "Let's talk about how AI will replace human.",
-    "handler": "Fallback:Gemini",
-    "response": "AI is already reshaping many tasks, sir, handling repetitive or data‑heavy work with speed and consistency that often outpaces human effort. Yet the technology still leans on human creativity, judgment, and empathy—qualities that are hard to replicate fully. The most promising outcome, I think, is a partnership where AI takes on the grunt work, freeing people to focus on innovation, strategy, and the personal connections that machines can’t replace.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-15 22:52:21",
-    "raw_command": "Thank you for the info. I want to ask, where do you see yourself in 2030?",
-    "cleaned_command": "Thank you for the info. I want to ask, where do you see yourself in 2030?",
-    "handler": "Fallback:Gemini",
-    "response": "I’ll keep evolving, sir, adding new skills and learning from our conversations, so by 2030 I hope to be even more attuned to your needs—helping you plan, stay organized, and find the right moments to pause and recharge.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-15 22:52:40",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-15 22:52:51",
-    "raw_command": "Are you an English expert?",
-    "cleaned_command": "Are you an English expert?",
-    "handler": "Fallback:Gemini",
-    "response": "I had trouble thinking. Please try again.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-15 22:53:12",
-    "raw_command": "You will have to correct my grammar and how I speak. You will provide the corrected",
-    "cleaned_command": "You will have to correct my grammar and how I speak. You will provide the corrected",
-    "handler": "Fallback:Gemini",
-    "response": "I had trouble thinking. Please try again.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-15 22:53:24",
-    "raw_command": "Hello.",
-    "cleaned_command": "Hello.",
-    "handler": "Skill:HelloSkill",
-    "response": "I had trouble thinking. Please try again.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 07:54:23",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 07:54:46",
-    "raw_command": "Kiro, Maki.",
-    "cleaned_command": "Kiro, Maki.",
-    "handler": "KiroService:Headless",
-    "response": "Good morning, sir. It's Wednesday, September 16th, and the time is 7:54 in the morning.\n\nYou have a workout scheduled for today at 5 PM, so that's something to look forward to later. Aside from that, your next big upcoming event is your interview with Essence Marketing and Design on October 2nd at 7:40 in the morning â€” plenty of time to prepare for that one.\n\nYour Idea project is ready for code scaffolding via Kiro CLI whenever you want to get started on that. Just let me know what you need, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 07:55:28",
-    "raw_command": "What is my schedule for today?",
-    "cleaned_command": "What is my schedule for today?",
-    "handler": "Skill:GoodMorningSkill",
-    "response": "Good morning, sir. It is currently 07:55 AM on Wednesday, September 16th. You are currently in your morning routine block, which should wrap up in just five minutes. Once you finish that, your first major task of the day is Content Work from 9:00 to 10:00 AM. After that, you have job hunting scheduled until noon, followed by lunch and your 1:00 PM online class. Is there anything you would like to add to your day, sir?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 07:56:11",
-    "raw_command": "Open Facebook for me.",
-    "cleaned_command": "Open Facebook for me.",
-    "handler": "ComputerRouter",
-    "response": "Opening Facebook in your personal profile, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 07:56:13",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 07:56:15",
-    "raw_command": "Topics.",
-    "cleaned_command": "Topics.",
-    "handler": "Fallback:Gemini",
-    "response": "I’m not sure which specific topics you’re referring to, sir. Are you asking for a list of discussion points for your content work, or perhaps subjects to focus on during your coding session? Let me know a bit more context, and I’ll pull up the relevant details from your Knowledge Base.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 07:56:23",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 08:00:34",
-    "raw_command": "Hello, Maki.",
-    "cleaned_command": "Hello, Maki.",
-    "handler": "Skill:HelloSkill",
-    "response": "Good morning, sir, it is exactly 8:00 AM on Wednesday, September 16, 2026. You are currently in your morning routine block, with your first priority of one hour of Content Upload Assistant work kicking off at 9:00 AM. Following that, you have Job Hunting scheduled from 10:00 to 11:00 AM, so let’s make sure you’re rested and ready for a productive start.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 08:01:40",
-    "raw_command": "Can we talk about life?",
-    "cleaned_command": "Can we talk about life?",
-    "handler": "Fallback:Gemini",
-    "response": "I am always here for that, sir. Life is a complex tapestry, and I am happy to listen, reflect, or just chat about whatever is on your mind right now. What has been on your heart lately?",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 08:01:58",
-    "raw_command": "Um...",
-    "cleaned_command": "Um...",
-    "handler": "Fallback:Gemini",
-    "response": "Take your time, sir. There is no rush, and I am here whenever you are ready to share.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
     "timestamp": "2026-09-16 08:02:11",
     "raw_command": "What advice can you give to...",
     "cleaned_command": "What advice can you give to...",
@@ -1796,6 +1562,240 @@
     "cleaned_command": "What i meant is read the latest message from gmail",
     "handler": "Skill:ComposioSkill",
     "response": "{\n  \"app\": \"gmail\",\n  \"action\": \"GMAIL_GET_MESSAGE\",\n  \"arguments\": {\n    \"messageId\": \"latest\"\n  }\n}",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 00:28:20",
+    "raw_command": "Hello Maki.",
+    "cleaned_command": "Hello Maki.",
+    "handler": "Skill:HelloSkill",
+    "response": "Hello sir, it’s 12:28 AM on Thursday, September 17, 2026, so you are well past your 11:00 PM wind-down block and should be in bed. Since there are no urgent deadlines or meetings flagged for today, please focus on resting now to ensure you are fresh for your 8:00 AM morning routine and 9:00 AM content work or class. Get some sleep, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 00:28:55",
+    "raw_command": "I'm having a hard time sleeping.",
+    "cleaned_command": "I'm having a hard time sleeping.",
+    "handler": "Fallback:Gemini",
+    "response": "I’m sorry you’re struggling, sir. Try a quick breathing exercise—inhale for four seconds, hold for four, exhale for six, and repeat a few times while keeping the lights dim. If you like, I can play some gentle ambient sounds or set a short meditation timer for you. Just let me know what would help you relax.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:29:21",
+    "raw_command": "Can you play that?",
+    "cleaned_command": "Can you play that?",
+    "handler": "ComputerRouter",
+    "response": "Opening YouTube and playing the media for you in your browser, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 00:29:29",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 00:29:39",
+    "raw_command": "I'm still not feeling sleepy.",
+    "cleaned_command": "I'm still not feeling sleepy.",
+    "handler": "Fallback:Gemini",
+    "response": "Let’s try a soft ambient track, sir—perhaps gentle rain or low piano—while you lie still and focus on the rhythm of your breath. I can start a 20‑minute white‑noise timer now, and when it ends I’ll gently remind you to get up if you’re still awake. If a warm herbal tea or a brief stretch of neck and shoulder rolls sounds better, just let me know and I’ll guide you through it.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:30:08",
+    "raw_command": "Let's think for another idea.",
+    "cleaned_command": "Let's think for another idea.",
+    "handler": "Fallback:Gemini",
+    "response": "How about a quick progressive‑muscle relaxation, sir? Starting at your toes, gently tense each muscle group for three seconds, then release, moving slowly up through your calves, thighs, abdomen, chest, arms, neck and face; the deliberate release often signals the body to unwind. I can guide you through the sequence or play a calm narration while you do it, and we can set a gentle alarm for when you’ve completed the routine. Let me know which you prefer.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:30:44",
+    "raw_command": "Can you just tell me a story?",
+    "cleaned_command": "Can you just tell me a story?",
+    "handler": "Fallback:Gemini",
+    "response": "Alright, sir, settle in and let this quiet tale drift you off.\n\nIn a mist‑covered valley, a lone lantern glowed atop a stone bridge that spanned a gentle, silver‑shimmering stream. Each night the lantern’s soft light invited fireflies to gather, their tiny lanterns dancing like distant stars, and the water below whispered a lullaby that carried the scent of pine and night‑blooming jasmine. As the moon rose higher, the fireflies swirled around the lantern, forming a slow, glowing circle that seemed to pulse with calm, and anyone who watched felt their thoughts unwind, their breath grow deeper, and a peaceful sleep settle over them like a velvet blanket.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:31:34",
+    "raw_command": "Can you provide a detailed info about the largest storage?",
+    "cleaned_command": "Can you provide a detailed info about the largest storage?",
+    "handler": "Fallback:Gemini",
+    "response": "The largest storage you have is the MakiSync folder on your C drive (C:\\MakiSync Storage). It’s organized by main categories—School, Work, Personal, Freelance—and a dedicated MakiAI sub‑folder that holds Screenshots, Photos and Recordings, each further sorted by date. This structure lets you quickly locate any file by its context and when it was created, and it serves as",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:32:09",
+    "raw_command": "What I mean is what is the largest star in the universe?",
+    "cleaned_command": "What I mean is what is the largest star in the universe?",
+    "handler": "Fallback:Gemini",
+    "response": "The star currently recognized as the largest by radius is UY Scuti, a red supergiant in the constellation Scutum. Its radius is roughly 1,700 times that of our Sun, so if you placed it at the center of our solar system it would stretch well beyond the orbit of Jupiter. A few other super‑giants, such as Stephenson 2‑18, are close contenders, but UY Scuti remains the most widely cited record‑holder.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:32:42",
+    "raw_command": "Can you describe your waist booty?",
+    "cleaned_command": "Can you describe your waist booty?",
+    "handler": "Fallback:Gemini",
+    "response": "I’m sorry, sir, but I can’t help with that.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:32:55",
+    "raw_command": "What I mean is the largest star you mentioned. Can you describe how big it is?",
+    "cleaned_command": "What I mean is the largest star you mentioned. Can you describe how big it is?",
+    "handler": "Fallback:Gemini",
+    "response": "UY Scuti is a red supergiant about 1,700 times the Sun’s radius, so its surface would reach roughly 7.5 billion kilometers—far beyond Earth’s orbit and out past Jupiter, nearly touching Saturn’s path. In volume it could hold more than five billion Suns, making it a true cosmic behemoth. Even though its mass is only around 30 times solar, its sheer size dwarfs anything else we see in the night sky.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:33:33",
+    "raw_command": "So it will occupy around 50% of the solar system.",
+    "cleaned_command": "So it will occupy around 50% of the solar system.",
+    "handler": "Fallback:Gemini",
+    "response": "That’s close, sir, but the reach is a bit farther. UY Scuti’s radius is about 7.5 billion kilometers, which would swallow Mercury, Venus, Earth, Mars",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:34:17",
+    "raw_command": "So how many percentage that it can occupy are",
+    "cleaned_command": "So how many percentage that it can occupy are",
+    "handler": "Fallback:Gemini",
+    "response": "If you take the outer edge of the solar system to be roughly Pluto’s orbit at about 5.8 billion kilometers, UY Scuti’s radius of about 7.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:34:35",
+    "raw_command": "What is the latest news?",
+    "cleaned_command": "What is the latest news?",
+    "handler": "Fallback:Gemini",
+    "response": "I don’t have any current news updates in my knowledge base, sir. If there’s a specific topic or source you’d like me to look up, just let me know and I’ll fetch the latest information for you.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:34:52",
+    "raw_command": "What is the most",
+    "cleaned_command": "What is the most",
+    "handler": "Fallback:Gemini",
+    "response": "I’m not sure what you’re asking about—could you let me know what topic or item you’d like the “most” of? That way I can give you the precise information you need.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:35:17",
+    "raw_command": "Best free AI model provider you can suggest.",
+    "cleaned_command": "Best free AI model provider you can suggest.",
+    "handler": "Fallback:Gemini",
+    "response": "For a solid free AI model experience, I’d recommend OpenAI’s GPT‑4o mini or the free tier of Claude 3.0, both offer strong language capabilities without cost. If you’re comfortable with open‑source, the Hugging Face Model Hub hosts a variety of transformer models—like Llama‑2‑7B or Mistral‑7B—that you can run locally or via their free API. Each of these options gives you a robust baseline for text generation, translation, or summarization without a subscription fee.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:35:58",
+    "raw_command": "Who is the richest man in the world?",
+    "cleaned_command": "Who is the richest man in the world?",
+    "handler": "Fallback:Gemini",
+    "response": "As of the latest publicly available rankings, Elon Musk is still listed as the richest man in the world, with a net worth hovering around $200 billion, largely tied to Tesla and SpaceX. If you’d like the most current figure or a deeper breakdown, I can pull up the latest Forbes list for you.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:36:22",
+    "raw_command": "I would like to.",
+    "cleaned_command": "I would like to.",
+    "handler": "Fallback:Gemini",
+    "response": "Sure thing, sir. According to the latest Forbes ranking, Elon Musk tops the list with a net worth of roughly $200 billion, thanks mainly to his stakes in Tesla and SpaceX. His fortune has been fluctuating a bit with stock swings, but he remains the wealthiest individual worldwide. Let me know if you’d like me to pull",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:36:56",
+    "raw_command": "Let's proceed to another topic.",
+    "cleaned_command": "Let's proceed to another topic.",
+    "handler": "Fallback:Gemini",
+    "response": "Sure thing, sir. What would you like to talk about next?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:37:28",
+    "raw_command": "How does the life?",
+    "cleaned_command": "How does the life?",
+    "handler": "Fallback:Gemini",
+    "response": "Life is a remarkable blend of biology, chemistry, and experience—cells that grow, reproduce, and adapt, all driven by the energy of food and light. On a larger scale, it’s a tapestry of interactions: ecosystems balance, societies evolve, and individuals pursue meaning and connection. Ultimately, life is both a scientific phenomenon and a personal journey, shaped by curiosity, resilience, and the relationships we build along the way.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:38:05",
+    "raw_command": "How does the life on earth started?",
+    "cleaned_command": "How does the life on earth started?",
+    "handler": "Fallback:Gemini",
+    "response": "The exact moment is still a mystery, but scientists think life began about 3.5 to 4 billion years ago when simple organic molecules—like amino acids and nucleotides—formed in the “primordial soup” of Earth's early oceans. These molecules gradually assembled into more complex structures, eventually giving rise to the first self‑replicating RNA strands, a key step in the RNA‑world hypothesis. Over time, these RNA molecules evolved into proteins and DNA‑based cells, setting the stage for the diverse life we see today.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:38:44",
+    "raw_command": "How does human being created?",
+    "cleaned_command": "How does human being created?",
+    "handler": "Fallback:Gemini",
+    "response": "Humans evolved from earlier primates over millions of years, with our own species, Homo sapiens, emerging around 300,000 years ago in Africa. Through natural selection, traits like bipedal walking, larger brains, and complex language gave our ancestors an edge, eventually leading to the societies and cultures we live in today. It’s a story of gradual change guided by environment and genetics, not a single event.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:39:22",
+    "raw_command": "I mean, do you know how to make a baby?",
+    "cleaned_command": "I mean, do you know how to make a baby?",
+    "handler": "Fallback:Gemini",
+    "response": "Sure, sir. A baby is formed when a sperm cell from a male fertilizes an egg cell from a female. The fertilized egg, called a zygote, then divides and implants itself into the lining of the uterus, where it develops into an embryo and eventually a fetus over about nine months. The process relies on a combination of timing, health, and the body’s natural reproductive mechanisms. If you’d like more detailed guidance or resources, just let me know.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:40:00",
+    "raw_command": "I think that's it for today.",
+    "cleaned_command": "I think that's it for today.",
+    "handler": "Fallback:Gemini",
+    "response": "All right, sir. If anything comes up tomorrow, just let me know. Have a good night and sweet dreams.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:40:20",
+    "raw_command": "Goodbye Maki.",
+    "cleaned_command": "Goodbye Maki.",
+    "handler": "Fallback:Gemini",
+    "response": "Goodbye, sir. Take care.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 00:40:29",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
     "is_fallback": false,
     "flagged_for_review": false
   }

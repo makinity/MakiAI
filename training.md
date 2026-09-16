@@ -3542,3 +3542,237 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"{   "app": "gmail",   "action": "GMAIL_GET_MESSAGE",   "arguments": {     "messageId": "latest"   } }"`
 
 ---
+
+### 🔹 Live Session Command — 12:28:20 AM
+* **Spoken / Typed Command:** `"Hello Maki."`
+* **Extracted Payload:** `"Hello Maki."`
+* **Matched Handler:** `Skill:HelloSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Hello sir, it’s 12:28 AM on Thursday, September 17, 2026, so you are well past your 11:00 PM wind-down block and should be in bed. Since the..."`
+
+---
+
+### 🔹 Live Session Command — 12:28:55 AM
+* **Spoken / Typed Command:** `"I'm having a hard time sleeping."`
+* **Extracted Payload:** `"I'm having a hard time sleeping."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I’m sorry you’re struggling, sir. Try a quick breathing exercise—inhale for four seconds, hold for four, exhale for six, and repeat a few ti..."`
+
+---
+
+### 🔹 Live Session Command — 12:29:21 AM
+* **Spoken / Typed Command:** `"Can you play that?"`
+* **Extracted Payload:** `"Can you play that?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening YouTube and playing the media for you in your browser, sir."`
+
+---
+
+### 🔹 Live Session Command — 12:29:29 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 12:29:39 AM
+* **Spoken / Typed Command:** `"I'm still not feeling sleepy."`
+* **Extracted Payload:** `"I'm still not feeling sleepy."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Let’s try a soft ambient track, sir—perhaps gentle rain or low piano—while you lie still and focus on the rhythm of your breath. I can start..."`
+
+---
+
+### 🔹 Live Session Command — 12:30:08 AM
+* **Spoken / Typed Command:** `"Let's think for another idea."`
+* **Extracted Payload:** `"Let's think for another idea."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"How about a quick progressive‑muscle relaxation, sir? Starting at your toes, gently tense each muscle group for three seconds, then release,..."`
+
+---
+
+### 🔹 Live Session Command — 12:30:44 AM
+* **Spoken / Typed Command:** `"Can you just tell me a story?"`
+* **Extracted Payload:** `"Can you just tell me a story?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Alright, sir, settle in and let this quiet tale drift you off.  In a mist‑covered valley, a lone lantern glowed atop a stone bridge that spa..."`
+
+---
+
+### 🔹 Live Session Command — 12:31:34 AM
+* **Spoken / Typed Command:** `"Can you provide a detailed info about the largest storage?"`
+* **Extracted Payload:** `"Can you provide a detailed info about the largest storage?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"The largest storage you have is the MakiSync folder on your C drive (C:\MakiSync Storage). It’s organized by main categories—School, Work, P..."`
+
+---
+
+### 🔹 Live Session Command — 12:32:09 AM
+* **Spoken / Typed Command:** `"What I mean is what is the largest star in the universe?"`
+* **Extracted Payload:** `"What I mean is what is the largest star in the universe?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"The star currently recognized as the largest by radius is UY Scuti, a red supergiant in the constellation Scutum. Its radius is roughly 1,70..."`
+
+---
+
+### 🔹 Live Session Command — 12:32:42 AM
+* **Spoken / Typed Command:** `"Can you describe your waist booty?"`
+* **Extracted Payload:** `"Can you describe your waist booty?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I’m sorry, sir, but I can’t help with that."`
+
+---
+
+### 🔹 Live Session Command — 12:32:55 AM
+* **Spoken / Typed Command:** `"What I mean is the largest star you mentioned. Can you describe how big it is?"`
+* **Extracted Payload:** `"What I mean is the largest star you mentioned. Can you describe how big it is?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"UY Scuti is a red supergiant about 1,700 times the Sun’s radius, so its surface would reach roughly 7.5 billion kilometers—far beyond Earth’..."`
+
+---
+
+### 🔹 Live Session Command — 12:33:33 AM
+* **Spoken / Typed Command:** `"So it will occupy around 50% of the solar system."`
+* **Extracted Payload:** `"So it will occupy around 50% of the solar system."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"That’s close, sir, but the reach is a bit farther. UY Scuti’s radius is about 7.5 billion kilometers, which would swallow Mercury, Venus, Ea..."`
+
+---
+
+### 🔹 Live Session Command — 12:34:17 AM
+* **Spoken / Typed Command:** `"So how many percentage that it can occupy are"`
+* **Extracted Payload:** `"So how many percentage that it can occupy are"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"If you take the outer edge of the solar system to be roughly Pluto’s orbit at about 5.8 billion kilometers, UY Scuti’s radius of about 7."`
+
+---
+
+### 🔹 Live Session Command — 12:34:35 AM
+* **Spoken / Typed Command:** `"What is the latest news?"`
+* **Extracted Payload:** `"What is the latest news?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I don’t have any current news updates in my knowledge base, sir. If there’s a specific topic or source you’d like me to look up, just let me..."`
+
+---
+
+### 🔹 Live Session Command — 12:34:52 AM
+* **Spoken / Typed Command:** `"What is the most"`
+* **Extracted Payload:** `"What is the most"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I’m not sure what you’re asking about—could you let me know what topic or item you’d like the “most” of? That way I can give you the precise..."`
+
+---
+
+### 🔹 Live Session Command — 12:35:17 AM
+* **Spoken / Typed Command:** `"Best free AI model provider you can suggest."`
+* **Extracted Payload:** `"Best free AI model provider you can suggest."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"For a solid free AI model experience, I’d recommend OpenAI’s GPT‑4o mini or the free tier of Claude 3.0, both offer strong language capabili..."`
+
+---
+
+### 🔹 Live Session Command — 12:35:58 AM
+* **Spoken / Typed Command:** `"Who is the richest man in the world?"`
+* **Extracted Payload:** `"Who is the richest man in the world?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"As of the latest publicly available rankings, Elon Musk is still listed as the richest man in the world, with a net worth hovering around $2..."`
+
+---
+
+### 🔹 Live Session Command — 12:36:22 AM
+* **Spoken / Typed Command:** `"I would like to."`
+* **Extracted Payload:** `"I would like to."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure thing, sir. According to the latest Forbes ranking, Elon Musk tops the list with a net worth of roughly $200 billion, thanks mainly to ..."`
+
+---
+
+### 🔹 Live Session Command — 12:36:56 AM
+* **Spoken / Typed Command:** `"Let's proceed to another topic."`
+* **Extracted Payload:** `"Let's proceed to another topic."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure thing, sir. What would you like to talk about next?"`
+
+---
+
+### 🔹 Live Session Command — 12:37:28 AM
+* **Spoken / Typed Command:** `"How does the life?"`
+* **Extracted Payload:** `"How does the life?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Life is a remarkable blend of biology, chemistry, and experience—cells that grow, reproduce, and adapt, all driven by the energy of food and..."`
+
+---
+
+### 🔹 Live Session Command — 12:38:05 AM
+* **Spoken / Typed Command:** `"How does the life on earth started?"`
+* **Extracted Payload:** `"How does the life on earth started?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"The exact moment is still a mystery, but scientists think life began about 3.5 to 4 billion years ago when simple organic molecules—like ami..."`
+
+---
+
+### 🔹 Live Session Command — 12:38:44 AM
+* **Spoken / Typed Command:** `"How does human being created?"`
+* **Extracted Payload:** `"How does human being created?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Humans evolved from earlier primates over millions of years, with our own species, Homo sapiens, emerging around 300,000 years ago in Africa..."`
+
+---
+
+### 🔹 Live Session Command — 12:39:22 AM
+* **Spoken / Typed Command:** `"I mean, do you know how to make a baby?"`
+* **Extracted Payload:** `"I mean, do you know how to make a baby?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure, sir. A baby is formed when a sperm cell from a male fertilizes an egg cell from a female. The fertilized egg, called a zygote, then di..."`
+
+---
+
+### 🔹 Live Session Command — 12:40:00 AM
+* **Spoken / Typed Command:** `"I think that's it for today."`
+* **Extracted Payload:** `"I think that's it for today."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"All right, sir. If anything comes up tomorrow, just let me know. Have a good night and sweet dreams."`
+
+---
+
+### 🔹 Live Session Command — 12:40:20 AM
+* **Spoken / Typed Command:** `"Goodbye Maki."`
+* **Extracted Payload:** `"Goodbye Maki."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Goodbye, sir. Take care."`
+
+---
+
+### 🔹 Live Session Command — 12:40:29 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---

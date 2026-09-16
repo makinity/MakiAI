@@ -311,3 +311,137 @@ class ComposioService:
                 return {"success": False, "error": f"Graph API Error ({r.status_code}): {err_body}"}
         except Exception as e:
             return {"success": False, "error": str(e)}
+
+    def delete_facebook_post(self, post_id: str = "latest", page_name: str = "MakiSync") -> Dict[str, Any]:
+        """Delete the latest post or a specific post on the Facebook Page."""
+        try:
+            import requests
+            pages_res = self.execute_action("FACEBOOK_LIST_MANAGED_PAGES", {})
+            p_list = pages_res.get("data", {}).get("data", []) if pages_res.get("success") else []
+            target_page = next((p for p in p_list if page_name.lower() in p.get("name", "").lower()), p_list[0] if p_list else None)
+            if not target_page:
+                return {"success": False, "error": "No managed Facebook Page found"}
+
+            token = target_page.get("access_token")
+            pid = target_page.get("id")
+
+            target_post_id = post_id
+            if post_id == "latest" or not post_id:
+                posts_res = requests.get(f"https://graph.facebook.com/v20.0/{pid}/posts?limit=1", headers={"Authorization": f"Bearer {token}"}, timeout=10)
+                posts_data = posts_res.json().get("data", [])
+                if not posts_data:
+                    return {"success": False, "error": "No posts found on the page to delete"}
+                target_post_id = posts_data[0].get("id")
+
+            del_res = requests.delete(f"https://graph.facebook.com/v20.0/{target_post_id}", headers={"Authorization": f"Bearer {token}"}, timeout=10)
+            if del_res.status_code == 200 and del_res.json().get("success"):
+                return {"success": True, "post_id": target_post_id}
+            else:
+                # Try Composio tool
+                comp_res = self.execute_action("FACEBOOK_DELETE_POST", {"post_id": target_post_id})
+                return comp_res
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def create_facebook_comment(self, message_text: str, post_id: str = "latest", page_name: str = "MakiSync") -> Dict[str, Any]:
+        """Post a comment on a Facebook post."""
+        try:
+            import requests
+            pages_res = self.execute_action("FACEBOOK_LIST_MANAGED_PAGES", {})
+            p_list = pages_res.get("data", {}).get("data", []) if pages_res.get("success") else []
+            target_page = next((p for p in p_list if page_name.lower() in p.get("name", "").lower()), p_list[0] if p_list else None)
+            if not target_page:
+                return {"success": False, "error": "No managed Facebook Page found"}
+
+            token = target_page.get("access_token")
+            pid = target_page.get("id")
+
+            target_post_id = post_id
+            if post_id == "latest" or not post_id:
+                posts_res = requests.get(f"https://graph.facebook.com/v20.0/{pid}/posts?limit=1", headers={"Authorization": f"Bearer {token}"}, timeout=10)
+                posts_data = posts_res.json().get("data", [])
+                if not posts_data:
+                    return {"success": False, "error": "No posts found to comment on"}
+                target_post_id = posts_data[0].get("id")
+
+            url = f"https://graph.facebook.com/v20.0/{target_post_id}/comments"
+            r = requests.post(url, data={"message": message_text}, headers={"Authorization": f"Bearer {token}"}, timeout=10)
+            if r.status_code == 200:
+                return {"success": True, "data": r.json(), "post_id": target_post_id}
+            else:
+                return {"success": False, "error": f"Graph API Error: {r.text}"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def edit_facebook_comment(self, new_text: str, comment_id: str = "latest", post_id: str = "latest", page_name: str = "MakiSync") -> Dict[str, Any]:
+        """Edit an existing comment on a Facebook post."""
+        try:
+            import requests
+            pages_res = self.execute_action("FACEBOOK_LIST_MANAGED_PAGES", {})
+            p_list = pages_res.get("data", {}).get("data", []) if pages_res.get("success") else []
+            target_page = next((p for p in p_list if page_name.lower() in p.get("name", "").lower()), p_list[0] if p_list else None)
+            if not target_page:
+                return {"success": False, "error": "No managed Facebook Page found"}
+
+            token = target_page.get("access_token")
+            pid = target_page.get("id")
+
+            target_comment_id = comment_id
+            if comment_id == "latest" or not comment_id:
+                # Find latest post
+                posts_res = requests.get(f"https://graph.facebook.com/v20.0/{pid}/posts?limit=1", headers={"Authorization": f"Bearer {token}"}, timeout=10)
+                posts_data = posts_res.json().get("data", [])
+                if not posts_data:
+                    return {"success": False, "error": "No posts found"}
+                top_pid = posts_data[0].get("id")
+                # Get comments on top post
+                comments_res = requests.get(f"https://graph.facebook.com/v20.0/{top_pid}/comments?limit=1", headers={"Authorization": f"Bearer {token}"}, timeout=10)
+                comm_data = comments_res.json().get("data", [])
+                if not comm_data:
+                    return {"success": False, "error": "No comments found to edit"}
+                target_comment_id = comm_data[0].get("id")
+
+            url = f"https://graph.facebook.com/v20.0/{target_comment_id}"
+            r = requests.post(url, data={"message": new_text}, headers={"Authorization": f"Bearer {token}"}, timeout=10)
+            if r.status_code == 200:
+                return {"success": True, "data": r.json(), "comment_id": target_comment_id}
+            else:
+                return {"success": False, "error": f"Graph API Error: {r.text}"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def delete_facebook_comment(self, comment_id: str = "latest", post_id: str = "latest", page_name: str = "MakiSync") -> Dict[str, Any]:
+        """Delete a comment from a Facebook post."""
+        try:
+            import requests
+            pages_res = self.execute_action("FACEBOOK_LIST_MANAGED_PAGES", {})
+            p_list = pages_res.get("data", {}).get("data", []) if pages_res.get("success") else []
+            target_page = next((p for p in p_list if page_name.lower() in p.get("name", "").lower()), p_list[0] if p_list else None)
+            if not target_page:
+                return {"success": False, "error": "No managed Facebook Page found"}
+
+            token = target_page.get("access_token")
+            pid = target_page.get("id")
+
+            target_comment_id = comment_id
+            if comment_id == "latest" or not comment_id:
+                posts_res = requests.get(f"https://graph.facebook.com/v20.0/{pid}/posts?limit=1", headers={"Authorization": f"Bearer {token}"}, timeout=10)
+                posts_data = posts_res.json().get("data", [])
+                if not posts_data:
+                    return {"success": False, "error": "No posts found"}
+                top_pid = posts_data[0].get("id")
+                comments_res = requests.get(f"https://graph.facebook.com/v20.0/{top_pid}/comments?limit=1", headers={"Authorization": f"Bearer {token}"}, timeout=10)
+                comm_data = comments_res.json().get("data", [])
+                if not comm_data:
+                    return {"success": False, "error": "No comments found to delete"}
+                target_comment_id = comm_data[0].get("id")
+
+            url = f"https://graph.facebook.com/v20.0/{target_comment_id}"
+            r = requests.delete(url, headers={"Authorization": f"Bearer {token}"}, timeout=10)
+            if r.status_code == 200 and r.json().get("success"):
+                return {"success": True, "comment_id": target_comment_id}
+            else:
+                # Try Composio tool
+                return self.execute_action("FACEBOOK_DELETE_COMMENT", {"comment_id": target_comment_id})
+        except Exception as e:
+            return {"success": False, "error": str(e)}

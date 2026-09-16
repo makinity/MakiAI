@@ -77,6 +77,40 @@ class ComposioSkill(BaseSkill):
         if is_read_followup and not any(w in p_lower for w in ("reply", "respond", "send", "draft", "write")):
             return self._handle_read_followup(clean_text)
 
+        # Step 1.6: Facebook Post / Comment Deletion & Editing Direct Interceptions
+        if any(w in p_lower for w in ("facebook", "fb", "makisync", "page", "post", "comment")):
+            # Delete post
+            if any(w in p_lower for w in ("delete", "remove")) and any(w in p_lower for w in ("post", "posts")):
+                del_res = self.composio.delete_facebook_post()
+                if del_res.get("success"):
+                    return "I've successfully deleted the latest post on your MakiSync Facebook page, sir."
+                return f"I had trouble deleting the post, sir: {del_res.get('error', 'Please check permissions')}"
+
+            # Delete comment
+            if any(w in p_lower for w in ("delete", "remove")) and any(w in p_lower for w in ("comment", "comments")):
+                del_comm = self.composio.delete_facebook_comment()
+                if del_comm.get("success"):
+                    return "I've successfully deleted the latest comment from your Facebook post, sir."
+                return f"I had trouble deleting the comment, sir: {del_comm.get('error', 'No comments found')}"
+
+            # Edit comment
+            if any(w in p_lower for w in ("edit", "update", "change")) and any(w in p_lower for w in ("comment", "comments")):
+                new_msg = re.sub(r"^.*?(?:to\s+say|saying|say|to|with)\s+", "", clean_text, flags=re.IGNORECASE).strip(" '\"\t\n\r.")
+                if new_msg:
+                    edit_res = self.composio.edit_facebook_comment(new_msg)
+                    if edit_res.get("success"):
+                        return f"I've updated the comment on your Facebook post to: \"{new_msg}\", sir."
+                    return f"I had trouble updating the comment, sir: {edit_res.get('error', 'No comments found')}"
+
+            # Create comment
+            if any(w in p_lower for w in ("comment on", "add a comment", "post a comment", "leave a comment")):
+                comm_msg = re.sub(r"^.*?(?:saying|say|with|that)\s+", "", clean_text, flags=re.IGNORECASE).strip(" '\"\t\n\r.")
+                if comm_msg:
+                    add_comm = self.composio.create_facebook_comment(comm_msg)
+                    if add_comm.get("success"):
+                        return f"I've posted your comment \"{comm_msg}\" on your latest Facebook post, sir."
+                    return f"I had trouble adding the comment, sir: {add_comm.get('error')}"
+
         is_reply_followup = any(w in p_lower for w in ("reply", "respond", "replying", "send it directly")) or bool(re.search(r"\b(?:draft|write|compose|send)\s+(?:a\s+)?(?:reply|response)\b", p_lower))
         if is_reply_followup:
             return self._handle_reply_followup(clean_text)
@@ -246,17 +280,35 @@ RULES:
         # Deterministic Heuristic Fallbacks (if LLM is offline or in stub mode)
         p_lower = user_prompt.lower()
         if any(w in p_lower for w in ("makisync", "facebook", "fb", "messenger")):
-            if any(w in p_lower for w in ("post", "publish", "create post", "share")):
+            if any(w in p_lower for w in ("post", "publish", "create post", "share")) and not any(w in p_lower for w in ("what", "read", "check", "get")):
                 post_text = re.sub(r"^.*?(?:post|saying|say)\s+", "", user_prompt, flags=re.IGNORECASE).strip(" '\"\t\n\r")
                 return {"app": "facebook", "action": "FACEBOOK_CREATE_POST", "arguments": {"message": post_text or user_prompt, "page_id": "MakiSync"}}
-            if any(w in p_lower for w in ("message", "messages", "inbox", "conversation", "conversations", "unread", "chat", "check", "read", "view")):
+            if any(w in p_lower for w in ("say", "said", "message", "messages", "inbox", "conversation", "conversations", "unread", "chat", "check", "read", "view", "visitor", "user", "who")):
                 return {"app": "facebook", "action": "FACEBOOK_GET_PAGE_CONVERSATIONS", "arguments": {"page_id": "MakiSync"}}
             if any(w in p_lower for w in ("post", "posts", "feed", "timeline")):
                 return {"app": "facebook", "action": "FACEBOOK_GET_PAGE_POSTS", "arguments": {"page_id": "MakiSync"}}
 
         if any(w in p_lower for w in ("gmail", "email", "emails", "inbox", "mail")):
-            if any(w in p_lower for w in ("send", "write", "draft", "compose")):
-                return {"app": "gmail", "action": "GMAIL_SEND_EMAIL", "arguments": {"body": user_prompt}}
+            has_to_email = bool(re.search(r"[\w\.-]+@[\w\.-]+\.\w+", user_prompt))
+            if any(w in p_lower for w in ("send", "write", "draft", "compose", "sample", "test email", "create")) or has_to_email:
+                email_match = re.search(r"[\w\.-]+@[\w\.-]+\.\w+", user_prompt)
+                to_addr = email_match.group(0) if email_match else ""
+                subj_match = re.search(r"\babout\s+(.+)$", user_prompt, re.IGNORECASE)
+                subj = subj_match.group(1).strip() if subj_match else "MakiAI Update"
+                
+                # Clean prompt to create meaningful body if user didn't write a full letter
+                clean_body = re.sub(r"^(?:draft|send|write|compose|sample)\s+(?:an?\s+)?(?:test\s+)?(?:email|gmail|message)\s+(?:to\s+[\w\.-]+@[\w\.-]+\.\w+\s*)?(?:about\s+[^,\.]+)?", "", user_prompt, flags=re.IGNORECASE).strip(" '\"\t\n\r:-")
+                body_content = clean_body if len(clean_body) > 10 else f"Hello,\n\nThis is a sample update sent via MakiAI.\n\nBest regards,\nMark"
+
+                return {
+                    "app": "gmail",
+                    "action": "GMAIL_SEND_EMAIL",
+                    "arguments": {
+                        "recipient_email": to_addr,
+                        "subject": subj,
+                        "body": body_content
+                    }
+                }
             return {"app": "gmail", "action": "GMAIL_FETCH_EMAILS", "arguments": {}}
 
         if any(w in p_lower for w in ("calendar", "gcal", "meeting", "events")):
@@ -286,7 +338,12 @@ RULES:
     def _handle_read_followup(self, user_prompt: str) -> str:
         """Read the full content / body of the latest email or Facebook message."""
         p_lower = user_prompt.lower()
-        target_app = "facebook" if any(w in p_lower for w in ("facebook", "messenger", "fb", "page", "makisync")) else "gmail"
+        if any(w in p_lower for w in ("facebook", "messenger", "fb", "page", "makisync")):
+            target_app = "facebook"
+        elif any(w in p_lower for w in ("gmail", "email", "emails", "inbox", "mail")):
+            target_app = "gmail"
+        else:
+            target_app = self._last_context_app
 
         if target_app == "facebook":
             if not getattr(self, "_cached_incoming_messages", None) and not self._cached_messages:
@@ -359,13 +416,21 @@ RULES:
         """Handle drafting or directly sending a reply to the recent email or Facebook post/message."""
         p_lower = user_prompt.lower()
         
+        # Determine target app
+        if any(w in p_lower for w in ("facebook", "messenger", "fb", "page", "makisync")):
+            target_app = "facebook"
+        elif any(w in p_lower for w in ("gmail", "email", "emails", "inbox", "mail")):
+            target_app = "gmail"
+        else:
+            target_app = self._last_context_app
+
         # Cleanly extract message text if user specified one
         clean_msg = re.sub(r"^(?:send\s+(?:a\s+)?reply(?:\s+(?:saying|with|that|to|a))?|reply(?:\s+(?:saying|with|that|to|a))?|just\s+reply(?:\s+(?:saying|with|that|to|a))?|post(?:\s+saying)?|saying|just\s+say)\s+", "", user_prompt, flags=re.IGNORECASE).strip(" '\"\t\n\r.")
         clean_msg = re.sub(r"^(?:saying|with|that|a|an)\s+", "", clean_msg, flags=re.IGNORECASE).strip(" '\"\t\n\r.")
-        extracted_message = clean_msg if clean_msg and clean_msg.lower() not in ("reply", "response") else ""
+        extracted_message = clean_msg if clean_msg and clean_msg.lower() not in ("reply", "response", "to this email", "to that email", "to this message", "draft a reply", "draft a reply to this email") else ""
 
         # Handle Gmail Reply
-        if self._last_context_app == "gmail" or "email" in p_lower:
+        if target_app == "gmail":
             if not self._cached_emails:
                 res = self.composio.execute_action("GMAIL_FETCH_EMAILS", {"max_results": 1})
                 if res.get("success"):
@@ -378,9 +443,9 @@ RULES:
                 to_email = match.group(1) if match else raw_sender.strip()
                 subject = "Re: " + re.sub(r"^Re:\s*", "", top_m.get("subject", "Update"), flags=re.IGNORECASE)
 
-                # Direct send requested
-                if extracted_message or ("send" in p_lower and "draft" not in p_lower):
-                    body = extracted_message or "Hello, thank you for reaching out."
+                # Direct send requested if explicit message text provided and not asking to draft
+                if extracted_message and not any(w in p_lower for w in ("draft", "open composer", "open draft", "compose")):
+                    body = extracted_message
                     send_res = self.composio.execute_action("GMAIL_SEND_EMAIL", {
                         "recipient_email": to_email,
                         "subject": subject,
@@ -406,7 +471,7 @@ RULES:
                 return f"I'm ready to draft a reply to {to_email}, sir. What would you like to say?"
 
         # Handle Facebook Page Post / Messenger Reply
-        if self._last_context_app == "facebook" or any(w in p_lower for w in ("facebook", "messenger", "makisync", "page")):
+        if target_app == "facebook":
             msg_to_post = extracted_message or "Hello world"
 
             # Check if we should reply in Messenger conversation or post to page timeline
