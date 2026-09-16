@@ -60,6 +60,11 @@ class TTSService:
         self.use_fallback = use_fallback
         self.ducker = AudioDuckingService(duck_ratio=0.30)
 
+        # Voice configuration (Default: British Male assistant matching VoiceStudio profile)
+        self.edge_voice = os.getenv("TTS_VOICE", "en-GB-RyanNeural")
+        self.edge_rate = os.getenv("TTS_RATE", "+2%")
+        self.edge_pitch = os.getenv("TTS_PITCH", "-8Hz")
+
         self._speaking = False
         self._last_spoke_time = 0.0
         self._elevenlabs_disabled = False
@@ -290,9 +295,9 @@ class TTSService:
             async def _generate():
                 communicate = edge_tts.Communicate(
                     text=text,
-                    voice=voice,
-                    rate="+5%",     # Slightly faster — more Jarvis-like
-                    pitch="-5Hz",   # Slightly lower pitch
+                    voice=self.edge_voice,
+                    rate=self.edge_rate,
+                    pitch=self.edge_pitch,
                 )
                 await communicate.save(tmp_path)
 
