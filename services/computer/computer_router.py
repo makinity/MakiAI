@@ -178,9 +178,11 @@ class ComputerRouter:
           - "what am i wearing" / "what is this in my hand"
         """
         is_camera_vision = bool(
-            re.search(r"\b(what\s+am\s+i\s+(?:doing|holding|wearing|carrying|holding\s+up))\b", lowered)
+            re.search(r"\b(?:what\s+am\s+i|(?:do\s+you\s+|can\s+you\s+|you\s+)?know\s+what\s+i\s+(?:am|have)|(?:can\s+you\s+)?see\s+what\s+i\s+am|guess\s+what\s+i\s+(?:am|have))\s+(?:doing|holding|wearing|carrying|holding\s+up)\b", lowered)
+            or re.search(r"\b(?:you\s+know|do\s+you\s+know|guess|can\s+you\s+see|tell\s+me)\s+what\s+(?:i\s+am|i\'m|am\s+i)\s+(?:holding|doing|wearing|holding\s+up)\b", lowered)
+            or re.search(r"\b(what\s+am\s+i\s+(?:doing|holding|wearing|carrying|holding\s+up))\b", lowered)
             or re.search(r"\b(what(?:'s|\s+is)\s+(?:this|that|the\s+object)\s+in\s+my\s+hand)\b", lowered)
-            or re.search(r"\b(what\s+object\s+is\s+in\s+my\s+hand|what\s+is\s+in\s+my\s+hands?)\b", lowered)
+            or re.search(r"\b(what\s+object\s+is\s+in\s+my\s+hand|what\s+is\s+in\s+my\s+hands?|what\s+do\s+i\s+have\s+in\s+my\s+hands?)\b", lowered)
             or re.search(r"\b(look\s+at\s+me|take\s+a\s+look\s+at\s+me|see\s+me|can\s+you\s+see\s+me)\b", lowered)
             or re.search(r"\b(look\s+through\s+(?:the\s+)?(?:camera|webcam)|check\s+(?:the\s+)?webcam)\b", lowered)
             or re.search(r"\b(is\s+(?:there\s+)?anyone\s+behind\s+me|who\s+is\s+behind\s+me|someone\s+behind\s+me)\b", lowered)
