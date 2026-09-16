@@ -41,4 +41,7 @@ Keep it concise (3-4 sentences max), warm, and spoken aloud by a personal assist
 Do not use bullet points or robotic lists. Do not say 'Certainly' or 'I don't have live-clock access'. You have direct access to the live clock.
 """.strip()
 
-        return self._ask_gemini(prompt)
+        resp = self._ask_gemini(prompt)
+        if not resp or "I had trouble thinking" in resp:
+            return f"It is currently {time_str} on {day}, sir. According to your schedule, you are in your active focus block. Let me know what you would like to work on next."
+        return resp

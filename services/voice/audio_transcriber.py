@@ -23,13 +23,17 @@ VOCABULARY_PROMPT = (
 
 # Common phonetic mishearings mapped to their intended terms
 PHONETIC_REPLACEMENTS = [
-    (re.compile(r"\b(key\s*row|kero|cure\s*row|hero)\b", re.IGNORECASE), "Kiro"),
+    (re.compile(r"\b(?:magazine|cable|max\s*sync|make\s*sync|make\s*a\s*sync|monkey\s*sync|maki\s*sink)\s+storage\b", re.IGNORECASE), "MakiSync Storage"),
+    (re.compile(r"\b(?:magazine|max\s*sync|make\s*sync|make\s*a\s*sync|monkey\s*sync|maki\s*sink)\b(?=\s+(?:folder|files?|recordings?|photos?|screenshots?|docs?|assignments?|school|work|personal))", re.IGNORECASE), "MakiSync"),
+    (re.compile(r"\b(key\s*row|kero|cure\s*row|curro|hero(?=\s+cli|\s+terminal|\s+code))\b", re.IGNORECASE), "Kiro"),
     (re.compile(r"\b(macky|machi|make\s*he|maki\s*a\s*i)\b", re.IGNORECASE), "Maki"),
     (re.compile(r"\b(make\s*a\s*sync|monkey\s*sync|make\s*he\s*sync|maki\s*sink)\b", re.IGNORECASE), "MakiSync"),
-    (re.compile(r"\b(canvas)\s+(poster|design|app)\b", re.IGNORECASE), r"Canva \2"),
+    (re.compile(r"\b(canvas)\s+(poster|design|app|site|website)\b", re.IGNORECASE), r"Canva \2"),
+    (re.compile(r"\b(?:for|build|building|on|develop|developing)\s+tops\b", re.IGNORECASE), "for TaskMaster"),
     (re.compile(r"\b(task\s*master)\b", re.IGNORECASE), "TaskMaster"),
     (re.compile(r"\b(munch\s*bite)\b", re.IGNORECASE), "MunchBite"),
 ]
+
 
 
 class AudioTranscriber:

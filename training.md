@@ -2093,3 +2093,66 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"You're welcome, sir."`
 
 ---
+
+### 🔹 Live Session Command — 09:18:17 AM
+* **Spoken / Typed Command:** `"Tile, Maki."`
+* **Extracted Payload:** `"Tile, Maki."`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Done, sir. I've maximized and fitted Windows Script Host, MakiAI across both your monitors with zero overlap."`
+
+---
+
+### 🔹 Live Session Command — 09:18:42 AM
+* **Spoken / Typed Command:** `"Togo Sucarate, Next.js, Cate. Tvomaki ."`
+* **Extracted Payload:** `"Togo Sucarate, Next.js, Cate. Tvomaki ."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I'm not quite sure I understand, sir. Could you tell me a bit more about what you need with Togo Sucarate and Next.js? Are you looking for g..."`
+
+---
+
+### 🔹 Live Session Command — 09:19:16 AM
+* **Spoken / Typed Command:** `"Hello Maki. Hello."`
+* **Extracted Payload:** `"Hello Maki. Hello."`
+* **Matched Handler:** `Skill:HelloSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Good morning, sir. It is currently 9:19 AM on Wednesday, September 16, 2026. You should be wrapping up your one-hour Content Upload Assistan..."`
+
+---
+
+### 🔹 Live Session Command — 09:19:55 AM
+* **Spoken / Typed Command:** `"Would you open Facebook for me?"`
+* **Extracted Payload:** `"Would you open Facebook for me?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening Facebook in your personal profile, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:20:14 AM
+* **Spoken / Typed Command:** `"Can you drag the browser to the second monitor?"`
+* **Extracted Payload:** `"Can you drag the browser to the second monitor?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Done, sir. I've moved (3) Facebook to your secondary monitor."`
+
+---
+
+### 🔹 Live Session Command — 09:20:33 AM
+* **Spoken / Typed Command:** `"What are my schedule for tomorrow?"`
+* **Extracted Payload:** `"What are my schedule for tomorrow?"`
+* **Matched Handler:** `Skill:GoodMorningSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Good morning, sir. Here is your overview for tomorrow, Thursday, September 17, 2026. You will start with your usual morning routine and cont..."`
+
+---
+
+### 🔹 Live Session Command — 09:21:30 AM
+* **Spoken / Typed Command:** `"Do I have any scheduled meetings?"`
+* **Extracted Payload:** `"Do I have any scheduled meetings?"`
+* **Matched Handler:** `Skill:ReminderSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I had trouble thinking. Please try again."`
+
+---

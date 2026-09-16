@@ -18,9 +18,11 @@ from services.ai.kiro_service import KiroService
 
 TRAINING_MD_PATH = Path(__file__).resolve().parents[1] / "training.md"
 COMMAND_LOG_PATH = Path(__file__).resolve().parents[1] / "data" / "command_log.json"
+_LOGGER_LOCK = threading.Lock()
 
 # Set to False anytime to turn off training.md auto-logging
 ENABLE_TRAINING_LOGGER = True
+
 
 # Lightweight system prompt for general conversation — no KB files injected
 # Keeps responses fast for questions outside the knowledge base
@@ -137,35 +139,36 @@ class Orchestrator:
                 short_time = datetime.now().strftime("%I:%M:%S %p")
                 status_icon = "⚠️ **Fallback / Needs Calibration**" if is_fallback else "✅ **Optimal & Routed**"
 
-                # 1. Update data/command_log.json
-                COMMAND_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-                log_entries = []
-                if COMMAND_LOG_PATH.exists():
-                    try:
-                        with open(COMMAND_LOG_PATH, "r", encoding="utf-8") as f:
-                            log_entries = json.load(f)
-                    except Exception:
-                        log_entries = []
+                with _LOGGER_LOCK:
+                    # 1. Update data/command_log.json
+                    COMMAND_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+                    log_entries = []
+                    if COMMAND_LOG_PATH.exists():
+                        try:
+                            with open(COMMAND_LOG_PATH, "r", encoding="utf-8") as f:
+                                log_entries = json.load(f)
+                        except Exception:
+                            log_entries = []
 
-                new_entry = {
-                    "timestamp": now_str,
-                    "raw_command": raw_text,
-                    "cleaned_command": cleaned_text,
-                    "handler": handler_name,
-                    "response": response,
-                    "is_fallback": is_fallback,
-                    "flagged_for_review": is_fallback,
-                }
-                log_entries.append(new_entry)
-                if len(log_entries) > 200:
-                    log_entries = log_entries[-200:]
+                    new_entry = {
+                        "timestamp": now_str,
+                        "raw_command": raw_text,
+                        "cleaned_command": cleaned_text,
+                        "handler": handler_name,
+                        "response": response,
+                        "is_fallback": is_fallback,
+                        "flagged_for_review": is_fallback,
+                    }
+                    log_entries.append(new_entry)
+                    if len(log_entries) > 200:
+                        log_entries = log_entries[-200:]
 
-                with open(COMMAND_LOG_PATH, "w", encoding="utf-8") as f:
-                    json.dump(log_entries, f, indent=2, ensure_ascii=False)
+                    with open(COMMAND_LOG_PATH, "w", encoding="utf-8") as f:
+                        json.dump(log_entries, f, indent=2, ensure_ascii=False)
 
-                # 2. Append to training.md
-                if TRAINING_MD_PATH.exists():
-                    md_block = f"""
+                    # 2. Append to training.md
+                    if TRAINING_MD_PATH.exists():
+                        md_block = f"""
 ### 🔹 Live Session Command — {short_time}
 * **Spoken / Typed Command:** `"{raw_text}"`
 * **Extracted Payload:** `"{cleaned_text}"`
@@ -175,10 +178,11 @@ class Orchestrator:
 
 ---
 """
-                    with open(TRAINING_MD_PATH, "a", encoding="utf-8") as f:
-                        f.write(md_block)
+                        with open(TRAINING_MD_PATH, "a", encoding="utf-8") as f:
+                            f.write(md_block)
             except Exception as e:
                 print(f"[Orchestrator] Command logger error: {e}")
+
 
         threading.Thread(target=worker, daemon=True, name="CommandLoggerThread").start()
 
@@ -260,6 +264,23 @@ class Orchestrator:
 
         # 0. Homework follow-up — if waiting for instructions after Temp-Guide was opened
         if self._awaiting_homework_instructions and self._homework_skill:
+            if re.search(r"\b(cancel|stop|abort|nevermind|never\s+mind)\b", cleaned, flags=re.IGNORECASE):
+                self._awaiting_homework_instructions = False
+                return "Homework creation cancelled, sir.", "HomeworkSkill:Cancelled", False, cleaned
+
+            # Check if input is a distinct skill command
+            other_skill = self.skill_router.detect(cleaned) if self.skill_router else None
+            if other_skill and getattr(other_skill, "SKILL_ID", "") != "homework":
+                self._awaiting_homework_instructions = False
+                skill_name = other_skill.__class__.__name__
+                return other_skill.execute(cleaned), f"Skill:{skill_name}", False, cleaned
+
+            # Check if input is a computer control command
+            comp_res = self.computer_router.handle(cleaned)
+            if comp_res:
+                self._awaiting_homework_instructions = False
+                return comp_res, "ComputerRouter", False, cleaned
+
             self._awaiting_homework_instructions = False
             return self._homework_skill.create_homework(cleaned), "HomeworkSkill:GenerateDocx", False, cleaned
 

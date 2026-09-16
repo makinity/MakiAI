@@ -27,12 +27,11 @@ class GeminiService:
     """
 
     GROQ_MODELS = [
-        "qwen/qwen3.8-27b",
-        "groq/compound-mini",
         "openai/gpt-oss-120b",
         "openai/gpt-oss-20b",
-        "groq/compound",
+        "qwen/qwen3.8-27b",
     ]
+
 
     def __init__(self, api_key: str = "", groq_api_key: str = ""):
         """
@@ -106,7 +105,7 @@ class GeminiService:
                 self._groq_client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": "hi"}],
-                    max_tokens=5,
+                    max_tokens=20,
                 )
                 print(f"[AIService] Groq model working: {model}")
                 return model
@@ -162,12 +161,12 @@ class GeminiService:
             return self._stub_response(user_text)
 
         if self._provider == "groq" or (self._groq_client and not self._gemini_client):
-            safe_context = system_context[:2500] if len(system_context) > 2500 else system_context
-            return self._send_groq(user_text, safe_context)
+            return self._send_groq(user_text, system_context)
         elif self._provider == "gemini":
             return self._send_gemini(user_text, system_context)
 
         return self._stub_response(user_text)
+
 
     def _clean_response(self, text: str) -> str:
         """Strip internal thinking/reasoning tags and tokens from model responses."""
@@ -303,36 +302,40 @@ CRITICAL RULES:
         candidate_models = [self._groq_model] + [m for m in self.GROQ_MODELS if m != self._groq_model]
 
         for model_name in candidate_models:
-            try:
-                stream = self._groq_client.chat.completions.create(
-                    model=model_name,
-                    messages=messages,
-                    max_tokens=600,
-                    temperature=0.7,
-                    stream=True,
-                )
+            for attempt in range(2):
+                try:
+                    stream = self._groq_client.chat.completions.create(
+                        model=model_name,
+                        messages=messages,
+                        max_tokens=250,
+                        temperature=0.7,
+                        stream=True,
+                    )
 
-                answer = ""
-                for chunk in stream:
-                    delta = chunk.choices[0].delta.content
-                    if delta:
-                        answer += delta
+                    answer = ""
+                    for chunk in stream:
+                        delta = chunk.choices[0].delta.content
+                        if delta:
+                            answer += delta
 
-                answer = self._clean_response(answer)
+                    answer = self._clean_response(answer)
 
-                if answer:
-                    self._groq_model = model_name
-                    self._add_to_history("user", user_text)
-                    self._add_to_history("model", answer)
-                    return answer
+                    if answer:
+                        self._groq_model = model_name
+                        self._add_to_history("user", user_text)
+                        self._add_to_history("model", answer)
+                        return answer
 
-            except Exception as e:
-                err_str = str(e).lower()
-                if "429" in err_str or "rate limit" in err_str or "quota" in err_str:
-                    print(f"[AIService] Groq model '{model_name}' hit rate limit. Trying alternate model...")
-                else:
+                except Exception as e:
+                    err_str = str(e).lower()
+                    if "429" in err_str or "rate limit" in err_str or "quota" in err_str:
+                        if attempt == 0:
+                            import time
+                            time.sleep(1.5)
+                            continue
                     print(f"[AIService] Groq error on {model_name}: {e}")
-                continue
+                    break
+
 
         # Fallback to Gemini if all Groq models fail or are rate limited (one-shot, no loop)
         if self._gemini_client and depth == 0:
@@ -343,9 +346,10 @@ CRITICAL RULES:
 
     def _send_gemini(self, user_text: str, system_context: str, depth: int = 0) -> str:
         """Send via Gemini API with automatic model rotation on temporary 503/429 errors."""
-        bounded_ctx = system_context[:2500] if len(system_context) > 2500 else system_context
+        bounded_ctx = system_context[:15000] if len(system_context) > 15000 else system_context
         full_prompt = f"{bounded_ctx}\n\n---\n\nUser: {user_text}" if bounded_ctx else user_text
         gemini_models = ["gemini-3.6-flash"]
+
 
         for model_name in gemini_models:
             try:

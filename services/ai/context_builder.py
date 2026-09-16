@@ -383,21 +383,9 @@ class ContextBuilder:
     def build_skill_context(self, skill_name: str, required_files: list[str]) -> str:
         """
         Build a skill-specific system prompt.
-        CRITICAL: Required skill files are loaded FIRST in full,
-        followed by core identity and profile context.
+        Loads required skill files compactly to respect API TPM limits.
         """
-        MAX_CONTEXT_CHARS = 40000
-
-        FULL_FILES = {
-            "workflows/time-management.md",
-            "workflows/deadlines.md",
-            "workflows/carryover.md",
-            "workflows/daily.md",
-            "about/social-media.md",
-            "about/profile.md",
-            "config/coding-standards.md",
-            "preferences/preferences.md",
-        }
+        MAX_CONTEXT_CHARS = 3500
 
         parts = [f"## Executing Skill: {skill_name}\n"]
 
@@ -408,40 +396,24 @@ class ContextBuilder:
             norm_path = file_path.replace("\\", "/")
             if content:
                 parts.append(f"## {norm_path}")
-                parts.append(content if norm_path in FULL_FILES else content[:3000])
-                parts.append("")
-            else:
-                parts.append(f"## {norm_path}")
-                parts.append(f"(File not found: {norm_path})")
+                parts.append(content[:1500])
                 parts.append("")
 
-        # 2. CORE IDENTITY FILES NEXT
-        parts.append("### Mark's Identity & Background:")
-        for file_path in CORE_IDENTITY_FILES:
-            if file_path.endswith("/"):
-                continue
-            norm_path = file_path.replace("\\", "/")
-            if any(norm_path == rf.replace("\\", "/") for rf in required_files):
-                continue  # Already included above
-            content = self.kb_reader.read(file_path)
-            if content:
-                parts.append(f"## {norm_path}")
-                parts.append(content if norm_path in FULL_FILES else content[:1500])
-                parts.append("")
-
-        # 3. SAVED LONG-TERM MEMORIES & ACTIVE NOTES
-        memories_summary = self._get_saved_memories()
-        if memories_summary:
-            parts.append(memories_summary)
+        # 2. CORE IDENTITY / PREFERENCES (Compact)
+        profile_content = self.kb_reader.read("about/profile.md")
+        if profile_content:
+            parts.append("### Profile Summary:")
+            parts.append(profile_content[:400])
             parts.append("")
 
-        # 4. MAKI PERSONALITY
+        # 3. MAKI PERSONALITY
         parts.append(MAKI_PERSONALITY)
 
         full = "\n".join(parts).strip()
         if len(full) > MAX_CONTEXT_CHARS:
             full = full[:MAX_CONTEXT_CHARS]
         return full
+
 
     def build_memory_context(self, memories: list[dict]) -> str:
         """

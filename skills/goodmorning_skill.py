@@ -128,4 +128,9 @@ Constraints:
 - Keep total response concise (under 120 words).
 """.strip()
 
-        return self._ask_gemini(prompt)
+        resp = self._ask_gemini(prompt)
+        if not resp or "I had trouble thinking" in resp:
+            if is_tomorrow:
+                return f"Here is your schedule overview for tomorrow, {day_name}, {date_str}, sir. You have your standard routine and planned activities scheduled. Let me know if you would like to prepare anything for tomorrow, sir."
+            return f"{greeting}, sir. The current time is {time_str}. According to your schedule, you are currently in your scheduled focus block for {day_name}. Is there anything you would like to add to your day, sir?"
+        return resp

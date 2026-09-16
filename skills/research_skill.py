@@ -61,12 +61,15 @@ class ResearchSkill(BaseSkill):
         """Clean command wrappers and distill natural speech into a core search query."""
         cleaned = text.strip()
         
-        # Remove common spoken conversational preambles
+        # Remove common spoken conversational preambles (English & Taglish)
         patterns = [
             r"^(?:please\s+)?(?:search(?:\s+the\s+web|\s+google|\s+online)?\s+(?:for|about)?|look\s+up|find\s+(?:information\s+about|out\s+about|out\s+if|out|me)|google|research)\s+",
             r"^(?:can\s+you\s+)?(?:help\s+me\s+)?(?:find\s+out\s+(?:if|about)?|search|find|lookup|research)\s+",
             r"^(?:what\s+is\s+the\s+latest\s+on|who\s+won\s+the|tell\s+me\s+about)\s+",
+            r"^(?:paki\s+)?(?:mag\s*research(?:\s+ka)?(?:\s+nang)?|magsaliksik(?:\s+ka)?|hanapin\s+sa\s+internet\s+(?:ang)?)\s*(?:tungkol\s+sa\s+|para\s+sa\s+|ukol\s+sa\s+)?",
+            r"^(?:tungkol\s+sa\s+|para\s+sa\s+|ukol\s+sa\s+)",
         ]
+
         for p in patterns:
             cleaned = re.sub(p, "", cleaned, flags=re.IGNORECASE).strip()
 

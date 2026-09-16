@@ -502,7 +502,7 @@ class ComputerRouter:
             return self.window_mgr.close_window("youtube")
 
         # 1. Play / Pause / Resume controls
-        if re.search(r"\b(play\s+pause|toggle\s+play|pause|resume\s+music|unpause)\b", lowered):
+        if re.search(r"\b(play\s+pause|toggle\s+play|pause|resume(?:\s+(?:music|playback|song|video|audio))?|continue\s+(?:playback|music|song)|unpause)\b", lowered):
             return self.media.play_pause()
 
         # 2. Next / Skip
@@ -811,44 +811,52 @@ class ComputerRouter:
         Handle smart file search commands using natural language dates and recency.
         Examples:
           "open the screenshot I took just now"
+          "open the captured image in the magazine storage"
           "open my last photo"
           "find the recording from yesterday"
           "open screenshot from today"
           "show my photos from Monday"
           "open the last screenshot you take"
         """
+        # Normalize common Whisper misrecognitions ("magazine storage" / "max sync" -> "makisync storage")
+        norm = re.sub(r"\b(?:magazine|max\s+sync|make\s+sync|maki\s+sync|cable)\s+storage\b", "makisync storage", lowered)
+
         # Detect category
         category = None
-        if re.search(r"\bscreenshots?\b", lowered):
+        if re.search(r"\bscreenshots?\b|\bcaptured?\s*(?:image|photo|picture|screen)?\b|\bcapture\b|\bscreen\s+capture\b", norm):
             category = "Screenshots"
-        elif re.search(r"\bphotos?\b|\bpictures?\b|\bcamera\b", lowered):
+        elif re.search(r"\bphotos?\b|\bpictures?\b|\bcamera\b", norm):
             category = "Photos"
-        elif re.search(r"\brecordings?\b|\bvideos?\b", lowered):
+        elif re.search(r"\brecordings?\b|\bvideos?\b", norm):
             category = "Recordings"
+        elif re.search(r"\b(images?|captured?\s+image)\b", norm):
+            category = "Screenshots"
 
         if not category:
             return None
 
         # Detect "open/show/find + last/latest/just/recent/captured" → find latest
         if (
-            re.search(r"\b(open|show|find|get|display|view)\b.*\b(last|latest|recent|just|previous|captured?|took|taken|saved)\b", lowered)
-            or re.search(r"\b(last|latest|recent|just|previous)\b.*\b(screenshot|photo|recording|picture|video|image|camera)\b", lowered)
-            or re.search(r"\blast\b|\blatest\b|\bjust\s+now\b|\bmost\s+recent\b|\bjust\s+took\b|\bjust\s+captured\b|\byou\s+took\b|\byou\s+take\b|\byou\s+captured?\b|\byou\s+save\b|\byou\s+saved\b", lowered)
+            re.search(r"\b(open|show|find|get|display|view)\b.*\b(last|latest|recent|just|previous|captured?|image|photo|picture|screenshot|screen|recording|video|took|taken|saved|storage|makisync)\b", norm)
+            or re.search(r"\b(last|latest|recent|just|previous)\b.*\b(screenshot|photo|recording|picture|video|image|camera)\b", norm)
+            or re.search(r"\blast\b|\blatest\b|\bjust\s+now\b|\bmost\s+recent\b|\bjust\s+took\b|\bjust\s+captured\b|\byou\s+took\b|\byou\s+take\b|\byou\s+captured?\b|\byou\s+save\b|\byou\s+saved\b", norm)
+            or re.search(r"\bcaptured?\s+(?:image|photo|picture|screen)\b", norm)
         ):
             return self.files.find_latest(category)
+
 
         # Detect date reference
         date_match = re.search(
             r"\b(today|yesterday|monday|tuesday|wednesday|thursday|friday|saturday|sunday"
             r"|\d{4}-\d{2}-\d{2}|just\s+now|right\s+now)\b",
-            lowered
+            norm
         )
         if date_match:
             date_str = date_match.group(1)
             return self.files.find_by_date(category, date_str)
 
         # "open my screenshots folder" style
-        if re.search(r"\bfolder\b|\bopen\b", lowered):
+        if re.search(r"\bfolder\b|\bopen\b", norm):
             return self.files.open_maki_folder(category)
 
         return None

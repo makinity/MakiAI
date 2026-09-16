@@ -55,6 +55,27 @@
       "datetime": "2026-09-16T17:00:00",
       "repeat": null,
       "status": "pending"
+    },
+    {
+      "id": "dfa42124-7a0b-4826-a76e-dac1a3d3041b",
+      "text": "message the client",
+      "datetime": "2026-09-17T15:00:00",
+      "repeat": null,
+      "status": "pending"
+    },
+    {
+      "id": "cd3df6c0-ce8c-4141-88da-a74c7f6c9813",
+      "text": "drink water",
+      "datetime": "2026-09-16T09:16:00",
+      "repeat": null,
+      "status": "missed"
+    },
+    {
+      "id": "9d621384-30b3-4134-8843-873c627896b0",
+      "text": "workout",
+      "datetime": "2026-09-17T17:00:00",
+      "repeat": null,
+      "status": "pending"
     }
   ]
 }

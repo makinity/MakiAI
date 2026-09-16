@@ -29,7 +29,7 @@ class MemorySkill(BaseSkill):
         """Route to remember, recall, or forget subcommand."""
         lowered = text.lower()
 
-        if any(kw in lowered for kw in ["what do you remember", "recall", "do you know"]):
+        if any(kw in lowered for kw in ["what do you remember", "recall", "do you know", "what is my", "what's my", "ano ang"]):
             return self._recall(text)
         elif any(kw in lowered for kw in ["forget", "delete", "remove", "clear"]):
             return self._forget(text)

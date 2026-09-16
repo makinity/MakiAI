@@ -28,20 +28,24 @@ class GoodNightSkill(BaseSkill):
 
         prompt = f"""
 Today is {today}. Tomorrow is {tomorrow}.
+The user said: "{text}"
 
-Generate Mark's night wrap-up following this exact format:
+Generate a warm, natural spoken night wrap-up briefing for sir:
+1. Greet sir warmly for the night ("Good night, sir.").
+2. Briefly summarize tomorrow's key routine ({tomorrow}) from workflows/time-management.md.
+3. Mention any key prep items or priority focus for tomorrow.
+4. End warmly with: "What tasks or activities did you miss or leave unfinished today, sir?"
 
-1. 🌙 Good Night, Mark! — today's date
-2. 🔭 Tomorrow: {tomorrow} — tomorrow's full schedule from the weekly table in time-management.md
-3. 🎒 What to Prepare Tonight — specific prep items based on tomorrow's schedule
-4. 📋 Tomorrow's Priority Order — from time-management.md
-
-End with: "What tasks or activities did you miss or leave unfinished today?"
-
-Keep the spoken version concise — this will be read aloud.
+Constraints:
+- Speak in natural flowing conversational sentences suitable for TTS (no markdown asterisks, no bullets, no emojis, no numbered headers).
+- Address the user as 'sir'.
+- Keep total response concise (under 100 words).
 """.strip()
 
-        return self._ask_gemini(prompt)
+        resp = self._ask_gemini(prompt)
+        if not resp or "I had trouble thinking" in resp:
+            return f"Good night, sir. Tomorrow is {tomorrow}, and I have your schedule ready for when you wake up. What tasks or activities did you miss or leave unfinished today, sir?"
+        return resp
 
     def update_carryover(self, missed_tasks: str) -> str:
         """
@@ -64,7 +68,7 @@ Keep the spoken version concise — this will be read aloud.
                 "Keep the file structure but mark everything as done or cleared."
             )
             self.kb_writer.write("workflows/carryover.md", cleared)
-            return "Great work today! Carryover cleared. Sleep well, Mark."
+            return "Great work today! Carryover cleared. Sleep well, sir."
 
         # Add missed tasks to carryover
         current = self.kb_reader.read("workflows/carryover.md")
@@ -76,4 +80,5 @@ Keep the spoken version concise — this will be read aloud.
         )
         self.kb_writer.write("workflows/carryover.md", updated)
         self.kb_writer.update_last_updated("workflows/carryover.md")
-        return "Got it. I've added those to tomorrow's carry-over. Rest well, Mark."
+        return "Got it. I've added those to tomorrow's carry-over, sir. Rest well."
+

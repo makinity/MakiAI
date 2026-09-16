@@ -77,22 +77,28 @@ Return the full updated deadlines.md content only — no explanation.
         prompt = f"""
 Today is {today}.
 
-Here are Mark's current deadlines:
+Here are Mark's current deadlines from workflows/deadlines.md:
 {content}
 
-Summarize the deadlines clearly and concisely for voice output.
-Use these priority indicators:
-- 🔴 Overdue
-- 🚨 Due today
-- 🟠 Due tomorrow
-- 🟡 Due within 3 days
-- ⚪ Due within 7 days
-
-Keep it short — this is spoken aloud. Only mention pending deadlines, not completed ones.
-If there are no pending deadlines, say "You have no pending deadlines. Great work!"
+Summarize the pending deadlines clearly, warmly, and concisely for sir:
+- Clearly state the task and due dates.
+- Highlight urgency naturally (e.g., due today, tomorrow, or later this week).
+- Speak in natural flowing conversational sentences suitable for TTS (no markdown asterisks, no bullets, no emojis, no numbered headers).
+- Address sir directly. Keep it short (under 90 words).
+- Only mention pending deadlines, not completed ones.
+- If there are no pending deadlines, say "You have no pending deadlines right now, sir. Great work!"
 """.strip()
 
-        return self._ask_gemini(prompt)
+        resp = self._ask_gemini(prompt)
+        if not resp or "I had trouble thinking" in resp:
+            # Extract first pending item if any
+            lines = [l.strip() for l in content.splitlines() if l.strip().startswith("-") or l.strip().startswith("*")]
+            if lines:
+                first_items = ", ".join(lines[:3])
+                return f"Here are your upcoming deadlines, sir: {first_items}."
+            return "You currently have no pending deadlines recorded, sir."
+        return resp
+
 
     def _complete(self, text: str) -> str:
         """Mark a deadline as completed."""

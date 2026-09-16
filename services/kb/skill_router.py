@@ -81,6 +81,7 @@ class SkillRouter:
                 r"\bwhat\s+do\s+you\s+remember\b",
                 r"\bwhat\s+did\s+i\s+(say|tell\s+you)\b",
                 r"\b(do\s+you\s+)?recall\b",
+                r"\b(what\s+is|what'?s|ano\s+ang)\s+my\s+(secondary\s+email|wifi|password|birthday|secret|address|phone|saved\s+note|remembered)\b",
                 r"\b(forget|delete|remove|clear)\b",
                 r"\btandaan\s+mo\b",
                 r"\bnaaalala\s+mo\s+ba\b",
@@ -153,7 +154,8 @@ class SkillRouter:
                 r"\b(google\s+(doc|docs|sheet|sheets|drive|slides)|gdoc|gsheet)\b",
                 r"\b(google\s+calendar|gcal|my\s+calendar|calendar\s+events?|check\s+(my\s+)?calendar)\b",
                 r"\b(check\s+(my\s+)?(gmail|emails?)|unread\s+emails?|send\s+(an?\s+)?email|draft\s+(an?\s+)?email|emails?\s+on\s+gmail|read\s+(my\s+)?(gmail|emails?)|fetch\s+(my\s+)?(gmail|emails?)|inbox\s+emails?)\b",
-                r"\b(notion|trello|github|gitlab|discord|spotify)\b",
+                r"\b(connect|integrate|sync|link)\s+(with\s+)?(notion|trello|github|gitlab|discord|spotify)\b",
+                r"\b(notion|trello)\s+(page|board|task|card)\b",
                 r"\b(composio|cloud\s+app|connect\s+app)\b",
             ]),
             ("research", [
