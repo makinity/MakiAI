@@ -55,6 +55,7 @@ class MakiUIApi:
         self._session_expires_at = 0.0
         self._last_command_text = ""
         self._last_command_time = 0.0
+        self._active_modal: Optional[Dict[str, Any]] = None
 
         # Add initial welcome greeting to activity
         self._activity.append({
@@ -316,6 +317,7 @@ class MakiUIApi:
 
         with self._lock:
             activity_copy = list(self._activity)
+            modal_copy = dict(self._active_modal) if self._active_modal else None
 
         return {
             "bot_name": self.bot_name,
@@ -324,11 +326,85 @@ class MakiUIApi:
                 "state": frontend_state,
             },
             "activity": activity_copy,
+            "active_modal": modal_copy,
             "mic_active": (app_state == AppState.LISTENING or self._session_active),
             "auto_listen_enabled": self._auto_listen_enabled,
             "speaking_active": is_speaking,
             "command_busy": self._command_busy,
         }
+
+    # ─── Situational Interactive Modals API ───────────────────────────────────
+
+    def set_active_modal(self, modal_type: str, data: Dict[str, Any]) -> None:
+        """Trigger an interactive modal card in the desktop frontend."""
+        with self._lock:
+            self._active_modal = {
+                "type": modal_type,
+                "data": data,
+                "timestamp": time.time(),
+            }
+        print(f"[UIBridge] Interactive modal opened: {modal_type} ({data.get('title', '')})")
+
+    def clear_active_modal(self) -> None:
+        """Clear active modal card."""
+        with self._lock:
+            self._active_modal = None
+
+    def dismiss_modal(self) -> Dict[str, Any]:
+        """Dismiss active modal without saving."""
+        self.clear_active_modal()
+        return {"ok": True, **self.get_ui_state()}
+
+    def save_deadline(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Save or update structured deadline entry directly to deadlines.md."""
+        if not payload or not isinstance(payload, dict):
+            return {"ok": False, "message": "Invalid deadline payload"}
+
+        title = str(payload.get("title", "New Task")).strip()
+        category = str(payload.get("category", "School")).strip()
+        due_date = str(payload.get("due_date", "")).strip()
+        due_time = str(payload.get("due_time", "23:59")).strip()
+        priority = str(payload.get("priority", "Normal")).strip()
+
+        kb_reader = getattr(self.orchestrator, "kb_reader", None)
+        kb_writer = getattr(self.orchestrator, "kb_writer", None)
+        context_builder = getattr(self.orchestrator, "context_builder", None)
+
+        if not kb_reader or not kb_writer:
+            return {"ok": False, "message": "KB services unavailable"}
+
+        current = kb_reader.read("workflows/deadlines.md") or "# ⏳ Deadlines\n\n## 🎓 School Deadlines\n\n## 💼 Work / Client Deadlines\n\n## 🚀 Projects Deadlines\n\n## 👤 Personal Deadlines\n\n## ✅ Completed\n"
+
+        entry = f"- [ ] **{title}** — Due: {due_date} {due_time} ({priority})"
+        cat_header = f"## 🎓 School Deadlines" if category == "School" else (
+            "## 💼 Work / Client Deadlines" if category == "Work" else (
+                "## 🚀 Projects Deadlines" if category == "Projects" else "## 👤 Personal Deadlines"
+            )
+        )
+
+        # Remove existing line if updating by title match
+        lines = current.splitlines()
+        filtered_lines = [l for l in lines if not (title.lower() in l.lower() and "- [ ]" in l)]
+        current = "\n".join(filtered_lines)
+
+        if cat_header in current:
+            updated = current.replace(cat_header, f"{cat_header}\n{entry}")
+        elif "## Pending" in current:
+            updated = current.replace("## Pending", f"## Pending\n{entry}")
+        else:
+            updated = f"{current.rstrip()}\n\n{cat_header}\n{entry}\n"
+
+        kb_writer.write("workflows/deadlines.md", updated)
+        kb_writer.update_last_updated("workflows/deadlines.md")
+        if context_builder:
+            context_builder.invalidate_cache()
+
+        self.clear_active_modal()
+        confirmation = f"Saved {title} to your {category} deadlines for {due_date}, sir."
+        self.add_activity("assistant", confirmation)
+        self.tts_service.speak(confirmation)
+
+        return {"ok": True, "message": confirmation, **self.get_ui_state()}
 
     def send_command(self, command: str) -> Dict[str, Any]:
         """

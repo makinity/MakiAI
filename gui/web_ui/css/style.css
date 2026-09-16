@@ -835,3 +835,173 @@ body::before {
         width: 100%;
     }
 }
+
+/* ─── Situational Interactive Modal ────────────────────────────── */
+[hidden],
+.modal-overlay[hidden] {
+    display: none !important;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(3, 7, 18, 0.65);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    animation: fadeIn 200ms ease;
+}
+
+.interactive-modal {
+    width: min(34rem, calc(100vw - 2rem));
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    background: rgba(12, 22, 38, 0.94);
+    border: 1px solid rgba(118, 215, 255, 0.28);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(118, 215, 255, 0.15);
+    animation: modalPop 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-icon-badge {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: var(--radius-md);
+    background: rgba(118, 215, 255, 0.12);
+    border: 1px solid rgba(118, 215, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+}
+
+.modal-header-icon {
+    width: 1.3rem;
+    height: 1.3rem;
+    fill: currentColor;
+}
+
+.modal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+}
+
+.category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.category-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-soft);
+    padding: 0.4rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.category-pill:hover {
+    background: rgba(118, 215, 255, 0.12);
+    border-color: rgba(118, 215, 255, 0.3);
+    color: var(--text-main);
+}
+
+.category-pill.active {
+    background: linear-gradient(135deg, rgba(62, 182, 255, 0.28), rgba(142, 125, 255, 0.28));
+    border-color: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(118, 215, 255, 0.3);
+}
+
+.priority-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.priority-opt {
+    flex: 1;
+    cursor: pointer;
+    margin: 0;
+}
+
+.priority-opt input {
+    display: none;
+}
+
+.priority-badge {
+    display: block;
+    text-align: center;
+    padding: 0.45rem;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    transition: var(--transition);
+}
+
+.priority-opt:hover .priority-badge {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.priority-opt input:checked + .priority-badge.low {
+    background: rgba(118, 255, 207, 0.15);
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.priority-opt input:checked + .priority-badge.normal {
+    background: rgba(118, 215, 255, 0.18);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.priority-opt input:checked + .priority-badge.urgent {
+    background: rgba(255, 122, 157, 0.2);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.modal-btn-cancel {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-soft);
+    border-radius: var(--radius-md);
+    padding: 0.55rem 1.1rem;
+    font-weight: 600;
+}
+
+.modal-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.modal-btn-save {
+    padding: 0.55rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+}
+

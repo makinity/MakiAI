@@ -90,6 +90,8 @@ class SkillRouter:
                 r"\badd\s+(a\s+)?deadline\b",
                 r"\bset\s+(a\s+)?deadline\b",
                 r"\bnew\s+deadline\b",
+                r"\bdeadline\s+(?:for|to|on|by|called|named|due)\b",
+                r"\b(?:have|got|may)\s+(?:a\s+)?deadline\b",
                 r"\b(show|list|view|what\s+are|check)\s+(my\s+)?deadlines?\b",
                 r"\b(do\s+(?:i|we)\s+have\s+(?:any\s+)?deadlines?|any\s+deadlines?\s+(?:coming\s+up|soon)|upcoming\s+deadlines?)\b",
                 r"\bdeadline\s+(done|complete|completed|finished)\b",
@@ -190,7 +192,7 @@ class SkillRouter:
         """
         # Strip wake word prefix before matching
         cleaned = re.sub(
-            r"^(hey\s+maki[,.]?\s*)",
+            r"^(hey\s+maki[,.]?\s*|maki[,.]?\s*)",
             "",
             text.strip(),
             flags=re.IGNORECASE,

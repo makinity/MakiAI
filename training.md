@@ -2372,3 +2372,363 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"You are sitting in front of the camera wearing white over-ear headphones while holding up a pair of eyeglasses in your hand, sir."`
 
 ---
+
+### 🔹 Live Session Command — 10:35:51 PM
+* **Spoken / Typed Command:** `"Hello, Maki."`
+* **Extracted Payload:** `"Hello, Maki."`
+* **Matched Handler:** `Skill:HelloSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Good evening, sir. It is currently 10:35 PM on Wednesday, September 16, 2026. You should be in your wind-down period right now, preparing to..."`
+
+---
+
+### 🔹 Live Session Command — 10:36:26 PM
+* **Spoken / Typed Command:** `"Can you add deadline for Pops to chapter 4 by Friday 11.59 PM?"`
+* **Extracted Payload:** `"Can you add deadline for Pops to chapter 4 by Friday 11.59 PM?"`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I've drafted that deadline for Pops to chapter 4 under School due on 2026-09-18, sir. You can adjust the details on your screen."`
+
+---
+
+### 🔹 Live Session Command — 10:36:42 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 10:36:49 PM
+* **Spoken / Typed Command:** `"Deadline."`
+* **Extracted Payload:** `"Deadline."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You have three urgent school deadlines due tomorrow, Thursday, September 18, by 11:59 PM. These are your Pops Chapter 4, the Capstone Chapte..."`
+
+---
+
+### 🔹 Live Session Command — 10:37:17 PM
+* **Spoken / Typed Command:** `"I just canceled it."`
+* **Extracted Payload:** `"I just canceled it."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. I’ve noted that you canceled those deadlines, so I won’t flag them in future briefings. If you need to reschedule or add ne..."`
+
+---
+
+### 🔹 Live Session Command — 10:37:36 PM
+* **Spoken / Typed Command:** `"So, can you, do you know what all my,"`
+* **Extracted Payload:** `"So, can you, do you know what all my,"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I’m here, sir. Please go ahead and finish your thought—what specifically would you like me to recall or manage for you?"`
+
+---
+
+### 🔹 Live Session Command — 10:37:48 PM
+* **Spoken / Typed Command:** `"What I mean is..."`
+* **Extracted Payload:** `"What I mean is..."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Take your time, sir. I am listening."`
+
+---
+
+### 🔹 Live Session Command — 10:37:58 PM
+* **Spoken / Typed Command:** `"What I mean is do I have any deadlines?"`
+* **Extracted Payload:** `"What I mean is do I have any deadlines?"`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You have three school deadlines coming up tomorrow, Thursday, September 18. The Capstone Chapter 4 Final Review is marked urgent and is due ..."`
+
+---
+
+### 🔹 Live Session Command — 10:38:27 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:38:32 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:41:17 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:41:23 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:41:30 PM
+* **Spoken / Typed Command:** `"What are my deadlines?"`
+* **Extracted Payload:** `"What are my deadlines?"`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I apologize, sir, but I cannot see any specific pending deadlines in the provided list. The document only contains a header and a system err..."`
+
+---
+
+### 🔹 Live Session Command — 10:41:51 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:42:03 PM
+* **Spoken / Typed Command:** `"Maki deadline for Cops 2 Chapter 4 by Friday at 11.59pm."`
+* **Extracted Payload:** `"deadline for Cops 2 Chapter 4 by Friday at 11.59pm."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You have one pending deadline, sir. The COPs 2 Chapter 4 is due this Friday, September 18, at 11:59 PM. You have two days to complete it, so..."`
+
+---
+
+### 🔹 Live Session Command — 10:42:25 PM
+* **Spoken / Typed Command:** `"What are my deadlines?"`
+* **Extracted Payload:** `"What are my deadlines?"`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You have one pending deadline, sir. Your COPs 2 Chapter 4 is due this Friday, September 18, at 11:59 PM. That is in two days, so you have a ..."`
+
+---
+
+### 🔹 Live Session Command — 10:46:47 PM
+* **Spoken / Typed Command:** `"What are my definitions?"`
+* **Extracted Payload:** `"What are my definitions?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I can see you have a "Definition of Terms" section in Chapter 1 of your capstone, sir. The file is saved at `C:\Knowledge-Base\school\projec..."`
+
+---
+
+### 🔹 Live Session Command — 10:47:24 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:47:30 PM
+* **Spoken / Typed Command:** `"What are my deadlines?"`
+* **Extracted Payload:** `"What are my deadlines?"`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I don't have access to your specific deadlines list right now, sir, as the provided workflow file indicates a previous error. Could you plea..."`
+
+---
+
+### 🔹 Live Session Command — 10:49:39 PM
+* **Spoken / Typed Command:** `"what are my deadlines?"`
+* **Extracted Payload:** `"what are my deadlines?"`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You currently have no pending deadlines recorded, sir. Let me know if you would like me to add one for you."`
+
+---
+
+### 🔹 Live Session Command — 10:49:52 PM
+* **Spoken / Typed Command:** `"Add edit line for"`
+* **Extracted Payload:** `"Add edit line for"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"It looks like your message got cut off, sir. You mentioned adding an edit line, but I’m not sure which file or document you’re referring to...."`
+
+---
+
+### 🔹 Live Session Command — 10:50:15 PM
+* **Spoken / Typed Command:** `"What I mean is add a new deadline for Capscun 2 Chapter 4 by Friday at 11.59 PM."`
+* **Extracted Payload:** `"What I mean is add a new deadline for Capscun 2 Chapter 4 by Friday at 11.59 PM."`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I've drafted that deadline for What I mean is add a new deadline for Capscun 2 Chapter 4 under School due on 2026-09-18, sir. Please confirm..."`
+
+---
+
+### 🔹 Live Session Command — 10:50:53 PM
+* **Spoken / Typed Command:** `"It's already scheduled or added to the deadline.md."`
+* **Extracted Payload:** `"It's already scheduled or added to the deadline.md."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. I see it is already logged in your deadlines file, with the Capscun 2 Chapter 4 submission due tomorrow, Thursday, at 11:59..."`
+
+---
+
+### 🔹 Live Session Command — 10:51:15 PM
+* **Spoken / Typed Command:** `"Maki, so I guess we're done."`
+* **Extracted Payload:** `"so I guess we're done."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"That’s right, sir. We’ve covered the main points. Since it’s nearly eleven, if you’re ready to wrap up for the day, let me know and I can ru..."`
+
+---
+
+### 🔹 Live Session Command — 10:51:36 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:51:44 PM
+* **Spoken / Typed Command:** `"What should I be doing now?"`
+* **Extracted Payload:** `"What should I be doing now?"`
+* **Matched Handler:** `Skill:HelloSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"It is 10:51 PM on Wednesday, so you are currently in your wind-down block, which runs until midnight. Since you’ve already hit your daily mi..."`
+
+---
+
+### 🔹 Live Session Command — 10:52:16 PM
+* **Spoken / Typed Command:** `"Do I have any hundred?"`
+* **Extracted Payload:** `"Do I have any hundred?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I don't have that information in your Knowledge Base, sir. Could you clarify what you mean by "hundred"? Are you referring to a specific amo..."`
+
+---
+
+### 🔹 Live Session Command — 10:52:33 PM
+* **Spoken / Typed Command:** `"What I mean is"`
+* **Extracted Payload:** `"What I mean is"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"It seems your message got cut off, sir. Please go ahead and finish your thought so I can help you."`
+
+---
+
+### 🔹 Live Session Command — 10:52:48 PM
+* **Spoken / Typed Command:** `"What I mean is check my Gmail for unread messages."`
+* **Extracted Payload:** `"What I mean is check my Gmail for unread messages."`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I found 15 unread messages in your Gmail, sir. Would you like me to read the subjects and senders so you can decide which ones to address?"`
+
+---
+
+### 🔹 Live Session Command — 10:53:11 PM
+* **Spoken / Typed Command:** `"The latest unread message."`
+* **Extracted Payload:** `"The latest unread message."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"{   "app": "gmail",   "action": "GMAIL_GET_MESSAGE",   "arguments": {     "messageId": "1a0aab2611df29d7"   } }"`
+
+---
+
+### 🔹 Live Session Command — 10:53:31 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:53:46 PM
+* **Spoken / Typed Command:** `"Can you open Zoom web browser for me?"`
+* **Extracted Payload:** `"Can you open Zoom web browser for me?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening Zoom Web Browser For Me."`
+
+---
+
+### 🔹 Live Session Command — 10:53:59 PM
+* **Spoken / Typed Command:** `"What is my birthday?"`
+* **Extracted Payload:** `"What is my birthday?"`
+* **Matched Handler:** `Skill:MemorySkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I don’t have anything stored about your birthday, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:54:13 PM
+* **Spoken / Typed Command:** `"Are you sure? Check the knowledge base."`
+* **Extracted Payload:** `"Are you sure? Check the knowledge base."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I just checked your Knowledge Base, and I don't see your birthday listed in your profile or any other documents, sir. It looks like that inf..."`
+
+---
+
+### 🔹 Live Session Command — 10:54:27 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 10:54:39 PM
+* **Spoken / Typed Command:** `"My founders were"`
+* **Extracted Payload:** `"My founders were"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Your message seems to have been cut off, sir. Could you please finish your thought?"`
+
+---
+
+### 🔹 Live Session Command — 10:55:17 PM
+* **Spoken / Typed Command:** `"One year slow."`
+* **Extracted Payload:** `"One year slow."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I'm not sure what you mean by "one year slow," sir. Could you clarify?"`
+
+---
+
+### 🔹 Live Session Command — 10:55:55 PM
+* **Spoken / Typed Command:** `"What is my mother's work"`
+* **Extracted Payload:** `"What is my mother's work"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I don’t have that information in your Knowledge Base, sir. Could you let me know what she does so I can add it to your profile?"`
+
+---
+
+### 🔹 Live Session Command — 10:56:35 PM
+* **Spoken / Typed Command:** `"What is my mother's work?"`
+* **Extracted Payload:** `"What is my mother's work?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I don't have that information in your Knowledge Base, sir. Your biodata lists your family background, but it doesn't specify your mother's o..."`
+
+---
+
+### 🔹 Live Session Command — 10:57:13 PM
+* **Spoken / Typed Command:** `"Okay, where did I attend university?"`
+* **Extracted Payload:** `"Okay, where did I attend university?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You are currently pursuing your Bachelor of Science in Information Technology at the University of Mindanao, sir."`
+
+---

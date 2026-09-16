@@ -61,6 +61,17 @@
         elements.settingElevenVoice = document.getElementById("setting-eleven-voice");
         elements.settingTtsFallback = document.getElementById("setting-tts-fallback");
         elements.settingKbPath = document.getElementById("setting-kb-path");
+
+        // Interactive Modal elements
+        elements.modalOverlay = document.getElementById("interactive-modal-overlay");
+        elements.modalCloseBtn = document.getElementById("modal-close-btn");
+        elements.modalCancelBtn = document.getElementById("modal-cancel-btn");
+        elements.modalSaveBtn = document.getElementById("modal-save-btn");
+        elements.modalTitleInput = document.getElementById("modal-deadline-title");
+        elements.modalDateInput = document.getElementById("modal-deadline-date");
+        elements.modalTimeInput = document.getElementById("modal-deadline-time");
+        elements.categoryPills = Array.from(document.querySelectorAll(".category-pill"));
+        elements.priorityRadios = Array.from(document.querySelectorAll("input[name='deadline-priority']"));
     }
 
     function bindEvents() {
@@ -80,6 +91,27 @@
 
         if (elements.saveSettingsBtn) {
             elements.saveSettingsBtn.addEventListener("click", handleSaveSettings);
+        }
+
+        // Modal category pill clicks
+        if (elements.categoryPills) {
+            elements.categoryPills.forEach((pill) => {
+                pill.addEventListener("click", () => {
+                    elements.categoryPills.forEach((p) => p.classList.remove("active"));
+                    pill.classList.add("active");
+                });
+            });
+        }
+
+        // Modal action buttons
+        if (elements.modalCloseBtn) {
+            elements.modalCloseBtn.addEventListener("click", handleDismissModal);
+        }
+        if (elements.modalCancelBtn) {
+            elements.modalCancelBtn.addEventListener("click", handleDismissModal);
+        }
+        if (elements.modalSaveBtn) {
+            elements.modalSaveBtn.addEventListener("click", handleSaveDeadlineModal);
         }
 
         // Password visibility toggles
@@ -106,7 +138,11 @@
 
         document.addEventListener("keydown", (event) => {
             if (event.key === "Escape") {
-                closeAllPanels();
+                if (elements.modalOverlay && !elements.modalOverlay.hidden) {
+                    handleDismissModal();
+                } else {
+                    closeAllPanels();
+                }
             }
         });
     }
@@ -432,6 +468,106 @@
 
         if (!wasSpeaking && state.speakingActive && state.orb && typeof state.orb.playSpeechPattern === "function") {
             state.orb.playSpeechPattern(getLatestSpokenText());
+        }
+
+        // Handle Situational Interactive Modals
+        if (payload.active_modal && payload.active_modal.type === "deadline") {
+            const modalData = payload.active_modal.data || {};
+            const isNewModal = !state.activeModal || (state.activeModal.data && state.activeModal.data.id !== modalData.id);
+
+            if (isNewModal) {
+                state.activeModal = payload.active_modal;
+                if (elements.modalTitleInput) elements.modalTitleInput.value = modalData.title || "";
+                if (elements.modalDateInput) elements.modalDateInput.value = modalData.due_date || "";
+                if (elements.modalTimeInput) elements.modalTimeInput.value = modalData.due_time || "23:59";
+
+                // Category pill selection
+                const targetCat = modalData.category || "School";
+                if (elements.categoryPills) {
+                    elements.categoryPills.forEach((p) => {
+                        p.classList.toggle("active", p.dataset.category === targetCat);
+                    });
+                }
+
+                // Priority radio selection
+                const targetPriority = modalData.priority || "Normal";
+                if (elements.priorityRadios) {
+                    elements.priorityRadios.forEach((r) => {
+                        r.checked = (r.value === targetPriority);
+                    });
+                }
+
+                if (elements.modalOverlay) {
+                    elements.modalOverlay.hidden = false;
+                    window.setTimeout(() => {
+                        if (elements.modalTitleInput) elements.modalTitleInput.focus();
+                    }, 120);
+                }
+            }
+        } else if (!payload.active_modal && state.activeModal) {
+            state.activeModal = null;
+            if (elements.modalOverlay) {
+                elements.modalOverlay.hidden = true;
+            }
+        }
+    }
+
+    // ─── Modal Actions ────────────────────────────────────────────────────────
+
+    async function handleSaveDeadlineModal() {
+        if (!state.bridge || typeof state.bridge.save_deadline !== "function") {
+            if (elements.modalOverlay) elements.modalOverlay.hidden = true;
+            state.activeModal = null;
+            return;
+        }
+
+        const activePill = elements.categoryPills ? elements.categoryPills.find((p) => p.classList.contains("active")) : null;
+        const category = activePill ? activePill.dataset.category : "School";
+
+        const selectedPriority = elements.priorityRadios ? (elements.priorityRadios.find((r) => r.checked)?.value || "Normal") : "Normal";
+
+        const payload = {
+            title: elements.modalTitleInput ? elements.modalTitleInput.value.trim() : "New Task",
+            category: category,
+            due_date: elements.modalDateInput ? elements.modalDateInput.value.trim() : "",
+            due_time: elements.modalTimeInput ? elements.modalTimeInput.value.trim() : "23:59",
+            priority: selectedPriority,
+        };
+
+        if (elements.modalSaveBtn) {
+            elements.modalSaveBtn.disabled = true;
+        }
+
+        try {
+            const res = await state.bridge.save_deadline(payload);
+            applyBackendState(res);
+            if (elements.modalOverlay) {
+                elements.modalOverlay.hidden = true;
+            }
+            state.activeModal = null;
+            renderAll();
+        } catch (err) {
+            console.error("[Modal] Save deadline error:", err);
+        } finally {
+            if (elements.modalSaveBtn) {
+                elements.modalSaveBtn.disabled = false;
+            }
+        }
+    }
+
+    async function handleDismissModal() {
+        if (elements.modalOverlay) {
+            elements.modalOverlay.hidden = true;
+        }
+        state.activeModal = null;
+        if (state.bridge && typeof state.bridge.dismiss_modal === "function") {
+            try {
+                const res = await state.bridge.dismiss_modal();
+                applyBackendState(res);
+                renderAll();
+            } catch (err) {
+                console.error("[Modal] Dismiss error:", err);
+            }
         }
     }
 
