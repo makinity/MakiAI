@@ -53,6 +53,8 @@ class MakiUIApi:
         self._command_busy = False
         self._session_active = False
         self._session_expires_at = 0.0
+        self._last_command_text = ""
+        self._last_command_time = 0.0
 
         # Add initial welcome greeting to activity
         self._activity.append({
@@ -129,7 +131,8 @@ class MakiUIApi:
         recognizer = sr.Recognizer()
         recognizer.dynamic_energy_threshold = False
         recognizer.energy_threshold = 250
-        recognizer.pause_threshold = 0.8
+        recognizer.pause_threshold = 0.45
+        recognizer.non_speaking_duration = 0.35
 
         while self._session_active and self._auto_listen_enabled:
             # Check timeout (45s of silence)
@@ -138,9 +141,9 @@ class MakiUIApi:
                 self._exit_active_session()
                 return
 
-            # Wait while Maki is speaking
-            if self.tts_service and self.tts_service.is_speaking_or_recent(0.6):
-                time.sleep(0.2)
+            # Wait while Maki is speaking or PTT is recording
+            if (self.tts_service and self.tts_service.is_speaking_or_recent(0.5)) or (self.ptt_service and self.ptt_service.is_recording):
+                time.sleep(0.1)
                 continue
 
             try:
@@ -148,8 +151,8 @@ class MakiUIApi:
                 with sr.Microphone() as source:
                     audio = recognizer.listen(source, timeout=4, phrase_time_limit=10)
 
-                # Gate check: discard if TTS spoke during recording
-                if self.tts_service and self.tts_service.is_speaking_or_recent(0.6):
+                # Gate check: discard if TTS spoke or PTT recorded during listening
+                if (self.tts_service and self.tts_service.is_speaking_or_recent(0.5)) or (self.ptt_service and self.ptt_service.is_recording):
                     continue
 
                 self.state_manager.set_state(AppState.THINKING)
@@ -189,14 +192,14 @@ class MakiUIApi:
 
             except sr.WaitTimeoutError:
                 self.state_manager.set_state(AppState.IDLE)
-                time.sleep(0.1)
+                time.sleep(0.05)
             except sr.UnknownValueError:
                 self.state_manager.set_state(AppState.IDLE)
-                time.sleep(0.1)
+                time.sleep(0.05)
             except Exception as e:
                 print(f"[ActiveSession] Error: {e}")
                 self.state_manager.set_state(AppState.IDLE)
-                time.sleep(0.3)
+                time.sleep(0.2)
 
     def _exit_active_session(self, farewell: str = "") -> None:
         """End active session and restart wake word listener."""
@@ -210,7 +213,7 @@ class MakiUIApi:
                 time.sleep(0.1)
                 waited += 0.1
 
-        time.sleep(0.5)
+        time.sleep(0.3)
         if self._auto_listen_enabled and self.wake_word_service:
             if not self.wake_word_service.is_running:
                 self.wake_word_service.start()
@@ -238,6 +241,14 @@ class MakiUIApi:
             self.state_manager.set_state(AppState.IDLE)
             return
 
+        # Deduplication shield: prevent duplicate triggers within 1.8s
+        now = time.time()
+        if clean.lower() == self._last_command_text.lower() and (now - self._last_command_time) < 1.8:
+            print(f"[UIBridge] Suppressed duplicate command within 1.8s: '{clean}'")
+            return
+        self._last_command_text = clean
+        self._last_command_time = now
+
         self.add_activity("user", clean)
         self.state_manager.set_state(AppState.THINKING)
 
@@ -245,13 +256,12 @@ class MakiUIApi:
             response = self.orchestrator.handle_command(clean)
             if response:
                 self.add_activity("assistant", response)
-                time.sleep(0.3)
                 waited = 0
                 while self.tts_service.is_speaking() and waited < 30:
-                    time.sleep(0.1)
-                    waited += 0.1
-                # Reverb decay buffer
-                time.sleep(0.4)
+                    time.sleep(0.05)
+                    waited += 0.05
+                # Brief reverb decay buffer
+                time.sleep(0.2)
         except Exception as e:
             print(f"[UIBridge] Handle command error: {e}")
             self.add_activity("system", f"Command error: {e}")

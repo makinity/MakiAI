@@ -58,6 +58,11 @@ class PushToTalkService:
         self._start_audio_stream()
         self.start_listener()
 
+    @property
+    def is_recording(self) -> bool:
+        with self._lock:
+            return self._recording
+
     def set_callbacks(
         self,
         on_ptt_start: Optional[Callable[[], None]] = None,

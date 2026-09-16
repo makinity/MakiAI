@@ -60,14 +60,15 @@ class TTSService:
         self.use_fallback = use_fallback
         self.ducker = AudioDuckingService(duck_ratio=0.30)
 
-        # Voice configuration (Default: British Male assistant matching VoiceStudio profile)
+        # Voice engine selection (Default: direct edge-tts for zero latency)
+        self.tts_engine = os.getenv("TTS_ENGINE", "edge-tts").lower()
         self.edge_voice = os.getenv("TTS_VOICE", "en-GB-RyanNeural")
         self.edge_rate = os.getenv("TTS_RATE", "+2%")
         self.edge_pitch = os.getenv("TTS_PITCH", "-8Hz")
 
         self._speaking = False
         self._last_spoke_time = 0.0
-        self._elevenlabs_disabled = False
+        self._elevenlabs_disabled = (self.tts_engine == "edge-tts")
         self._pygame_initialized = False
         self._init_pygame()
 
