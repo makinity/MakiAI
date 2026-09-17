@@ -48,3 +48,7 @@ logs/
 
 # ─── Whisper Model Cache ─────────────────────────────────────────────────────
 models/
+
+# ─── Scratch / Temporary Scripts ─────────────────────────────────────────────
+scratch/
+

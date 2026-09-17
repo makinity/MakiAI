@@ -32,12 +32,16 @@ class RoutineEngine:
         reminder_service=None,
         tts_service=None,
         app_launcher=None,
+        telegram_service=None,
+        discord_service=None,
         config_path: Path = CONFIG_PATH,
     ):
         self.kb_reader = kb_reader
         self.reminder_service = reminder_service
         self.tts_service = tts_service
         self.app_launcher = app_launcher
+        self.telegram_service = telegram_service
+        self.discord_service = discord_service
         self.config_path = config_path
 
         self._running = False
@@ -258,7 +262,30 @@ class RoutineEngine:
             except Exception as e:
                 print(f"[RoutineEngine] Voice announcement error: {e}")
 
+        # 5. Proactive Telegram Alert (if connected)
+        if self.telegram_service and voice_msg:
+            try:
+                self.telegram_service.send_notification(f"🔔 *MakiAI Routine:*\n{voice_msg}")
+            except Exception as e:
+                print(f"[RoutineEngine] Telegram alert error: {e}")
+
+        # 6. Proactive Discord Alert & Voice (if connected)
+        if self.discord_service and voice_msg:
+            try:
+                self.discord_service.send_notification(f"🔔 **MakiAI Routine:**\n{voice_msg}")
+                self.discord_service.speak_in_voice(voice_msg)
+            except Exception as e:
+                print(f"[RoutineEngine] Discord alert error: {e}")
+
         return voice_msg
+
+    def set_telegram_service(self, telegram_service) -> None:
+        """Connect Telegram service dynamically."""
+        self.telegram_service = telegram_service
+
+    def set_discord_service(self, discord_service) -> None:
+        """Connect Discord service dynamically."""
+        self.discord_service = discord_service
 
     def _resolve_chrome_profile_directory(self, profile_input: str) -> str:
         """Resolve Chrome profile folder from email, profile name, or directory name."""

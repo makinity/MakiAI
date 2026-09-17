@@ -1,86 +1,5 @@
 [
   {
-    "timestamp": "2026-09-16 23:51:11",
-    "raw_command": "Check the recent messages on my Facebook page.",
-    "cleaned_command": "Check the recent messages on my Facebook page.",
-    "handler": "Skill:ComposioSkill",
-    "response": "Sir, you have a recent message on your MakiSync Page from MakiSync saying: \"Hello world! MakiAI here.\". Would you like me to draft a response?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:52:31",
-    "raw_command": "Check the recent messages on my Facebook page.",
-    "cleaned_command": "Check the recent messages on my Facebook page.",
-    "handler": "Skill:ComposioSkill",
-    "response": "Sir, the latest message on your Facebook page is from Mark Liones Juntilla, saying “Test.” Would you like to reply?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:52:46",
-    "raw_command": "Reply saying hello world.",
-    "cleaned_command": "Reply saying hello world.",
-    "handler": "Skill:ComposioSkill",
-    "response": "I've sent your reply \"saying hello world\" directly to Mark Liones Juntilla on Facebook Messenger, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:53:00",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:53:07",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:53:18",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:53:29",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:54:21",
-    "raw_command": "Check the recent messages on my Facebook page.",
-    "cleaned_command": "Check the recent messages on my Facebook page.",
-    "handler": "Skill:ComposioSkill",
-    "response": "Sir, you have a recent message on your MakiSync Page from MakiSync saying: \"saying hello world\". Would you like me to draft a response?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:54:58",
-    "raw_command": ".",
-    "cleaned_command": ".",
-    "handler": "Fallback:Gemini",
-    "response": "Good evening, sir. How can I assist you right now?",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
     "timestamp": "2026-09-16 23:55:08",
     "raw_command": "Check the recent messages on my Facebook page",
     "cleaned_command": "Check the recent messages on my Facebook page",
@@ -1798,5 +1717,86 @@
     "response": "Closing MakiAI for you, sir.",
     "is_fallback": false,
     "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 23:47:37",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 23:47:43",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 23:47:50",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 23:48:02",
+    "raw_command": "Hello.",
+    "cleaned_command": "Hello.",
+    "handler": "Skill:HelloSkill",
+    "response": "Good evening, sir. It is currently 11:48 PM on Thursday, September 17, 2026. According to your schedule, you are in the 11:00 PM to 12:00 AM wind-down block, so it’s time to prepare for sleep. Tomorrow is Friday, so you’ll have flexible time for any late homework or meetings, but for now, focus on resting.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 23:48:32",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 23:48:40",
+    "raw_command": "Maki.",
+    "cleaned_command": "",
+    "handler": "DirectAcknowledgment",
+    "response": "Yes, sir? I'm listening.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 23:48:50",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 23:48:57",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 23:52:32",
+    "raw_command": "what is my schedule today",
+    "cleaned_command": "what is my schedule today",
+    "handler": "Fallback:Stub",
+    "response": "I heard: what is my schedule today. Full AI will be connected once your API key is set.",
+    "is_fallback": true,
+    "flagged_for_review": true
   }
 ]

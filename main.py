@@ -204,8 +204,26 @@ def bootstrap_maki_services():
             skill_router=skill_router,
         )
         telegram_service.start()
+        if routine_engine:
+            routine_engine.set_telegram_service(telegram_service)
     except Exception as e:
         print(f"[MakiAI] Telegram service init error: {e}")
+
+    # 9. Discord Remote Voice & Messaging Bridge
+    try:
+        from services.remote.discord_service import DiscordRemoteService
+        discord_service = DiscordRemoteService(
+            settings_service=settings,
+            orchestrator=orchestrator,
+            state_manager=state_manager,
+            tts_service=tts_service,
+            skill_router=skill_router,
+        )
+        discord_service.start()
+        if routine_engine:
+            routine_engine.set_discord_service(discord_service)
+    except Exception as e:
+        print(f"[MakiAI] Discord service init error: {e}")
 
     return ui_api, settings
 

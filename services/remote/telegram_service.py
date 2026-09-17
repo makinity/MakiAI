@@ -1088,3 +1088,46 @@ class TelegramRemoteService:
         except Exception as e:
             print(f"[TelegramBridge] Document/Photo error: {e}")
             await update.message.reply_text(f"⚠️ Failed to process file: {e}")
+
+    def send_notification(self, text: str, parse_mode: str = "Markdown") -> bool:
+        """
+        Send a proactive outbound push notification to the authorized user's Telegram chat.
+        Can be called from any background service (RoutineEngine, ReminderService, etc.).
+        """
+        if not self._token or not self._allowed_user_id:
+            return False
+
+        if not self._app or not self._loop or not self._loop.is_running():
+            # Fallback to direct HTTP request if loop isn't active
+            try:
+                import urllib.request
+                import urllib.parse
+                data = urllib.parse.urlencode({
+                    "chat_id": self._allowed_user_id,
+                    "text": text,
+                    "parse_mode": parse_mode
+                }).encode()
+                req = urllib.request.Request(f"https://api.telegram.org/bot{self._token}/sendMessage", data=data)
+                urllib.request.urlopen(req, timeout=5)
+                return True
+            except Exception as e:
+                print(f"[TelegramBridge] Outbound HTTP notification error: {e}")
+                return False
+
+        async def _async_send():
+            try:
+                await self._app.bot.send_message(
+                    chat_id=int(self._allowed_user_id),
+                    text=text,
+                    parse_mode=parse_mode
+                )
+            except Exception as ex:
+                print(f"[TelegramBridge] Outbound send_message error: {ex}")
+
+        try:
+            asyncio.run_coroutine_threadsafe(_async_send(), self._loop)
+            return True
+        except Exception as e:
+            print(f"[TelegramBridge] Failed to schedule outbound notification: {e}")
+            return False
+

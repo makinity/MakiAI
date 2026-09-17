@@ -57,6 +57,11 @@
 - **Calibrated British Neural Voice**: High-fidelity, natural speech (`en-GB-RyanNeural`) with intelligent audio ducking during speech output.
 - **Hardware Telemetry**: Real-time battery life, CPU/RAM utilization, brightness, volume scaling, and power state controls (lock, sleep, shutdown).
 
+### 🎮 11. Discord Remote Voice & Channel Calling Bridge
+- **Live Voice Calling**: Joins your private Discord Voice Channel (`General`) and speaks with British Ryan Neural TTS (`edge-tts` + `ffmpeg`).
+- **Two-Way Discord Commands**: Type `!call`, `!join`, `!leave`, `!screen`, or chat naturally with MakiAI from your phone or desktop.
+- **Proactive Channel Alerts**: Broadcasts class reminders ($T-15\text{m}$), client work alerts, and job-hunting presets to Discord text & voice.
+
 ---
 
 ## 🛠️ Tech Stack
@@ -101,6 +106,7 @@ MakiAI/
 │   ├── media/                  # Spotify & native Windows media controls
 │   ├── memory/                 # Multi-session memory persistence
 │   ├── reminder/               # Background task scheduler & notifications
+│   ├── remote/                 # Telegram & Discord 24/7 Mobile/Desktop Voice & Remote Bridges
 │   ├── routines/               # Autonomous routine monitoring daemon & workspace launcher
 │   ├── storage/                # MakiSync storage path handlers & utilities
 │   └── voice/                  # Porcupine wake word, STT, Edge-TTS & audio ducking
