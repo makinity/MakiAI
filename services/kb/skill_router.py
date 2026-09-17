@@ -9,36 +9,42 @@ Returns a skill instance ready to execute, or None if no skill matched.
 """
 
 import re
-from typing import Optional
+from typing import Optional, Union, Dict, Any, List
+
+from skills.base_skill import BaseSkill
 
 
 class SkillRouter:
     """
     Detects which KB skill to execute based on the user's input.
 
-    Skills are registered with their trigger keywords.
-    The router checks each trigger against the input and returns
-    the first matching skill instance.
-
-    Usage:
-        router = SkillRouter(skills_dict)
-        skill = router.detect("good morning")
-        if skill:
-            response = skill.execute(text)
+    Skills can be provided as a dictionary or managed dynamically
+    by a SkillRegistry.
     """
 
-    def __init__(self, skills: dict):
+    def __init__(self, skills: Union[dict, Any]):
         """
         Args:
-            skills: Dict mapping skill_id → skill instance.
-                    e.g. {"goodmorning": GoodMorningSkill(...), ...}
+            skills: Dict mapping skill_id → skill instance or SkillRegistry instance.
         """
-        self._skills = skills
+        self._registry = skills if hasattr(skills, "get_all_skills") else None
+        self._skills: Dict[str, Any] = skills.get_all_skills() if self._registry else (skills or {})
 
         # Trigger map: list of (pattern, skill_id) tuples
-        # Checked in order — more specific patterns first
         self._triggers: list[tuple[re.Pattern, str]] = []
         self._build_trigger_map()
+
+    @property
+    def skill_registry(self):
+        """Return attached SkillRegistry instance if any."""
+        return self._registry
+
+    def reload(self) -> None:
+        """Hot-reload skills and rebuild trigger maps."""
+        if self._registry and hasattr(self._registry, "reload_skills"):
+            self._skills = self._registry.reload_skills()
+        self._build_trigger_map()
+        print(f"[SkillRouter] Rebuilt trigger map with {len(self._triggers)} patterns across {len(self._skills)} skills.")
 
     # ─── Trigger Map ──────────────────────────────────────────────────────────
 
@@ -180,6 +186,21 @@ class SkillRouter:
             ]),
         ]
 
+        self._triggers = []
+        registered_ids = set()
+
+        # 1. Collect declared triggers from active skill instances
+        for skill_id, skill in self._skills.items():
+            declared_triggers = getattr(skill, "TRIGGERS", [])
+            if declared_triggers:
+                for pat in declared_triggers:
+                    try:
+                        self._triggers.append((re.compile(pat, re.IGNORECASE), skill_id))
+                        registered_ids.add(skill_id)
+                    except Exception as e:
+                        print(f"[SkillRouter] Invalid regex in skill '{skill_id}': {pat} ({e})")
+
+        # 2. Add fallback trigger definitions for standard skills
         for skill_id, patterns in trigger_definitions:
             for pattern in patterns:
                 compiled = re.compile(pattern, re.IGNORECASE)
@@ -206,6 +227,16 @@ class SkillRouter:
             flags=re.IGNORECASE,
         ).strip()
 
+        # 1. Check custom can_handle() on active skills first
+        for skill_id, skill in self._skills.items():
+            try:
+                if hasattr(skill, "can_handle") and skill.can_handle(cleaned):
+                    print(f"[SkillRouter] can_handle matched skill: {skill_id}")
+                    return skill
+            except Exception as e:
+                print(f"[SkillRouter] Error checking can_handle for {skill_id}: {e}")
+
+        # 2. Check regex trigger patterns
         for pattern, skill_id in self._triggers:
             if pattern.search(cleaned):
                 # 1. If research triggered but command asks to play/watch, pass to ComputerRouter
@@ -224,10 +255,6 @@ class SkillRouter:
                 if skill:
                     print(f"[SkillRouter] Matched skill: {skill_id}")
                     return skill
-                else:
-                    print(f"[SkillRouter] Skill '{skill_id}' matched but not registered.")
-
-        return None
 
         return None
 
@@ -240,6 +267,7 @@ class SkillRouter:
             skill_instance: The skill object with an execute() method.
         """
         self._skills[skill_id] = skill_instance
+        self._build_trigger_map()
         print(f"[SkillRouter] Registered skill: {skill_id}")
 
     def get_skill(self, skill_id: str) -> Optional[object]:
@@ -249,4 +277,10 @@ class SkillRouter:
     def list_skills(self) -> list[str]:
         """Return a list of all registered skill IDs."""
         return list(self._skills.keys())
+
+    def get_catalog(self) -> list[dict]:
+        """Return structured skill catalog."""
+        if self._registry and hasattr(self._registry, "get_catalog"):
+            return self._registry.get_catalog()
+        return [{"id": sid, "name": sid.title()} for sid in self._skills]
 

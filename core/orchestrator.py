@@ -15,6 +15,7 @@ from typing import Tuple
 from core.state_manager import StateManager, AppState
 from services.computer.computer_router import ComputerRouter
 from services.ai.kiro_service import KiroService
+from services.memory.fact_extractor import FactExtractor
 
 TRAINING_MD_PATH = Path(__file__).resolve().parents[1] / "training.md"
 COMMAND_LOG_PATH = Path(__file__).resolve().parents[1] / "data" / "command_log.json"
@@ -75,6 +76,9 @@ class Orchestrator:
         # Kiro CLI Coding Engine
         self.kiro_service = KiroService()
 
+        # Continuous Durable Fact & Memory Extractor
+        self.fact_extractor = FactExtractor()
+
     def set_services(self, services: dict) -> None:
         """Inject all backend services after initialization."""
         self.gemini_service = services.get("gemini") or services.get("gemini_service")
@@ -83,6 +87,10 @@ class Orchestrator:
         self.kb_reader = services.get("kb_reader")
         self.kb_writer = services.get("kb_writer")
         self.context_builder = services.get("context_builder")
+
+        # Pass Gemini to FactExtractor
+        if self.gemini_service and self.fact_extractor:
+            self.fact_extractor.set_ai_service(self.gemini_service)
 
         # Pass Gemini to ComputerRouter for vision/smart features
         if self.gemini_service and self.computer_router:
@@ -121,6 +129,10 @@ class Orchestrator:
         finally:
             # Asynchronously log command for self-improvement and training review
             self._log_command_event(text.strip(), cleaned_cmd, handler_name, response, is_fallback)
+
+            # Asynchronously extract durable facts & preferences for long-term memory
+            if self.fact_extractor and response:
+                self.fact_extractor.extract_async(text.strip(), response)
 
             # State resets to IDLE after TTS finishes (via tts_service callbacks)
             if not self.tts_service or not self.tts_service.is_speaking():
@@ -211,6 +223,14 @@ class Orchestrator:
         # Instant acknowledgment for simple pleasantries ("Thank you.", "Thanks Maki")
         if re.match(r"^(thank\s+you|thanks|thank\s+you\s+maki|thanks\s+maki)[.,?!]?$", raw_stripped, flags=re.IGNORECASE):
             return "You're welcome, sir.", "DirectAcknowledgment", False, cleaned
+
+        # Instant command: hot-reload skills
+        if re.search(r"^(?:please\s+)?(?:reload|refresh)\s+(?:all\s+)?skills?$", cleaned, flags=re.IGNORECASE):
+            if self.skill_router:
+                self.skill_router.reload()
+                skill_count = len(getattr(self.skill_router, "_skills", {}))
+                return f"All skills have been hot-reloaded successfully, sir. {skill_count} active skills ready.", "SkillRouter:Reload", False, cleaned
+            return "Skill router is not active, sir.", "SkillRouter:Reload", False, cleaned
 
         # 0. Kiro CLI Integration (Interactive Terminal or Headless Code Gen)
         if "kiro" in cleaned.lower():

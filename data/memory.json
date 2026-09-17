@@ -13,6 +13,13 @@
       "value": "The user's dog's name is Cooper",
       "created_at": "2026-09-15T21:27:28.766336",
       "updated_at": "2026-09-15T21:27:28.766336"
+    },
+    {
+      "id": "18e26f5e-878e-46e0-bc1a-8cb932534fa6",
+      "key": "personal_project_maki_cli",
+      "value": "User is building a CLI for coding called Maki-CLI. User's favorite color is dark navy blue.",
+      "created_at": "2026-09-17T20:42:37.654250",
+      "updated_at": "2026-09-17T20:42:37.655183"
     }
   ]
 }

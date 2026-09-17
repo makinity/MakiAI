@@ -113,6 +113,223 @@ class FileManager:
     def __init__(self):
         self.last_created_file: Path | None = None
         self.last_accessed_file: Path | None = None
+        self._cached_index: list[Path] = []
+        self._index_time: float = 0.0
+
+    def _scan_directory_fast(self, root: Path, max_depth: int = 4) -> list[Path]:
+        """Fast non-recursive directory scanner using os.scandir with directory pruning."""
+        if not root or not root.exists():
+            return []
+
+        IGNORED_NAMES = {
+            "node_modules", ".git", ".next", "__pycache__", "venv", ".venv",
+            "dist", "build", ".idea", ".vscode", "appdata", "$recycle.bin",
+            "system volume information", "site-packages", ".cache", ".gemini",
+            "windows", "program files", "program files (x86)"
+        }
+
+        results = []
+        stack = [(str(root), 0)]
+
+        while stack:
+            curr_dir, depth = stack.pop()
+            if depth > max_depth:
+                continue
+            try:
+                with os.scandir(curr_dir) as it:
+                    for entry in it:
+                        try:
+                            name_lower = entry.name.lower()
+                            if name_lower.startswith(".") or name_lower in IGNORED_NAMES:
+                                continue
+                            if entry.is_file(follow_symlinks=False):
+                                results.append(Path(entry.path))
+                            elif entry.is_dir(follow_symlinks=False):
+                                if depth < max_depth:
+                                    stack.append((entry.path, depth + 1))
+                        except (PermissionError, OSError):
+                            continue
+            except (PermissionError, OSError):
+                continue
+
+        return results
+
+    def get_indexed_files(self, force_refresh: bool = False) -> list[Path]:
+        """Return cached indexed files across all priority system roots with 4-second TTL."""
+        import time
+        now = time.time()
+        if not force_refresh and self._cached_index and (now - self._index_time < 4.0):
+            return self._cached_index
+
+        from services.storage.maki_sync import MAKI_SYNC_ROOT
+        from services.settings.settings_service import SettingsService
+
+        kb_path = Path(SettingsService().get_kb_path())
+        roots = [
+            (Path.home() / "Downloads", 2),
+            (MAKI_SYNC_ROOT, 5),
+            (kb_path, 4),
+            (Path.home() / "Documents", 3),
+            (Path.home() / "Desktop", 2),
+            (Path.home() / "Pictures", 3),
+            (Path.home() / "Videos", 2),
+            (Path(r"c:\development"), 3),
+        ]
+
+        all_files = []
+        seen = set()
+        for root_p, depth in roots:
+            if root_p and root_p.exists():
+                for f in self._scan_directory_fast(root_p, max_depth=depth):
+                    f_str = str(f).lower()
+                    if f_str not in seen:
+                        seen.add(f_str)
+                        all_files.append(f)
+
+        self._cached_index = all_files
+        self._index_time = now
+        return all_files
+
+    def find_latest_file(self, target_type: str = "any", source: str = "any") -> Path | None:
+        """
+        Find the newest file matching target_type and source filter across indexed system roots.
+        """
+        files = self.get_indexed_files()
+        if not files:
+            return None
+
+        # 1. Resolve Target Extensions
+        TYPE_MAP = {
+            "docx": {".docx", ".doc"},
+            "word": {".docx", ".doc"},
+            "doc": {".docx", ".doc"},
+            "pdf": {".pdf"},
+            "image": {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".svg", ".ico", ".heic"},
+            "picture": {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".svg", ".ico", ".heic"},
+            "photo": {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".svg", ".heic"},
+            "screenshot": {".png", ".jpg", ".jpeg", ".webp"},
+            "video": {".mp4", ".mkv", ".mov", ".avi", ".webm", ".wmv", ".flv"},
+            "recording": {".mp4", ".mkv", ".mov", ".avi", ".webm"},
+            "excel": {".xlsx", ".xls", ".csv"},
+            "spreadsheet": {".xlsx", ".xls", ".csv"},
+            "xlsx": {".xlsx", ".xls"},
+            "csv": {".csv"},
+            "powerpoint": {".pptx", ".ppt"},
+            "presentation": {".pptx", ".ppt"},
+            "pptx": {".pptx", ".ppt"},
+            "code": {".py", ".js", ".ts", ".html", ".css", ".json", ".yaml", ".yml", ".env"},
+            "python": {".py"},
+            "script": {".py", ".js", ".ts"},
+            "text": {".txt", ".md"},
+            "note": {".txt", ".md"},
+            "notes": {".txt", ".md"},
+            "markdown": {".md"},
+            "document": {".docx", ".doc", ".pdf", ".txt", ".md", ".xlsx", ".pptx"},
+            "archive": {".zip", ".rar", ".7z", ".tar", ".gz"},
+            "zip": {".zip", ".rar", ".7z"},
+        }
+
+        target_clean = target_type.lower().strip().lstrip(".")
+        if target_type.startswith("."):
+            valid_exts = {target_type.lower().strip()}
+        else:
+            valid_exts = TYPE_MAP.get(target_clean, None)
+
+        filtered = files
+        if valid_exts:
+            filtered = [f for f in filtered if f.suffix.lower() in valid_exts]
+
+        # 2. Resolve Source Filters
+        src_lower = source.lower().strip()
+        if src_lower in ("download", "downloads", "downloaded"):
+            downloads_dir = str(Path.home() / "Downloads").lower()
+            filtered = [f for f in filtered if str(f).lower().startswith(downloads_dir)]
+        elif src_lower in ("screenshot", "screenshots"):
+            filtered = [f for f in filtered if "screenshot" in str(f).lower() or "capture" in str(f).lower()]
+        elif src_lower in ("photo", "photos", "camera"):
+            filtered = [f for f in filtered if "photo" in str(f).lower() or "camera" in str(f).lower()]
+        elif src_lower in ("recording", "recordings", "video", "videos"):
+            filtered = [f for f in filtered if "recording" in str(f).lower() or "video" in str(f).lower()]
+        elif src_lower in ("makisync", "storage"):
+            from services.storage.maki_sync import MAKI_SYNC_ROOT
+            maki_dir = str(MAKI_SYNC_ROOT).lower()
+            filtered = [f for f in filtered if str(f).lower().startswith(maki_dir)]
+        elif src_lower in ("knowledge_base", "kb", "knowledge"):
+            from services.settings.settings_service import SettingsService
+            kb_dir = str(SettingsService().get_kb_path()).lower()
+            filtered = [f for f in filtered if str(f).lower().startswith(kb_dir)]
+
+        if not filtered:
+            return None
+
+        # Sort by mtime descending
+        try:
+            filtered.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+            return filtered[0]
+        except Exception:
+            return filtered[0] if filtered else None
+
+    def open_latest_file(self, target_type: str = "any", source: str = "any", action: str = "open") -> str:
+        """
+        Find and either launch the latest file or reveal its folder in File Explorer.
+        
+        Args:
+            target_type: File extension (e.g. 'docx', 'pdf', 'png') or category ('image', 'document', etc.)
+            source: Source filter ('download', 'screenshot', 'storage', 'any')
+            action: 'open' (launch file) or 'reveal' (open folder with file highlighted)
+        """
+        latest = self.find_latest_file(target_type=target_type, source=source)
+        if not latest:
+            type_label = target_type.upper() if target_type.startswith(".") else target_type.capitalize()
+            src_label = f" in {source}" if source != "any" else ""
+            return f"I couldn't find any recent {type_label} files{src_label} on your PC, sir."
+
+        self.last_accessed_file = latest
+
+        # Nice descriptive name
+        friendly_types = {
+            "docx": "Word document", "word": "Word document", "doc": "Word document",
+            "pdf": "PDF document", "image": "image", "picture": "image", "photo": "photo",
+            "screenshot": "screenshot", "video": "video recording", "recording": "recording",
+            "excel": "spreadsheet", "spreadsheet": "spreadsheet", "code": "code file", "python": "Python script"
+        }
+        kind = friendly_types.get(target_type.lower().lstrip("."), f"{target_type.upper()} file")
+        src_desc = "downloaded " if source in ("download", "downloads") else ("captured " if source in ("screenshot", "photo") else "")
+
+        if action in ("reveal", "folder", "folder_path", "directory", "show_folder"):
+            self._open_in_explorer(latest)
+            return f"Opening the folder for your latest {src_desc}{kind}, '{latest.name}', in File Explorer, sir."
+        else:
+            self._open_file(latest)
+            return f"Opening your latest {src_desc}{kind}, '{latest.name}', for you, sir."
+
+    def open_specific_file(self, query: str, action: str = "open") -> str:
+        """
+        Find a specific file by keyword and open or reveal it.
+        """
+        found = self.find_file(query)
+        if not found:
+            return f"I couldn't find any file matching '{query}' across your storage or Knowledge Base, sir."
+
+        self.last_accessed_file = found
+        if action in ("reveal", "folder", "folder_path", "directory", "show_folder"):
+            self._open_in_explorer(found)
+            return f"Opening the folder for '{found.name}' in File Explorer, sir."
+        else:
+            self._open_file(found)
+            return f"Opening '{found.name}' from {found.parent.name} for you, sir."
+
+    def reveal_in_explorer(self, filepath: Path | str) -> str:
+        """Reveal a specific file or path in Windows File Explorer."""
+        p = Path(filepath) if isinstance(filepath, str) else filepath
+        if p.exists():
+            if p.is_file():
+                self._open_in_explorer(p)
+                return f"Opening the folder containing '{p.name}' in File Explorer, sir."
+            else:
+                self._open_folder_in_explorer(p)
+                return f"Opening '{p.name}' folder in File Explorer, sir."
+        return f"I couldn't find the path '{filepath}', sir."
 
     def get_last_file(self) -> Path | None:
         """Return the most recently created or accessed text/document file."""
@@ -122,20 +339,7 @@ class FileManager:
         if self.last_accessed_file and self.last_accessed_file.exists() and self.last_accessed_file.suffix.lower() in DOC_EXTENSIONS:
             return self.last_accessed_file
 
-        # Fallback: Find the newest document/text file in MakiSync Storage
-        from services.storage.maki_sync import MAKI_SYNC_ROOT
-        try:
-            if MAKI_SYNC_ROOT.exists():
-                files = [
-                    f for f in MAKI_SYNC_ROOT.rglob("*")
-                    if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in DOC_EXTENSIONS
-                ]
-                if files:
-                    files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
-                    return files[0]
-        except Exception:
-            pass
-        return None
+        return self.find_latest_file("document")
 
     def create_file(self, filename: str, content: str = "", folder_path: str = "") -> str:
         """
@@ -268,55 +472,56 @@ class FileManager:
                 if cand.exists() and cand.is_file():
                     return _prefer_pdf(cand)
 
-        # 2. Search primary roots first (Knowledge Base & MakiSync Storage)
-        primary_roots = [r for r in [kb_path, MAKI_SYNC_ROOT] if r and r.exists()]
-        secondary_roots = [Path.home() / "Documents", Path.home() / "Desktop", Path.home() / "Downloads"]
+        # 2. Search indexed files (Exact filename/stem match first)
+        indexed = self.get_indexed_files()
+        query_lower = query_clean.lower()
 
-        # Clean query tokens (remove filler words)
+        # Exact match check
+        for p in indexed:
+            if p.name.lower() == query_lower or p.stem.lower() == query_lower:
+                return _prefer_pdf(p)
+
+        # Exact match with common extension check
+        for ext in [".pdf", ".docx", ".doc", ".txt", ".md", ".xlsx", ".pptx", ".py", ".png", ".jpg"]:
+            cand_name = f"{query_lower}{ext}"
+            for p in indexed:
+                if p.name.lower() == cand_name:
+                    return _prefer_pdf(p)
+
+        # 3. Clean query tokens (remove filler words)
         tokens_raw = re.sub(
-            r"\b(open|show|find|get|the|file|document|where|i|store|my|inside|in|knowledge|base|space|storage|please|can|you)\b",
+            r"\b(open|show|find|get|the|file|document|where|i|store|my|inside|in|knowledge|base|space|storage|please|can|you|for|me|called|named|folder|path|location|directory)\b",
             "",
             query_clean,
             flags=re.IGNORECASE
         ).strip()
         keywords = [t.lower() for t in re.split(r"[\s_\-]+", tokens_raw) if len(t) >= 3]
 
-        IGNORED_DIRS = {"node_modules", ".git", ".next", "__pycache__", "venv", ".venv", "dist", "build", ".idea", ".vscode"}
+        if not keywords:
+            return None
 
-        # Check primary roots first (Exact filename/stem search)
-        for root in primary_roots:
-            for p in root.rglob("*"):
-                if p.is_file() and not p.name.startswith(".") and not any(part in IGNORED_DIRS for part in p.parts):
-                    if p.name.lower() == query_clean.lower() or p.stem.lower() == query_clean.lower():
-                        return _prefer_pdf(p)
-
-        # Check primary roots for keyword match
+        # 4. Keyword score search across all indexed files
         best_file = None
-        best_score = 0
-        if keywords:
-            for root in primary_roots:
-                for p in root.rglob("*"):
-                    if p.is_file() and not p.name.startswith(".") and not any(part in IGNORED_DIRS for part in p.parts):
-                        fname_lower = p.name.lower()
-                        # Only score if keywords actually appear in the filename itself
-                        score = sum(1 for kw in keywords if kw in fname_lower)
-                        if score > 0:
-                            if p.suffix.lower() == ".pdf":
-                                score += 0.5
-                            if score > best_score:
-                                best_score = score
-                                best_file = p
+        best_score = 0.0
 
-        if best_score > 0 and best_file:
+        for p in indexed:
+            fname_lower = p.name.lower()
+            # Count how many keywords appear in the filename
+            matches = sum(1 for kw in keywords if kw in fname_lower)
+            if matches > 0:
+                # Score formula: matched tokens / total keywords + bonus for exact prefix + bonus for PDF
+                score = matches / len(keywords)
+                if fname_lower.startswith(keywords[0]):
+                    score += 0.2
+                if p.suffix.lower() == ".pdf":
+                    score += 0.1
+                # Prefer more recent files slightly on ties
+                if score > best_score:
+                    best_score = score
+                    best_file = p
+
+        if best_score >= 0.5 and best_file:
             return _prefer_pdf(best_file)
-
-        # Fallback to secondary roots (Desktop, Documents, Downloads)
-        for root in secondary_roots:
-            if root and root.exists():
-                for p in root.glob("*"):
-                    if p.is_file() and not p.name.startswith("."):
-                        if p.name.lower() == query_clean.lower() or p.stem.lower() == query_clean.lower():
-                            return _prefer_pdf(p)
 
         return None
 

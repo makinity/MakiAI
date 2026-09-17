@@ -181,8 +181,23 @@ class ComposioSkill(BaseSkill):
 
         print(f"[ComposioSkill] Executing cloud action: {action_slug} with args: {arguments}")
 
-        # Step 3: Execute Action
-        result = self.composio.execute_action(action_slug, arguments)
+        # Step 3: Execute Action with Self-Healing Engine
+        def _call_composio(**kw):
+            return self.composio.execute_action(action_slug, kw)
+
+        is_ok, result, status_msg = self.self_healer.execute_with_retry(
+            action_fn=_call_composio,
+            action_name=action_slug,
+            caller="ComposioSkill",
+            params=arguments,
+            user_intent=clean_text,
+            ai_service=self.gemini,
+            max_retries=2,
+            is_success_fn=lambda r: bool(isinstance(r, dict) and r.get("success", False))
+        )
+
+        if not result:
+            result = {"success": False, "error": status_msg}
 
         # Step 3.5: If page conversations retrieved, fetch latest messages details
         if result.get("success") and action_slug == "FACEBOOK_GET_PAGE_CONVERSATIONS":

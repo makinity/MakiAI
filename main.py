@@ -51,20 +51,9 @@ def bootstrap_maki_services():
     from services.kb.kb_writer import KBWriter
     from services.kb.kb_index import KBIndex
     from services.kb.skill_router import SkillRouter
+    from services.skills.skill_registry import SkillRegistry
     from services.reminder.reminder_service import ReminderService
     from services.memory.memory_service import MemoryService
-    from skills.goodmorning_skill import GoodMorningSkill
-    from skills.goodnight_skill import GoodNightSkill
-    from skills.hello_skill import HelloSkill
-    from skills.deadline_skill import DeadlineSkill
-    from skills.reminder_skill import ReminderSkill
-    from skills.memory_skill import MemorySkill
-    from skills.new_project_skill import NewProjectSkill
-    from skills.homework_skill import HomeworkSkill
-    from skills.research_skill import ResearchSkill
-    from skills.clip_skill import ClipSkill
-    from skills.interpreter_skill import InterpreterSkill
-    from skills.composio_skill import ComposioSkill
     from services.cloud.composio_service import ComposioService
     from gui.ui_bridge import MakiUIApi
 
@@ -81,21 +70,16 @@ def bootstrap_maki_services():
     state_manager = StateManager()
     orchestrator = Orchestrator(state_manager)
 
-    # 2. KB & Context
-    kb_reader = KBReader(kb_path=settings.get_kb_path())
-    kb_writer = KBWriter(kb_path=settings.get_kb_path())
-    kb_index = KBIndex(kb_reader=kb_reader)
-    memory_service = MemoryService()
-
-    # 3. AI & Router
+    # 2. AI & KB Services
     gemini = GeminiService(
         api_key=settings.get_gemini_api_key(),
         groq_api_key=settings.get_groq_api_key(),
     )
-    context_builder = ContextBuilder(
-        kb_reader=kb_reader,
-        kb_index=kb_index,
-    )
+    kb_path = settings.get_kb_path()
+    kb_reader = KBReader(kb_path)
+    kb_writer = KBWriter(kb_path)
+    kb_index = KBIndex(kb_reader=kb_reader)
+    context_builder = ContextBuilder(kb_reader, kb_index=kb_index)
     context_builder.invalidate_cache()
 
     # Auto-index hook
@@ -115,25 +99,19 @@ def bootstrap_maki_services():
     kb_writer.write = _write_and_invalidate
     kb_writer.append = _append_and_invalidate
 
-    # 4. Skills
-    skill_deps = (gemini, context_builder, kb_reader, kb_writer)
+    # 4. Skills (Dynamic Discovery & Auto-Loading)
     reminder_service = ReminderService()
     composio_service = ComposioService()
-    skills = {
-        "goodmorning": GoodMorningSkill(*skill_deps),
-        "goodnight": GoodNightSkill(*skill_deps),
-        "hello": HelloSkill(*skill_deps),
-        "deadline": DeadlineSkill(*skill_deps),
-        "reminder": ReminderSkill(*skill_deps, reminder_service=reminder_service),
-        "memory": MemorySkill(*skill_deps),
-        "new_project": NewProjectSkill(*skill_deps),
-        "homework": HomeworkSkill(*skill_deps),
-        "research": ResearchSkill(*skill_deps),
-        "clip": ClipSkill(*skill_deps),
-        "interpreter": InterpreterSkill(*skill_deps),
-        "composio": ComposioSkill(*skill_deps, composio_service=composio_service),
-    }
-    skill_router = SkillRouter(skills)
+    skill_registry = SkillRegistry({
+        "gemini": gemini,
+        "context_builder": context_builder,
+        "kb_reader": kb_reader,
+        "kb_writer": kb_writer,
+        "reminder_service": reminder_service,
+        "composio_service": composio_service,
+    })
+    skill_registry.discover_and_load()
+    skill_router = SkillRouter(skill_registry)
 
     # 5. Voice Services
     tts_service = TTSService(
@@ -194,7 +172,7 @@ def bootstrap_maki_services():
     )
 
     # Connect UI Bridge to all interactive skills
-    for skill_name, skill_inst in skills.items():
+    for skill_name, skill_inst in skill_registry.get_all_skills().items():
         if hasattr(skill_inst, "set_ui_bridge"):
             skill_inst.set_ui_bridge(ui_api)
 

@@ -3776,3 +3776,966 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"You're welcome, sir."`
 
 ---
+
+### 🔹 Live Session Command — 10:27:27 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:27:35 AM
+* **Spoken / Typed Command:** `"Help me create my homework"`
+* **Extracted Payload:** `"Help me create my homework"`
+* **Matched Handler:** `Skill:HomeworkSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I've drafted the homework generator for Help me create my homework, sir. Please review the topics and format style on your screen."`
+
+---
+
+### 🔹 Live Session Command — 10:27:47 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:27:57 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:28:02 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:28:05 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:28:07 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:28:10 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:28:14 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:28:23 AM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `HomeworkSkill:GenerateDocx`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Your homework is ready, sir. I've saved it as homework_Tampak_102822.docx in your Assignments folder and opened it for you."`
+
+---
+
+### 🔹 Live Session Command — 10:28:50 AM
+* **Spoken / Typed Command:** `"Sampai, Upwork, Zylam, FastAPI, MakiBase, Sipabase, Tupics, Taks."`
+* **Extracted Payload:** `"Sampai, Upwork, Zylam, FastAPI, MakiBase, Sipabase, Tupics, Taks."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Sure, sir. Here’s a quick rundown of each of those names:  Sampai is a freelance marketplace that connects clients with remote talent, much ..."`
+
+---
+
+### 🔹 Live Session Command — 10:29:50 AM
+* **Spoken / Typed Command:** `"This video is a video."`
+* **Extracted Payload:** `"This video is a video."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Indeed it is, sir. Is there a specific video file you would like me to process, save to MakiSync, or upload for you today?"`
+
+---
+
+### 🔹 Live Session Command — 10:30:01 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:30:05 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:30:09 AM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I am here, sir. How can I assist you today?"`
+
+---
+
+### 🔹 Live Session Command — 10:30:42 AM
+* **Spoken / Typed Command:** `"Pembrokeak."`
+* **Extracted Payload:** `"Pembrokeak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I am not quite sure I caught that, sir. How can I help you today?"`
+
+---
+
+### 🔹 Live Session Command — 10:31:01 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:31:04 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:31:06 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:31:07 AM
+* **Spoken / Typed Command:** `"Topics."`
+* **Extracted Payload:** `"Topics."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Are you asking about the topics for your subjects like ICC 600 and 601, sir, or would you like me to go over today's agenda and your current..."`
+
+---
+
+### 🔹 Live Session Command — 10:31:16 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:31:20 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:31:29 AM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good morning, sir. I am right here and ready to assist. What can I do for you today?"`
+
+---
+
+### 🔹 Live Session Command — 10:31:33 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:31:34 AM
+* **Spoken / Typed Command:** `"Rene."`
+* **Extracted Payload:** `"Rene."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I am here, sir. How can I help you today?"`
+
+---
+
+### 🔹 Live Session Command — 10:31:43 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:32:04 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:32:08 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:32:08 AM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good morning, sir. I am right here and ready whenever you need me. What can I help you with today?"`
+
+---
+
+### 🔹 Live Session Command — 10:32:29 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:32:36 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:32:44 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:32:48 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:32:50 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:32:53 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:33:11 AM
+* **Spoken / Typed Command:** `"Tick."`
+* **Extracted Payload:** `"Tick."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Still here, sir. It is currently 10:33 AM on a Thursday morning. Just as a quick reminder for your schedule today, you need to message your ..."`
+
+---
+
+### 🔹 Live Session Command — 10:34:11 AM
+* **Spoken / Typed Command:** `"12.000."`
+* **Extracted Payload:** `"12.000."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I had trouble thinking. Please try again."`
+
+---
+
+### 🔹 Live Session Command — 10:34:50 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:35:10 AM
+* **Spoken / Typed Command:** `"What are my schedule today? What is my schedule for today?"`
+* **Extracted Payload:** `"What are my schedule today? What is my schedule for today?"`
+* **Matched Handler:** `Skill:GoodMorningSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Good morning, sir. It is currently 10:34 AM.   Right now, you are in your job hunting block, which runs until noon. Following lunch, you hav..."`
+
+---
+
+### 🔹 Live Session Command — 10:35:46 AM
+* **Spoken / Typed Command:** `"I want you to add a new deadline about the activity tree on ICC 600 tomorrow at 12pm."`
+* **Extracted Payload:** `"I want you to add a new deadline about the activity tree on ICC 600 tomorrow at 12pm."`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I've drafted that deadline for I want you to add a new deadline about the activity tree on ICC 600 tomorrow under School due on 2026-09-18, ..."`
+
+---
+
+### 🔹 Live Session Command — 10:36:00 AM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Glad to hear it, sir. Let me know if there is anything else you need at the moment."`
+
+---
+
+### 🔹 Live Session Command — 10:36:05 AM
+* **Spoken / Typed Command:** `"So, let's go."`
+* **Extracted Payload:** `"So, let's go."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good morning, sir. Systems are online and ready when you are.   It is currently ten thirty-five in the morning, and you have a clear stretch..."`
+
+---
+
+### 🔹 Live Session Command — 10:36:32 AM
+* **Spoken / Typed Command:** `"I'm not sure."`
+* **Extracted Payload:** `"I'm not sure."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"That is completely fine, sir. Take your time. For today, you have a reminder to message the client at three this afternoon, and then your wo..."`
+
+---
+
+### 🔹 Live Session Command — 10:36:48 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:37:02 AM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 10:37:08 AM
+* **Spoken / Typed Command:** `"Topics, T"`
+* **Extracted Payload:** `"Topics, T"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Did you get cut off there, sir? Please let me know what topics or information you would like me to look into for you."`
+
+---
+
+### 🔹 Live Session Command — 10:37:14 AM
+* **Spoken / Typed Command:** `"."`
+* **Extracted Payload:** `"."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Standing by, sir. How can I assist you today?"`
+
+---
+
+### 🔹 Live Session Command — 10:37:19 AM
+* **Spoken / Typed Command:** `"Do we have any deadlines?"`
+* **Extracted Payload:** `"Do we have any deadlines?"`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You have two school deadlines coming up tomorrow, sir. First, your activity tree for ICC 600 is due at 1:00 PM. Later that night, your Capst..."`
+
+---
+
+### 🔹 Live Session Command — 08:34:34 PM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Is that all for now, sir? If you need anything else, just let me know."`
+
+---
+
+### 🔹 Live Session Command — 08:34:43 PM
+* **Spoken / Typed Command:** `"I usually write my scripts in Python using Antigravity."`
+* **Extracted Payload:** `"I usually write my scripts in Python using Antigravity."`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Done, sir. I've created and saved your document in script.py inside python and opened it for you."`
+
+---
+
+### 🔹 Live Session Command — 08:34:48 PM
+* **Spoken / Typed Command:** `"Mike Kroos."`
+* **Extracted Payload:** `"Mike Kroos."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"He’s a legend, sir. The metronome of modern football."`
+
+---
+
+### 🔹 Live Session Command — 08:34:59 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:35:03 PM
+* **Spoken / Typed Command:** `"What code editor and language do I use?"`
+* **Extracted Payload:** `"What code editor and language do I use?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You use Visual Studio Code as your primary editor, and you write your scripts in Python, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:35:16 PM
+* **Spoken / Typed Command:** `"What are my current tech stacks?"`
+* **Extracted Payload:** `"What are my current tech stacks?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Your core frontend stack is React.js for single-page applications and internal systems, and Next.js for portfolio sites, landing pages, and ..."`
+
+---
+
+### 🔹 Live Session Command — 08:35:43 PM
+* **Spoken / Typed Command:** `"I can pull up a..."`
+* **Extracted Payload:** `"I can pull up a..."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I can pull up the full tech stack document from your Knowledge Base, sir, to verify the specific backend and database technologies you are c..."`
+
+---
+
+### 🔹 Live Session Command — 08:35:46 PM
+* **Spoken / Typed Command:** `"Open the latest PDF we have in my PC"`
+* **Extracted Payload:** `"Open the latest PDF we have in my PC"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening your latest PDF document, 'Appendecies.pdf', for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:36:03 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:36:04 PM
+* **Spoken / Typed Command:** `"Open the folder path of the latest PDF we have in my PC"`
+* **Extracted Payload:** `"Open the folder path of the latest PDF we have in my PC"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening the folder for your latest PDF document, 'Appendecies.pdf', in File Explorer, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:36:27 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:36:30 PM
+* **Spoken / Typed Command:** `"MakiBak."`
+* **Extracted Payload:** `"Bak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. Let me know if you have any other questions or need assistance with anything else."`
+
+---
+
+### 🔹 Live Session Command — 08:36:30 PM
+* **Spoken / Typed Command:** `"Where is the latest screenshot saved?"`
+* **Extracted Payload:** `"Where is the latest screenshot saved?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening the folder for your latest screenshot, 'screenshot_20260915_221433.png', in File Explorer, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:36:50 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:36:57 PM
+* **Spoken / Typed Command:** `"So, I'm going to go ahead and get it."`
+* **Extracted Payload:** `"So, I'm going to go ahead and get it."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. I’ll retrieve the full tech stack document for you now."`
+
+---
+
+### 🔹 Live Session Command — 08:37:00 PM
+* **Spoken / Typed Command:** `"Let's do it."`
+* **Extracted Payload:** `"Let's do it."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Based on the available records, your current tech stack includes:  Frontend:    React.js: Used for Single Page Applications (SPA) and intern..."`
+
+---
+
+### 🔹 Live Session Command — 08:37:05 PM
+* **Spoken / Typed Command:** `"Check my deadlines"`
+* **Extracted Payload:** `"Check my deadlines"`
+* **Matched Handler:** `Error`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I encountered an error. Please try again."`
+
+---
+
+### 🔹 Live Session Command — 08:37:12 PM
+* **Spoken / Typed Command:** `"Check my deadlines"`
+* **Extracted Payload:** `"Check my deadlines"`
+* **Matched Handler:** `Error`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I encountered an error. Please try again."`
+
+---
+
+### 🔹 Live Session Command — 08:41:48 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:42:00 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:42:09 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:42:19 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:42:37 PM
+* **Spoken / Typed Command:** `"Hey Maki, remember that my favorite color is dark navy blue and I am building a cli for coding called Maki-CLI"`
+* **Extracted Payload:** `"remember that my favorite color is dark navy blue and I am building a cli for coding called Maki-CLI"`
+* **Matched Handler:** `Skill:MemorySkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Got it. I'll remember: personal_project_maki_cli — User is building a CLI for coding called Maki-CLI. User's favorite color is dark navy blu..."`
+
+---
+
+### 🔹 Live Session Command — 08:42:45 PM
+* **Spoken / Typed Command:** `"Okay."`
+* **Extracted Payload:** `"Okay."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You're all set, sir. I've noted that Maki-CLI is your current coding project and that dark navy blue is your favorite color. Is there anythi..."`
+
+---
+
+### 🔹 Live Session Command — 08:42:58 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:43:11 PM
+* **Spoken / Typed Command:** `"Maki, my secondary monitor is a 24-inch 100Hz NVISION"`
+* **Extracted Payload:** `"my secondary monitor is a 24-inch 100Hz NVISION"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"{   "key": "hardware_secondary_monitor",   "value": "User's secondary monitor is a 24-inch NVISION display with a 100Hz refresh rate." }"`
+
+---
+
+### 🔹 Live Session Command — 08:43:27 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:43:37 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:43:48 PM
+* **Spoken / Typed Command:** `"Tampakai."`
+* **Extracted Payload:** `"Tampakai."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You're welcome, sir. It’s been a pleasure. Let me know if you need anything else as you wrap up your evening."`
+
+---
+
+### 🔹 Live Session Command — 08:44:00 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:44:09 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:44:36 PM
+* **Spoken / Typed Command:** `"What monitor setup do I have?"`
+* **Extracted Payload:** `"What monitor setup do I have?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Based on your knowledge base, sir, I see a note about a secondary monitor. Specifically, you have a 24-inch NVISION monitor with a 100Hz ref..."`
+
+---
+
+### 🔹 Live Session Command — 08:44:59 PM
+* **Spoken / Typed Command:** `"Show what you know about me"`
+* **Extracted Payload:** `"Show what you know about me"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening WhatsApp Installer.exe from Downloads for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:45:09 PM
+* **Spoken / Typed Command:** `"Show what you know about me"`
+* **Extracted Payload:** `"Show what you know about me"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening WhatsApp Installer.exe from Downloads for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:45:22 PM
+* **Spoken / Typed Command:** `"Topics."`
+* **Extracted Payload:** `"Topics."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"To help you with that, sir, I need a little more context. Are you referring to the key topics for a specific school subject like ICC 600 or ..."`
+
+---
+
+### 🔹 Live Session Command — 08:45:48 PM
+* **Spoken / Typed Command:** `"List learned facts"`
+* **Extracted Payload:** `"List learned facts"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Here’s what I have on you, sir:  Your dog’s name is Cooper. You’re currently building a CLI for coding called Maki-CLI, and dark navy blue i..."`
+
+---
+
+### 🔹 Live Session Command — 08:46:32 PM
+* **Spoken / Typed Command:** `"Topics."`
+* **Extracted Payload:** `"Topics."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You’ve got two main school deadlines coming up soon, sir, and both seem to relate to specific topics. You have the Activity Tree for ICC 600..."`
+
+---
+
+### 🔹 Live Session Command — 08:46:46 PM
+* **Spoken / Typed Command:** `"Check my reminders"`
+* **Extracted Payload:** `"Check my reminders"`
+* **Matched Handler:** `Skill:ReminderSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You have your interview with Essence Marketing and Design scheduled for Friday, October 2nd at 7:40 AM Philippine Time. Aside from that upco..."`
+
+---
+
+### 🔹 Live Session Command — 08:46:49 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 08:47:17 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:47:27 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:47:37 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:47:55 PM
+* **Spoken / Typed Command:** `"Show what you know about me"`
+* **Extracted Payload:** `"Show what you know about me"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening WhatsApp Installer.exe from Downloads for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:48:10 PM
+* **Spoken / Typed Command:** `""Check my deadlines""`
+* **Extracted Payload:** `""Check my deadlines""`
+* **Matched Handler:** `Skill:DeadlineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You have two deadlines coming up tomorrow, sir. First, there is the activity tree for ICC 600, which is due at one in the afternoon. Later t..."`
+
+---
+
+### 🔹 Live Session Command — 08:48:11 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:48:38 PM
+* **Spoken / Typed Command:** `"Check my unread emails"`
+* **Extracted Payload:** `"Check my unread emails"`
+* **Matched Handler:** `Skill:ComposioSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, the email from Maya regarding "Your Landers membership is on us!" reads: "Your Landers membership is on us! Use this code to get a FREE..."`
+
+---
+
+### 🔹 Live Session Command — 08:48:54 PM
+* **Spoken / Typed Command:** `"If you need a room,"`
+* **Extracted Payload:** `"If you need a room,"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I am an AI, sir, so I do not need a place to sleep. However, if you are referring to your BoardEase project, I am ready to help you draft th..."`
+
+---
+
+### 🔹 Live Session Command — 08:49:19 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 08:49:35 PM
+* **Spoken / Typed Command:** `"Tain, Tain, Tain, Tain, Tain."`
+* **Extracted Payload:** `"Tain, Tain, Tain, Tain, Tain."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I’m here, sir. Is there something on your mind, or would you like me to check on your upcoming tasks?"`
+
+---
+
+### 🔹 Live Session Command — 08:49:36 PM
+* **Spoken / Typed Command:** `"Topics."`
+* **Extracted Payload:** `"Topics."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"{   "facts": [] }"`
+
+---
+
+### 🔹 Live Session Command — 08:50:09 PM
+* **Spoken / Typed Command:** `"Topics."`
+* **Extracted Payload:** `"Topics."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Could you let me know which topics you’d like to explore, sir?"`
+
+---
+
+### 🔹 Live Session Command — 08:50:20 PM
+* **Spoken / Typed Command:** `"Let's talk about life."`
+* **Extracted Payload:** `"Let's talk about life."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I am all ears, sir. Life has a way of keeping us busy, especially with school, work, and personal projects all at once. What is on your mind..."`
+
+---
+
+### 🔹 Live Session Command — 08:52:34 PM
+* **Spoken / Typed Command:** `"Show what you know about me"`
+* **Extracted Payload:** `"Show what you know about me"`
+* **Matched Handler:** `Skill:MemorySkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, I know you are Mark, currently working on the Maki-CLI and BoardEase projects while taking Capscun 2. You have a dog named Cooper, pref..."`
+
+---
+
+### 🔹 Live Session Command — 08:52:35 PM
+* **Spoken / Typed Command:** `"List learned facts"`
+* **Extracted Payload:** `"List learned facts"`
+* **Matched Handler:** `Skill:MemorySkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, I have your dog Cooper’s name, your Maki-CLI project, and your favorite color dark navy blue. I also note your school email, your 24-in..."`
+
+---
+
+### 🔹 Live Session Command — 08:52:35 PM
+* **Spoken / Typed Command:** `"Reload skills"`
+* **Extracted Payload:** `"Reload skills"`
+* **Matched Handler:** `SkillRouter:Reload`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"All skills have been hot-reloaded successfully, sir. 12 active skills ready."`
+
+---
+
+### 🔹 Live Session Command — 08:53:06 PM
+* **Spoken / Typed Command:** `"show me what you know about me."`
+* **Extracted Payload:** `"show me what you know about me."`
+* **Matched Handler:** `Skill:MemorySkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, I know your dog is named Cooper and you are currently building a coding CLI called Maki-CLI, with dark navy blue as your favorite color..."`
+
+---
+
+### 🔹 Live Session Command — 08:53:41 PM
+* **Spoken / Typed Command:** `"What course?"`
+* **Extracted Payload:** `"What course?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You are currently taking Capscun 2, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:53:49 PM
+* **Spoken / Typed Command:** `"What is my courage degree?"`
+* **Extracted Payload:** `"What is my courage degree?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I don't have a record of your "courage degree," sir. Could you clarify if you meant your degree program, such as your Bachelor of Science in..."`
+
+---
+
+### 🔹 Live Session Command — 08:54:27 PM
+* **Spoken / Typed Command:** `"Maki. You already mentioned it. Yeah, that's correct. Bachelors on information technology is mine."`
+* **Extracted Payload:** `"You already mentioned it. Yeah, that's correct. Bachelors on information technology is mine."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. I have noted that you are pursuing a Bachelor of Science in Information Technology."`
+
+---

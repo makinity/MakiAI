@@ -61,7 +61,7 @@
       "text": "message the client",
       "datetime": "2026-09-17T15:00:00",
       "repeat": null,
-      "status": "pending"
+      "status": "missed"
     },
     {
       "id": "cd3df6c0-ce8c-4141-88da-a74c7f6c9813",
@@ -75,7 +75,7 @@
       "text": "workout",
       "datetime": "2026-09-17T17:00:00",
       "repeat": null,
-      "status": "pending"
+      "status": "missed"
     }
   ]
 }

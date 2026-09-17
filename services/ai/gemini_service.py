@@ -146,7 +146,7 @@ class GeminiService:
 
     # ─── Core Send ────────────────────────────────────────────────────────────
 
-    def send(self, user_text: str, system_context: str = "") -> str:
+    def send(self, user_text: str, system_context: str = "", **kwargs) -> str:
         """
         Send a message and return the AI response.
 
@@ -157,6 +157,9 @@ class GeminiService:
         Returns:
             AI response string.
         """
+        if not system_context and "system_instruction" in kwargs:
+            system_context = kwargs["system_instruction"]
+
         if not self._initialized:
             return self._stub_response(user_text)
 

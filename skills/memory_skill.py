@@ -23,13 +23,40 @@ MEMORY_FILE = Path(__file__).resolve().parents[1] / "data" / "memory.json"
 class MemorySkill(BaseSkill):
 
     SKILL_ID = "memory"
-    REQUIRED_FILES = []   # Uses local memory.json, not KB files
+    NAME = "Long-Term Memory & Durable Facts"
+    DESCRIPTION = "Store, recall, and manage user preferences, learned facts, and notes across sessions."
+    REQUIRED_FILES = []   # Uses local memory.json and memory_facts.db
+
+    TRIGGERS = [
+        r"\b(remember\s+that|remember\s+this|remember\s+my|remember\s+our)\b",
+        r"\b(what\s+do\s+you\s+remember|what\s+did\s+i\s+tell\s+you|what\s+did\s+i\s+say)\b",
+        r"\b(what\s+do\s+you\s+know(?:\s+about\s+me)?|show\s+what\s+you\s+know(?:\s+about\s+me)?|list\s+what\s+you\s+know)\b",
+        r"\b(list|show|view|get|tell\s+me)\s+(all\s+)?(learned\s+facts|my\s+facts|facts|memories|memory|stored\s+facts)\b",
+        r"\b(what\s+are|what'?s)\s+my\s+(learned\s+facts|preferences|facts|memories)\b",
+        r"\b(forget|delete|remove|clear)\s+(about|the|my|this|that|fact|memory)?\b",
+        r"\b(do\s+you\s+remember|do\s+you\s+recall|recall)\b",
+        r"\b(tandaan\s+mo|naaalala\s+mo\s+ba)\b",
+    ]
+
+    def can_handle(self, text: str) -> bool:
+        """Custom matcher for natural memory queries."""
+        lowered = text.lower().strip()
+        return any(kw in lowered for kw in [
+            "show what you know", "what you know about me", "what do you know about me",
+            "list learned facts", "show learned facts", "show my memory", "list memories",
+            "remember that", "remember this", "forget about"
+        ])
 
     def execute(self, text: str) -> str:
         """Route to remember, recall, or forget subcommand."""
         lowered = text.lower()
 
-        if any(kw in lowered for kw in ["what do you remember", "recall", "do you know", "what is my", "what's my", "ano ang"]):
+        if any(kw in lowered for kw in [
+            "what do you remember", "recall", "do you know", "what is my", "what's my", "ano ang",
+            "show what you know", "what you know about me", "what do you know about me",
+            "list learned facts", "show learned facts", "list memories", "show my memory",
+            "show memories", "what are my preferences", "my facts"
+        ]):
             return self._recall(text)
         elif any(kw in lowered for kw in ["forget", "delete", "remove", "clear"]):
             return self._forget(text)
@@ -95,34 +122,48 @@ Return only the JSON — no explanation, no markdown fences.
             return "I had trouble storing that memory. Could you rephrase it?"
 
     def _recall(self, text: str) -> str:
-        """Search stored memories and return matching ones."""
+        """Search stored memories and auto-extracted facts, returning matching ones."""
+        from services.memory.fact_store import FactStore
         memories = self._load()
+        facts = FactStore().get_all_facts()
 
-        if not memories:
-            return "I don't have any memories stored yet. You can say 'remember that' to add some."
+        if not memories and not facts:
+            return "I don't have any memories or learned facts stored yet, sir."
 
-        # Build memory summary for Gemini to search
-        memory_text = "\n".join([
-            f"- {m['key']}: {m['value']}" for m in memories
-        ])
+        # Build memory + fact summary for Gemini to search
+        summary_lines = []
+        if memories:
+            summary_lines.append("Explicit Notes & Memories:")
+            for m in memories:
+                summary_lines.append(f"- {m['key']}: {m['value']}")
+        if facts:
+            summary_lines.append("Auto-Learned Facts & Preferences:")
+            for f in facts:
+                summary_lines.append(f"- [{f.get('category', 'general')}]: {f.get('fact')}")
+
+        all_text = "\n".join(summary_lines)
 
         prompt = f"""
 The user asked: "{text}"
 
-Here are all stored memories:
-{memory_text}
+Here is everything currently in memory and learned facts:
+{all_text}
 
-Find and return the most relevant memory or memories.
-Keep the answer short — 1 to 3 sentences. Spoken aloud.
-If nothing is relevant, say "I don't have anything stored about that."
+Find and answer the user's question accurately in a natural, spoken tone.
+Keep the answer concise (1 to 3 sentences).
+If nothing is relevant, say "I don't have anything stored about that, sir."
 """.strip()
 
         return self.gemini.send(prompt, "")
 
     def _forget(self, text: str) -> str:
-        """Remove a memory matching the topic mentioned."""
+        """Remove a memory or learned fact matching the topic mentioned."""
+        from services.memory.fact_store import FactStore
         memories = self._load()
-        if not memories:
+        fact_store = FactStore()
+        facts = fact_store.get_all_facts()
+
+        if not memories and not facts:
             return "I don't have any memories stored right now, sir."
 
         lowered = text.lower()
@@ -131,61 +172,79 @@ If nothing is relevant, say "I don't have anything stored about that."
             if len(w) >= 3 and w not in {
                 "forget", "delete", "remove", "clear", "about", "the", "my",
                 "our", "that", "this", "memory", "memories", "note", "notes",
-                "sir", "maki", "please", "deadline", "task"
+                "sir", "maki", "please", "deadline", "task", "fact", "facts",
+                "preference", "preferences"
             }
         ]
 
-        # Let Gemini identify which memory to remove
-        memory_text = "\n".join([
-            f"- {m['key']}: {m['value']}" for m in memories
-        ])
+        # Let Gemini identify which memory key or fact text to remove
+        all_lines = []
+        for m in memories:
+            all_lines.append(f"- [NOTE] {m['key']}: {m['value']}")
+        for f in facts:
+            all_lines.append(f"- [FACT:{f['id']}] {f['fact']}")
+
+        all_text = "\n".join(all_lines)
 
         prompt = f"""
 The user said: "{text}"
 
-Stored memories:
-{memory_text}
+Stored memories & facts:
+{all_text}
 
-Which memory key should be deleted? Return ONLY the key string — nothing else.
-If nothing matches, return "none".
+Which item should be deleted?
+If it's a note, return: NOTE:<key>
+If it's a fact, return: FACT:<id>
+If nothing matches, return: NONE
 """.strip()
 
-        key_to_delete = ""
+        target_to_delete = ""
         try:
-            raw_key = self.gemini.send(prompt, "")
-            key_to_delete = re.sub(r"^[-*#\s`]+|[`\s]+$", "", raw_key).strip().strip('"').strip("'")
-            if key_to_delete.lower().startswith("key:"):
-                key_to_delete = key_to_delete[4:].strip()
+            raw_target = self.gemini.send(prompt, "")
+            target_to_delete = re.sub(r"^[-*#\s`]+|[`\s]+$", "", raw_target).strip().strip('"').strip("'")
         except Exception:
-            key_to_delete = ""
+            target_to_delete = ""
 
-        target_k = key_to_delete.lower() if key_to_delete and key_to_delete.lower() != "none" else ""
-        before = len(memories)
+        deleted_items = []
 
+        # Check FactStore deletion
+        if target_to_delete.startswith("FACT:"):
+            try:
+                fid = int(target_to_delete[5:].strip())
+                if fact_store.delete_fact(fact_id=fid):
+                    deleted_items.append("learned fact")
+            except Exception:
+                pass
+
+        # Check keyword deletion in FactStore
+        if not deleted_items and search_words:
+            for w in search_words:
+                if fact_store.delete_fact(keyword=w):
+                    deleted_items.append(f"fact about '{w}'")
+
+        # Check memory.json deletion
+        target_k = target_to_delete[5:].strip().lower() if target_to_delete.startswith("NOTE:") else ""
+        before_mem = len(memories)
         remaining = []
-        deleted_names = []
 
         for m in memories:
             mk = m.get("key", "").lower()
             mv = m.get("value", "").lower()
-
-            # 1. Match from AI key detection
             matched_by_ai = bool(target_k and (mk == target_k or target_k in mk or mk in target_k))
-
-            # 2. Match from direct keyword tokens in user query
             matched_by_words = bool(search_words and any(w in mk or w in mv for w in search_words))
-
             if matched_by_ai or matched_by_words:
-                deleted_names.append(m.get("key", "Note"))
+                deleted_items.append(m.get("key", "Note"))
             else:
                 remaining.append(m)
 
-        if len(remaining) < before:
+        if len(remaining) < before_mem:
             self._save(remaining)
-            deleted_str = ", ".join(deleted_names)
-            return f"Done. I've forgotten: {deleted_str}."
 
-        return "I couldn't find that memory in my notes, sir."
+        if deleted_items:
+            deleted_str = ", ".join(deleted_items)
+            return f"Done, sir. I've forgotten: {deleted_str}."
+
+        return "I couldn't find that memory or fact in my records, sir."
 
     # ─── Storage ─────────────────────────────────────────────────────────────
 

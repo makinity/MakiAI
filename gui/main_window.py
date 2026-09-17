@@ -25,19 +25,9 @@ from services.kb.kb_reader import KBReader
 from services.kb.kb_writer import KBWriter
 from services.kb.kb_index import KBIndex
 from services.kb.skill_router import SkillRouter
+from services.skills.skill_registry import SkillRegistry
 from services.reminder.reminder_service import ReminderService
 from services.memory.memory_service import MemoryService
-from skills.goodmorning_skill import GoodMorningSkill
-from skills.goodnight_skill import GoodNightSkill
-from skills.hello_skill import HelloSkill
-from skills.deadline_skill import DeadlineSkill
-from skills.reminder_skill import ReminderSkill
-from skills.memory_skill import MemorySkill
-from skills.new_project_skill import NewProjectSkill
-from skills.homework_skill import HomeworkSkill
-from skills.research_skill import ResearchSkill
-from skills.clip_skill import ClipSkill
-from skills.interpreter_skill import InterpreterSkill
 from gui.pages.LoginPage import LoginPage
 from gui.pages.MainPage import MainPage
 from gui.pages.SettingsPage import SettingsPage
@@ -112,22 +102,16 @@ class MainWindow(QMainWindow):
         self.kb_writer.write = _write_and_invalidate
         self.kb_writer.append = _append_and_invalidate
 
-        # ── Skills ────────────────────────────────────────────────────────────
-        skill_deps = (self.gemini, self.context_builder, self.kb_reader, self.kb_writer)
-        skills = {
-            "goodmorning":  GoodMorningSkill(*skill_deps),
-            "goodnight":    GoodNightSkill(*skill_deps),
-            "hello":        HelloSkill(*skill_deps),
-            "deadline":     DeadlineSkill(*skill_deps),
-            "reminder":     ReminderSkill(*skill_deps, reminder_service=self.reminder_service),
-            "memory":       MemorySkill(*skill_deps),
-            "new_project":  NewProjectSkill(*skill_deps),
-            "homework":     HomeworkSkill(*skill_deps),
-            "research":     ResearchSkill(*skill_deps),
-            "clip":         ClipSkill(*skill_deps),
-            "interpreter":  InterpreterSkill(*skill_deps),
-        }
-        self.skill_router = SkillRouter(skills)
+        # ── Skills (Dynamic Discovery & Auto-Loading) ─────────────────────────
+        self.skill_registry = SkillRegistry({
+            "gemini": self.gemini,
+            "context_builder": self.context_builder,
+            "kb_reader": self.kb_reader,
+            "kb_writer": self.kb_writer,
+            "reminder_service": self.reminder_service,
+        })
+        self.skill_registry.discover_and_load()
+        self.skill_router = SkillRouter(self.skill_registry)
 
         # ── Voice services ────────────────────────────────────────────────────
         self.tts_service = TTSService(

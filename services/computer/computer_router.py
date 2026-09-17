@@ -78,6 +78,7 @@ class ComputerRouter:
             or self._handle_screen_vision(lowered, text)
             or self._handle_window_move(lowered, text)
             or self._handle_auto_tile(lowered, text)
+            or self._handle_fast_file_access(lowered, text)
             or self._handle_write_to_file(lowered, text)
             or self._handle_smart_search(lowered)   # ← Before _handle_open so "open last photo/screenshot" wins
             or self._handle_open(lowered, text)
@@ -318,6 +319,134 @@ class ComputerRouter:
 
         return self.window_mgr.auto_tile(target_monitor=target_mon, layout=layout, priority_apps=priority_apps)
 
+    # ─── Fast File Access & Control ───────────────────────────────────────────
+
+    def _handle_fast_file_access(self, lowered: str, original: str) -> str | None:
+        """
+        Ultra-fast file lookup, opening, and folder location revealing.
+        Handles:
+          - "Can you show me the latest docx i modified?"
+          - "Can you open the folder path of the latest .docx i modified"
+          - "Open the Latest Pdf we have in my pc"
+          - "Can you show me the latest image i download"
+          - "Open the folder path of the latest image we have in my pc"
+          - "Can you open Operating Systems Chapter 4 for me?"
+          - "Open notes.txt"
+          - "Where is the latest screenshot saved?"
+        """
+        # Clean filler prefixes
+        cleaned = re.sub(r"^(can you|could you|please|just|i want you to|i need you to|hey maki|maki)[,\s]+", "", lowered).strip()
+        cleaned = re.sub(r"[?!.,]+$", "", cleaned).strip()
+
+        # 1. Detect if the user wants to reveal the folder location vs open the file
+        reveal_indicators = [
+            r"\b(?:open|show|find|reveal|locate|get)?\s*(?:the\s+)?(?:folder\s+path|folder\s+location|folder|directory|path|location)\s+(?:of|for|where)\b",
+            r"\bwhere\s+is\s+(?:the\s+)?",
+            r"\bwhere\s+(?:did\s+you\s+save|is\s+.*?\s+saved|is\s+.*?\s+stored|is\s+.*?\s+located|does\s+.*?\s+live)\b",
+            r"\bfolder\s+path\b",
+        ]
+        is_reveal = any(re.search(pat, cleaned) for pat in reveal_indicators)
+        action = "reveal" if is_reveal else "open"
+
+        # Check if the query asks for "latest / most recent / last / newest / recently modified"
+        latest_match = re.search(
+            r"\b(?:latest|last|most\s+recent|newest|recently\s+modified|recently\s+saved|recently\s+downloaded|recent)\b",
+            cleaned
+        )
+
+        if latest_match:
+            # Determine source filter
+            source = "any"
+            if re.search(r"\b(download|downloaded|downloads)\b", cleaned):
+                source = "downloads"
+            elif re.search(r"\b(screenshot|screenshots|screen\s+capture)\b", cleaned):
+                source = "screenshots"
+            elif re.search(r"\b(photo|photos|camera|pictures?)\b", cleaned):
+                source = "photos"
+            elif re.search(r"\b(recording|recordings|videos?)\b", cleaned):
+                source = "recordings"
+            elif re.search(r"\b(makisync|storage|synced)\b", cleaned):
+                source = "makisync"
+            elif re.search(r"\b(knowledge\s*base|kb)\b", cleaned):
+                source = "kb"
+
+            # Determine target file type / extension
+            target_type = "any"
+            # Explicit extension (e.g. .docx, docx, .pdf, pdf, .xlsx, .pptx, .py, .png, .jpg, etc.)
+            ext_match = re.search(r"\.?(docx|doc|pdf|xlsx|xls|csv|pptx|ppt|txt|md|py|js|ts|html|css|json|png|jpg|jpeg|gif|webp|mp4|mkv|zip)\b", cleaned)
+            if ext_match:
+                target_type = f".{ext_match.group(1)}"
+            elif re.search(r"\b(image|picture|photo|screenshot)\b", cleaned):
+                if "screenshot" in cleaned:
+                    target_type = "screenshot"
+                    if source == "any":
+                        source = "screenshots"
+                elif "photo" in cleaned or "camera" in cleaned:
+                    target_type = "photo"
+                    if source == "any":
+                        source = "photos"
+                else:
+                    target_type = "image"
+            elif re.search(r"\b(word|document|doc)\b", cleaned):
+                target_type = "docx"
+            elif re.search(r"\b(pdf)\b", cleaned):
+                target_type = "pdf"
+            elif re.search(r"\b(spreadsheet|excel|sheet)\b", cleaned):
+                target_type = "spreadsheet"
+            elif re.search(r"\b(presentation|powerpoint|slides?)\b", cleaned):
+                target_type = "presentation"
+            elif re.search(r"\b(video|recording)\b", cleaned):
+                target_type = "video"
+            elif re.search(r"\b(code|python|script)\b", cleaned):
+                target_type = "code" if "code" in cleaned else "python"
+            elif re.search(r"\b(notes?|text)\b", cleaned):
+                target_type = "notes"
+            elif re.search(r"\b(file|document)\b", cleaned):
+                target_type = "document"
+
+            # Execute open_latest_file
+            if target_type != "any" or source != "any" or "file" in cleaned:
+                return self.files.open_latest_file(target_type=target_type, source=source, action=action)
+
+        # 2. Specific file lookup (e.g. "open appendecies.docx", "open Operating Systems Chapter 4", "folder path of Appendecies.docx")
+        # Strip command/filler prefixes to get pure target candidate
+        pure_candidate = re.sub(r"^(?:can\s+you\s+|could\s+you\s+|please\s+|just\s+|i\s+want\s+you\s+to\s+|i\s+need\s+you\s+to\s+|hey\s+maki\s+|maki\s+)+", "", lowered, flags=re.IGNORECASE).strip()
+        pure_candidate = re.sub(r"^(?:open|show(?:\s+me)?|view|display|reveal|find|locate|get|where\s+is)\s+", "", pure_candidate, flags=re.IGNORECASE).strip()
+        pure_candidate = re.sub(r"^(?:the\s+)?(?:folder\s+path\s+of|folder\s+of|path\s+of|location\s+of|file\s+called|document\s+called|file\s+named|document\s+named|folder\s+where)\s+", "", pure_candidate, flags=re.IGNORECASE).strip()
+        pure_candidate = re.sub(r"^(?:the\s+)?(?:my\s+)?(?:file|document|pdf|docx|spreadsheet|script)\s+", "", pure_candidate, flags=re.IGNORECASE).strip()
+        pure_candidate = pure_candidate.rstrip("?!.,").strip()
+        pure_candidate = re.sub(r"\s+(?:for\s+me|please|in\s+my\s+pc|on\s+my\s+pc|we\s+have)$", "", pure_candidate, flags=re.IGNORECASE).strip()
+
+        # Check for explicit file extension
+        ext_match = re.search(r"\.?(docx|doc|pdf|xlsx|xls|pptx|ppt|txt|md|csv|py|js|html|json|png|jpg|jpeg|gif|webp|mp4|mkv|zip)$", pure_candidate, flags=re.IGNORECASE)
+        if ext_match:
+            found = self.files.find_file(pure_candidate)
+            if found:
+                return self.files.open_specific_file(pure_candidate, action=action)
+
+        # Check for explicit file/document named patterns: e.g. "open the file called X", "open the document called X"
+        named_match = re.search(
+            r"\b(?:open|show(?:\s+me)?|view|display|reveal|find|locate)\s+(?:the\s+)?(?:folder\s+path\s+of\s+(?:the\s+)?|folder\s+of\s+(?:the\s+)?|path\s+of\s+(?:the\s+)?|file\s+called\s+|document\s+called\s+|file\s+named\s+|document\s+named\s+|document\s+|file\s+|pdf\s+|docx\s+|notes\s+about\s+)(.+?)(?:\s+(?:for\s+me|please))?$",
+            cleaned
+        )
+        if named_match:
+            cand = named_match.group(1).strip().rstrip("?!.,")
+            # Exclude browser keywords like "youtube", "chrome", "google", "settings", "camera", "website"
+            if cand and not any(k in cand for k in ("chrome", "browser", "youtube", "facebook", "gmail", "spotify", "camera", "settings")):
+                found = self.files.find_file(cand)
+                if found:
+                    return self.files.open_specific_file(cand, action=action)
+
+        # Check for general document topics (e.g. "open Operating Systems Chapter 4", "open chapter 4", "open weekly plan")
+        if re.search(r"\b(chapter\s+\d+|assignment\s+\d+|lecture\s+\d+|operating\s+systems?|weekly\s+plan|curriculum|syllabus|time\s+management)\b", cleaned):
+            cand = re.sub(r"^(?:open|show(?:\s+me)?|view|display|reveal|find|get)\s+(?:the\s+)?(?:my\s+)?", "", cleaned).strip().rstrip("?!.,")
+            cand = re.sub(r"\s+(?:for\s+me|please)$", "", cand).strip()
+            found = self.files.find_file(cand)
+            if found:
+                return self.files.open_specific_file(cand, action=action)
+
+        return None
+
     # ─── Open / Launch ────────────────────────────────────────────────────────
 
     def _handle_open(self, lowered: str, original: str) -> str | None:
@@ -367,9 +496,14 @@ class ComputerRouter:
             subprocess.Popen(f'explorer "{kb_dir}"')
             return "Opening your Knowledge Base folder."
 
-        # 3. Ignore assistant info queries (schedules, reminders, deadlines, meetings)
-        if re.search(r"\b(schedules?|reminders?|deadlines?|meetings?|calendar|appointments?|what\s+to\s+do)\b", cleaned, flags=re.IGNORECASE):
+        # 3. Ignore assistant info queries (schedules, reminders, deadlines, meetings, memory, skills)
+        if re.search(r"\b(schedules?|reminders?|deadlines?|meetings?|calendar|appointments?|what\s+to\s+do|skills|learned\s+facts|what\s+you\s+know|know\s+about\s+me|memories|memory|facts)\b", cleaned, flags=re.IGNORECASE):
             return None
+
+        # Ignore conversational questions starting with question words unless explicitly targeting a file/folder
+        if re.match(r"^(what|how|why|who|where|when|which|is|are|can|could|would)\s+", cleaned, flags=re.IGNORECASE):
+            if not re.search(r"\b(folder|path|location|file|document|pdf|docx|spreadsheet)\b", cleaned, flags=re.IGNORECASE):
+                return None
 
         # 4. Match 'open / launch / view / show + target'
         patterns = [
@@ -789,6 +923,15 @@ class ComputerRouter:
                     content = prompt_cleaned
             else:
                 content = prompt_cleaned
+
+        # Clean markdown code blocks if saving to a code/script file
+        if target_file.suffix.lower() in (".py", ".js", ".ts", ".html", ".css", ".json", ".sh", ".ps1", ".sql"):
+            code_match = re.search(r"```(?:[a-zA-Z0-9_\-]+)?\s*\n(.*?)```", content, re.DOTALL)
+            if code_match:
+                content = code_match.group(1).strip()
+            elif content.startswith("```") and content.endswith("```"):
+                content = re.sub(r"^```(?:[a-zA-Z0-9_\-]+)?\s*", "", content)
+                content = re.sub(r"\s*```$", "", content).strip()
 
         if not content:
             content = "Document generated by MakiAI."

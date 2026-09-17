@@ -108,6 +108,13 @@ class ContextBuilder:
             parts.append("")
             total_chars += len(memories_summary)
 
+        # Inject Learned Durable Facts & Preferences (Auto-Memory)
+        facts_summary = self._get_learned_facts()
+        if facts_summary:
+            parts.append(facts_summary)
+            parts.append("")
+            total_chars += len(facts_summary)
+
         for source in CORE_DIRS:
             if total_chars >= MAX_TOTAL:
                 break
@@ -128,6 +135,17 @@ class ContextBuilder:
 
         self._general_context_cache = "\n".join(parts).strip()
         return self._general_context_cache
+
+    def _get_learned_facts(self) -> str:
+        """
+        Load automatically extracted durable facts from SQLite FactStore.
+        """
+        try:
+            from services.memory.fact_store import FactStore
+            return FactStore().get_context_summary(limit=20)
+        except Exception as e:
+            print(f"[ContextBuilder] Error loading learned facts: {e}")
+            return ""
 
     def _get_saved_memories(self) -> str:
         """
@@ -254,6 +272,13 @@ class ContextBuilder:
             parts.append(memories_summary)
             parts.append("")
             total_chars += len(memories_summary)
+
+        # Inject Learned Durable Facts & Preferences (Auto-Memory)
+        facts_summary = self._get_learned_facts()
+        if facts_summary:
+            parts.append(facts_summary)
+            parts.append("")
+            total_chars += len(facts_summary)
 
         for file_path in CORE_FILES:
             if total_chars >= MAX_TOTAL:

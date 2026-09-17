@@ -23,9 +23,12 @@ class BaseSkill(ABC):
     """
 
     SKILL_ID: str = ""
+    NAME: str = ""
+    DESCRIPTION: str = ""
     REQUIRED_FILES: list[str] = []
+    TRIGGERS: list[str] = []
 
-    def __init__(self, gemini_service, context_builder, kb_reader, kb_writer):
+    def __init__(self, gemini_service=None, context_builder=None, kb_reader=None, kb_writer=None, **kwargs):
         """
         Args:
             gemini_service:  GeminiService instance for AI responses.
@@ -37,6 +40,28 @@ class BaseSkill(ABC):
         self.context_builder = context_builder
         self.kb_reader = kb_reader
         self.kb_writer = kb_writer
+        self.extra_services = kwargs
+
+        from services.tracing.execution_tracer import ExecutionTracer
+        from services.tracing.self_healer import SelfHealingEngine
+        self.tracer = ExecutionTracer()
+        self.self_healer = SelfHealingEngine(self.tracer)
+
+    def can_handle(self, text: str) -> bool:
+        """
+        Optional custom intent detector.
+        Subclasses can override this for complex logic beyond regex triggers.
+        """
+        return False
+
+    def schema(self) -> dict:
+        """Return standardized metadata schema for tool catalog & LLM tool calling."""
+        return {
+            "id": self.SKILL_ID,
+            "name": self.NAME or self.SKILL_ID.replace("_", " ").title(),
+            "description": self.DESCRIPTION,
+            "triggers": self.TRIGGERS,
+        }
 
     @abstractmethod
     def execute(self, text: str) -> str:
