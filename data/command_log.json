@@ -1,149 +1,5 @@
 [
   {
-    "timestamp": "2026-09-16 23:37:36",
-    "raw_command": "check my recent emails",
-    "cleaned_command": "check my recent emails",
-    "handler": "Fallback:Gemini",
-    "response": "I'm not connected yet. Please add a Groq or Gemini API key in your .env file.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 23:39:00",
-    "raw_command": "check my recent emails.",
-    "cleaned_command": "check my recent emails.",
-    "handler": "Fallback:Gemini",
-    "response": "Sure thing, sir. Which email account or client would you like me to open and review for you?",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 23:39:14",
-    "raw_command": "I want the hundqiyakingmaki.gmail.com.",
-    "cleaned_command": "I want the hundqiyakingmaki.gmail.com.",
-    "handler": "Fallback:Gemini",
-    "response": "I’m not able to access that Gmail account directly, sir. If you’d like me to open Gmail for you, I’ll need the login details or you can sign in yourself and let me know what you’d like to do next.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 23:39:34",
-    "raw_command": "Maki, check medicine emails.",
-    "cleaned_command": "check medicine emails.",
-    "handler": "Fallback:Gemini",
-    "response": "Understood, sir. I’ll open Gmail for you now. Please sign in to the account you use for your medicine correspondence, and let me know once you’re logged in so I can help you locate those messages.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 23:39:47",
-    "raw_command": "Maki, check my recent emails.",
-    "cleaned_command": "check my recent emails.",
-    "handler": "Fallback:Gemini",
-    "response": "Sure thing, sir. I’ll launch Gmail in your browser now. Once the sign‑in page appears, please log into the account you use for your medicine correspondence, and let me know when you’re in so I can help you locate the recent messages.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 23:40:02",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:40:25",
-    "raw_command": "Check the recent messages on my Facebook page.",
-    "cleaned_command": "Check the recent messages on my Facebook page.",
-    "handler": "Skill:ComposioSkill",
-    "response": "Sir, the most recent message on your Facebook page is from Mark Liones Juntilla—they just shared a link. Would you like me to open it or draft a reply for you?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:40:42",
-    "raw_command": "Drop or reply and send it directly.",
-    "cleaned_command": "Drop or reply and send it directly.",
-    "handler": "Fallback:Gemini",
-    "response": "Sure thing, sir. Would you like me to delete that message, or should I send a reply? If you’d like a reply, just let me know the text you’d like to send.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 23:40:51",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:41:01",
-    "raw_command": "Just said hello.",
-    "cleaned_command": "Just said hello.",
-    "handler": "Skill:ComposioSkill",
-    "response": "I couldn't determine which cloud action to take for that request, sir. Could you clarify if you'd like to use Google Docs, Calendar, Gmail, or Notion?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:41:21",
-    "raw_command": "What I meant is just reply a hello world.",
-    "cleaned_command": "What I meant is just reply a hello world.",
-    "handler": "Skill:ComposioSkill",
-    "response": "I couldn't determine which cloud action to take for that request, sir. Could you clarify if you'd like to use Google Docs, Calendar, Gmail, or Notion?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:41:28",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:41:55",
-    "raw_command": "Maki, check my recent emails",
-    "cleaned_command": "check my recent emails",
-    "handler": "Skill:ComposioSkill",
-    "response": "Sir, you have one new email from Calendly regarding an informational meeting with Todd Norton. Would you like me to read the details or help you reply?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:42:15",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:42:23",
-    "raw_command": "Read the details.",
-    "cleaned_command": "Read the details.",
-    "handler": "Skill:ComposioSkill",
-    "response": "Sir, the email from Calendly regarding \"Informational Meeting with Todd Norton\" reads: \"Hi Mark, Here's a message from your event organizer: Hi Mark Vencent, Thanks for attending Informational Meeting. Sign up, use the link\". Would you like me to draft a reply or open the email composer?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:42:49",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
     "timestamp": "2026-09-16 23:42:55",
     "raw_command": "Thank you.",
     "cleaned_command": "Thank you.",
@@ -1798,5 +1654,149 @@
     "response": "Understood, sir. I have noted that you are pursuing a Bachelor of Science in Information Technology.",
     "is_fallback": true,
     "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 20:58:50",
+    "raw_command": "can you open YouTube for me?",
+    "cleaned_command": "can you open YouTube for me?",
+    "handler": "ComputerRouter",
+    "response": "Opening YouTube in your personal profile, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 20:58:58",
+    "raw_command": "Open Canva for me.",
+    "cleaned_command": "Open Canva for me.",
+    "handler": "ComputerRouter",
+    "response": "Opening Canva in your design profile, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 20:59:10",
+    "raw_command": "Can you drag the Chrome browser to the second monitor?",
+    "cleaned_command": "Can you drag the Chrome browser to the second monitor?",
+    "handler": "ComputerRouter",
+    "response": "Done, sir. I've moved Home to your secondary monitor.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 20:59:16",
+    "raw_command": "Tunggiu.",
+    "cleaned_command": "Tunggiu.",
+    "handler": "Fallback:Gemini",
+    "response": "Good evening, sir. It’s just past nine PM on Thursday, September 17th. How can I help you wind down or assist with anything else?",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 20:59:36",
+    "raw_command": "What is my schedule today and this current time what should I do?",
+    "cleaned_command": "What is my schedule today and this current time what should I do?",
+    "handler": "Skill:GoodMorningSkill",
+    "response": "Good evening, sir. It is 08:59 PM on Thursday, September 17th. You are currently in your gaming and free time block, which runs until 9:00 PM. Once that wraps up, you have another hour of leisure before your wind-down routine starts at 11:00 PM. Sleep is scheduled for midnight. Is there anything you would like to add to your day, sir?",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:00:05",
+    "raw_command": "Nothing's over.",
+    "cleaned_command": "Nothing's over.",
+    "handler": "Fallback:Gemini",
+    "response": "Understood, sir. Take your time. I’m here if you need anything else.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 21:00:19",
+    "raw_command": "Can you open the camera and start recording me?",
+    "cleaned_command": "Can you open the camera and start recording me?",
+    "handler": "ComputerRouter",
+    "response": "Found it, sir. The latest photo is photo_20260913_174110.jpg from 2026-09-13. I've opened it and highlighted it in the folder.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:00:50",
+    "raw_command": "Tampak.",
+    "cleaned_command": "Tampak.",
+    "handler": "Fallback:Gemini",
+    "response": "Good evening, sir. I am ready to assist.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 21:01:06",
+    "raw_command": "Maki, do you know what I am doing right now?",
+    "cleaned_command": "do you know what I am doing right now?",
+    "handler": "ComputerRouter",
+    "response": "Yes sir, you are holding up a computer mouse right in front of the camera.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:01:18",
+    "raw_command": "Could you open the last image we have on our PC?",
+    "cleaned_command": "Could you open the last image we have on our PC?",
+    "handler": "ComputerRouter",
+    "response": "Opening your latest image, 'ebbe7c22-40d3-4aa5-99e2-2911c517509d.jpg', for you, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:01:34",
+    "raw_command": "The last image we have on our PC.",
+    "cleaned_command": "The last image we have on our PC.",
+    "handler": "ComputerRouter",
+    "response": "Opening your latest image, 'ebbe7c22-40d3-4aa5-99e2-2911c517509d.jpg', for you, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:01:57",
+    "raw_command": "Can you open the last PDF that we have in our, or the latest PDF we have in our,",
+    "cleaned_command": "Can you open the last PDF that we have in our, or the latest PDF we have in our,",
+    "handler": "ComputerRouter",
+    "response": "Opening your latest PDF document, 'Appendecies.pdf', for you, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:02:08",
+    "raw_command": "When you open the last screenshot we have,",
+    "cleaned_command": "When you open the last screenshot we have,",
+    "handler": "ComputerRouter",
+    "response": "Opening your latest screenshot, 'screenshot_20260915_221433.png', for you, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:02:22",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:02:29",
+    "raw_command": "Can you open the file button?",
+    "cleaned_command": "Can you open the file button?",
+    "handler": "ComputerRouter",
+    "response": "Opening 'Buttons.xaml' from Styles for you, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:02:40",
+    "raw_command": "What I mean is open the file path of the last screenshot we have.",
+    "cleaned_command": "What I mean is open the file path of the last screenshot we have.",
+    "handler": "ComputerRouter",
+    "response": "Opening the folder for your latest screenshot, 'screenshot_20260915_221433.png', in File Explorer, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
   }
 ]

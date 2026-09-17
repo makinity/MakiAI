@@ -4739,3 +4739,147 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"Understood, sir. I have noted that you are pursuing a Bachelor of Science in Information Technology."`
 
 ---
+
+### 🔹 Live Session Command — 08:58:50 PM
+* **Spoken / Typed Command:** `"can you open YouTube for me?"`
+* **Extracted Payload:** `"can you open YouTube for me?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening YouTube in your personal profile, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:58:58 PM
+* **Spoken / Typed Command:** `"Open Canva for me."`
+* **Extracted Payload:** `"Open Canva for me."`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening Canva in your design profile, sir."`
+
+---
+
+### 🔹 Live Session Command — 08:59:10 PM
+* **Spoken / Typed Command:** `"Can you drag the Chrome browser to the second monitor?"`
+* **Extracted Payload:** `"Can you drag the Chrome browser to the second monitor?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Done, sir. I've moved Home to your secondary monitor."`
+
+---
+
+### 🔹 Live Session Command — 08:59:16 PM
+* **Spoken / Typed Command:** `"Tunggiu."`
+* **Extracted Payload:** `"Tunggiu."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good evening, sir. It’s just past nine PM on Thursday, September 17th. How can I help you wind down or assist with anything else?"`
+
+---
+
+### 🔹 Live Session Command — 08:59:36 PM
+* **Spoken / Typed Command:** `"What is my schedule today and this current time what should I do?"`
+* **Extracted Payload:** `"What is my schedule today and this current time what should I do?"`
+* **Matched Handler:** `Skill:GoodMorningSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Good evening, sir. It is 08:59 PM on Thursday, September 17th. You are currently in your gaming and free time block, which runs until 9:00 P..."`
+
+---
+
+### 🔹 Live Session Command — 09:00:05 PM
+* **Spoken / Typed Command:** `"Nothing's over."`
+* **Extracted Payload:** `"Nothing's over."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Understood, sir. Take your time. I’m here if you need anything else."`
+
+---
+
+### 🔹 Live Session Command — 09:00:19 PM
+* **Spoken / Typed Command:** `"Can you open the camera and start recording me?"`
+* **Extracted Payload:** `"Can you open the camera and start recording me?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Found it, sir. The latest photo is photo_20260913_174110.jpg from 2026-09-13. I've opened it and highlighted it in the folder."`
+
+---
+
+### 🔹 Live Session Command — 09:00:50 PM
+* **Spoken / Typed Command:** `"Tampak."`
+* **Extracted Payload:** `"Tampak."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Good evening, sir. I am ready to assist."`
+
+---
+
+### 🔹 Live Session Command — 09:01:06 PM
+* **Spoken / Typed Command:** `"Maki, do you know what I am doing right now?"`
+* **Extracted Payload:** `"do you know what I am doing right now?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes sir, you are holding up a computer mouse right in front of the camera."`
+
+---
+
+### 🔹 Live Session Command — 09:01:18 PM
+* **Spoken / Typed Command:** `"Could you open the last image we have on our PC?"`
+* **Extracted Payload:** `"Could you open the last image we have on our PC?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening your latest image, 'ebbe7c22-40d3-4aa5-99e2-2911c517509d.jpg', for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:01:34 PM
+* **Spoken / Typed Command:** `"The last image we have on our PC."`
+* **Extracted Payload:** `"The last image we have on our PC."`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening your latest image, 'ebbe7c22-40d3-4aa5-99e2-2911c517509d.jpg', for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:01:57 PM
+* **Spoken / Typed Command:** `"Can you open the last PDF that we have in our, or the latest PDF we have in our,"`
+* **Extracted Payload:** `"Can you open the last PDF that we have in our, or the latest PDF we have in our,"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening your latest PDF document, 'Appendecies.pdf', for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:02:08 PM
+* **Spoken / Typed Command:** `"When you open the last screenshot we have,"`
+* **Extracted Payload:** `"When you open the last screenshot we have,"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening your latest screenshot, 'screenshot_20260915_221433.png', for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:02:22 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:02:29 PM
+* **Spoken / Typed Command:** `"Can you open the file button?"`
+* **Extracted Payload:** `"Can you open the file button?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening 'Buttons.xaml' from Styles for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:02:40 PM
+* **Spoken / Typed Command:** `"What I mean is open the file path of the last screenshot we have."`
+* **Extracted Payload:** `"What I mean is open the file path of the last screenshot we have."`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening the folder for your latest screenshot, 'screenshot_20260915_221433.png', in File Explorer, sir."`
+
+---

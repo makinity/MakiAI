@@ -1001,7 +1001,22 @@
         }
     }
 
+    let lastRenderedActivitySig = "";
+
     function renderActivity() {
+        const currentCount = state.activity.length;
+        const lastItem = currentCount > 0 ? state.activity[currentCount - 1] : null;
+        const currentSignature = currentCount + "_" + (lastItem ? ((lastItem.timestamp || "") + (lastItem.text || "")) : "");
+
+        if (currentSignature === lastRenderedActivitySig) {
+            return; // State unchanged — preserve scroll position
+        }
+
+        const wrap = elements.activityScrollWrap;
+        const isNearBottom = !wrap || (wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight <= 140);
+        const isInitial = !lastRenderedActivitySig;
+
+        lastRenderedActivitySig = currentSignature;
         elements.activityList.innerHTML = "";
 
         if (!state.activity.length) {
@@ -1040,7 +1055,12 @@
         });
 
         elements.activityCount.textContent = String(state.activity.length);
-        elements.activityScrollWrap.scrollTop = elements.activityScrollWrap.scrollHeight;
+
+        if (wrap && (isNearBottom || isInitial)) {
+            requestAnimationFrame(() => {
+                wrap.scrollTop = wrap.scrollHeight;
+            });
+        }
     }
 
     function renderMicState() {
