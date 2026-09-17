@@ -4883,3 +4883,138 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"Opening the folder for your latest screenshot, 'screenshot_20260915_221433.png', in File Explorer, sir."`
 
 ---
+
+### 🔹 Live Session Command — 09:06:08 PM
+* **Spoken / Typed Command:** `"do you know what I am doing right now?"`
+* **Extracted Payload:** `"do you know what I am doing right now?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes sir, you are making a playful peace sign gesture and sticking your tongue out, while holding up a box for a wireless lavalier microphone..."`
+
+---
+
+### 🔹 Live Session Command — 09:06:24 PM
+* **Spoken / Typed Command:** `"Do you know what time is it?"`
+* **Extracted Payload:** `"Do you know what time is it?"`
+* **Matched Handler:** `Skill:HelloSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"It is currently 9:06 PM on Thursday, sir. According to your schedule, you are in the 8:00–11:00 PM Gaming and Free Time block, so it’s the p..."`
+
+---
+
+### 🔹 Live Session Command — 09:06:49 PM
+* **Spoken / Typed Command:** `"Can you open YouTube for me?"`
+* **Extracted Payload:** `"Can you open YouTube for me?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening YouTube in your personal profile, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:06:57 PM
+* **Spoken / Typed Command:** `"Can you close the browser, please?"`
+* **Extracted Payload:** `"Can you close the browser, please?"`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"I couldn't find an open window or app for 'browser,', sir."`
+
+---
+
+### 🔹 Live Session Command — 09:07:05 PM
+* **Spoken / Typed Command:** `"And it's close YouTube for me."`
+* **Extracted Payload:** `"And it's close YouTube for me."`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Closing Youtube for you, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:07:14 PM
+* **Spoken / Typed Command:** `"Can you provide details about me?"`
+* **Extracted Payload:** `"Can you provide details about me?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Your full name is Mark Vencent L. Juntilla, and you are currently pursuing a Bachelor of Science in Information Technology in Sulop, Davao d..."`
+
+---
+
+### 🔹 Live Session Command — 09:07:50 PM
+* **Spoken / Typed Command:** `"We have an ability to update my knowledge base, especially my dog name. It's not Cooper, it's Milo."`
+* **Extracted Payload:** `"We have an ability to update my knowledge base, especially my dog name. It's not Cooper, it's Milo."`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Opening your Knowledge Base folder."`
+
+---
+
+### 🔹 Live Session Command — 09:08:06 PM
+* **Spoken / Typed Command:** `"I want you to update the... My name's dog. It's Milo, not Cooper."`
+* **Extracted Payload:** `"I want you to update the... My name's dog. It's Milo, not Cooper."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"I have updated your Knowledge Base, sir. I’ve corrected the record so your dog’s name is now Milo. Cooper is no longer listed as your dog."`
+
+---
+
+### 🔹 Live Session Command — 09:08:26 PM
+* **Spoken / Typed Command:** `"Okay, what's the name of my dog?"`
+* **Extracted Payload:** `"Okay, what's the name of my dog?"`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Your dog's name is Milo, sir."`
+
+---
+
+### 🔹 Live Session Command — 09:08:45 PM
+* **Spoken / Typed Command:** `"Okay, thank you Maki."`
+* **Extracted Payload:** `"Okay, thank you Maki."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"You’re welcome, sir. Let me know if there’s anything else I can help with."`
+
+---
+
+### 🔹 Live Session Command — 09:08:54 PM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 10:56:06 PM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:56:14 PM
+* **Spoken / Typed Command:** `"Well..."`
+* **Extracted Payload:** `"Well..."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Is something on your mind, sir? I’m here if you need anything or just want to talk."`
+
+---
+
+### 🔹 Live Session Command — 10:56:29 PM
+* **Spoken / Typed Command:** `"let's prepare for client work."`
+* **Extracted Payload:** `"let's prepare for client work."`
+* **Matched Handler:** `Skill:RoutineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Your client content upload block isn't scheduled until 9:00 AM, sir. But since you want to get ahead of your tasks, I've opened your client ..."`
+
+---
+
+### 🔹 Live Session Command — 10:56:53 PM
+* **Spoken / Typed Command:** `"Close the browser, Maki."`
+* **Extracted Payload:** `"Close the browser, Maki."`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Closing MakiAI for you, sir."`
+
+---

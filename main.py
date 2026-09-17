@@ -55,6 +55,7 @@ def bootstrap_maki_services():
     from services.reminder.reminder_service import ReminderService
     from services.memory.memory_service import MemoryService
     from services.cloud.composio_service import ComposioService
+    from services.routines.routine_engine import RoutineEngine
     from gui.ui_bridge import MakiUIApi
 
     # Storage initialization
@@ -99,19 +100,9 @@ def bootstrap_maki_services():
     kb_writer.write = _write_and_invalidate
     kb_writer.append = _append_and_invalidate
 
-    # 4. Skills (Dynamic Discovery & Auto-Loading)
+    # 4. Skills & Routine Engine
     reminder_service = ReminderService()
     composio_service = ComposioService()
-    skill_registry = SkillRegistry({
-        "gemini": gemini,
-        "context_builder": context_builder,
-        "kb_reader": kb_reader,
-        "kb_writer": kb_writer,
-        "reminder_service": reminder_service,
-        "composio_service": composio_service,
-    })
-    skill_registry.discover_and_load()
-    skill_router = SkillRouter(skill_registry)
 
     # 5. Voice Services
     tts_service = TTSService(
@@ -143,7 +134,27 @@ def bootstrap_maki_services():
         on_empty=lambda: state_manager.set_state(AppState.IDLE),
     )
 
-    # 6. Wire Orchestrator
+    # 6. Routine Engine (Workspace Provisioning & Background Scheduling)
+    routine_engine = RoutineEngine(
+        kb_reader=kb_reader,
+        reminder_service=reminder_service,
+        tts_service=tts_service,
+    )
+
+    # Dynamic Skills Discovery
+    skill_registry = SkillRegistry({
+        "gemini": gemini,
+        "context_builder": context_builder,
+        "kb_reader": kb_reader,
+        "kb_writer": kb_writer,
+        "reminder_service": reminder_service,
+        "composio_service": composio_service,
+        "routine_engine": routine_engine,
+    })
+    skill_registry.discover_and_load()
+    skill_router = SkillRouter(skill_registry)
+
+    # 7. Wire Orchestrator
     orchestrator.set_services({
         "gemini": gemini,
         "tts": tts_service,
@@ -153,13 +164,18 @@ def bootstrap_maki_services():
         "context_builder": context_builder,
     })
 
-    # Start reminder background service
+    # Start reminder and routine background services
     try:
         reminder_service.start()
     except Exception as e:
         print(f"[MakiAI] Reminder service start error: {e}")
 
-    # 7. UI Bridge API
+    try:
+        routine_engine.start()
+    except Exception as e:
+        print(f"[MakiAI] Routine engine start error: {e}")
+
+    # 8. UI Bridge API
     ui_api = MakiUIApi(
         orchestrator=orchestrator,
         state_manager=state_manager,
@@ -169,6 +185,7 @@ def bootstrap_maki_services():
         wake_word_service=wake_word_service,
         ptt_service=ptt_service,
         reminder_service=reminder_service,
+        routine_engine=routine_engine,
     )
 
     # Connect UI Bridge to all interactive skills

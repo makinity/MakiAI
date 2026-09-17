@@ -1,140 +1,5 @@
 [
   {
-    "timestamp": "2026-09-16 23:42:55",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:43:02",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:43:06",
-    "raw_command": "Maki, check my recent message on my facebook page",
-    "cleaned_command": "check my recent message on my facebook page",
-    "handler": "Skill:ComposioSkill",
-    "response": "Sir, the newest message on your Facebook page is from Mark Liones Juntilla, who just shared a link. Would you like to respond to it?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:43:18",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:43:24",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:43:30",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:43:42",
-    "raw_command": "Reply with \"What is that\"",
-    "cleaned_command": "Reply with \"What is that\"",
-    "handler": "Skill:ComposioSkill",
-    "response": "I had trouble executing the Facebook action, sir: Invalid request data provided\n- Following fields are missing:",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:43:57",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:43:59",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:46:25",
-    "raw_command": "Check the recent messages on my Facebook page.",
-    "cleaned_command": "Check the recent messages on my Facebook page.",
-    "handler": "Skill:ComposioSkill",
-    "response": "Sir, you have a recent message on your MakiSync Page from Mark Liones Juntilla saying: \"Testing hehehhee\". Would you like me to draft a response?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:48:21",
-    "raw_command": "Maki.",
-    "cleaned_command": "",
-    "handler": "DirectAcknowledgment",
-    "response": "Yes, sir? I'm listening.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:48:23",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:48:33",
-    "raw_command": "Check the recent messages on my Facebook page.",
-    "cleaned_command": "Check the recent messages on my Facebook page.",
-    "handler": "Skill:ComposioSkill",
-    "response": "Sir, I’ve checked your Facebook page messages. The most recent activity is from Mark Liones Juntilla, who sent a test message and shared a link. Would you like me to draft a reply for him?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:48:35",
-    "raw_command": "MakiBak.",
-    "cleaned_command": "Bak.",
-    "handler": "Fallback:Gemini",
-    "response": "Understood, sir. Just let me know what you'd like to do next.",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 23:48:50",
-    "raw_command": "Reply saying hello world.",
-    "cleaned_command": "Reply saying hello world.",
-    "handler": "Skill:ComposioSkill",
-    "response": "I've published your response \"saying hello world\" to your MakiSync Page, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
     "timestamp": "2026-09-16 23:51:11",
     "raw_command": "Check the recent messages on my Facebook page.",
     "cleaned_command": "Check the recent messages on my Facebook page.",
@@ -1796,6 +1661,141 @@
     "cleaned_command": "What I mean is open the file path of the last screenshot we have.",
     "handler": "ComputerRouter",
     "response": "Opening the folder for your latest screenshot, 'screenshot_20260915_221433.png', in File Explorer, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:06:08",
+    "raw_command": "do you know what I am doing right now?",
+    "cleaned_command": "do you know what I am doing right now?",
+    "handler": "ComputerRouter",
+    "response": "Yes sir, you are making a playful peace sign gesture and sticking your tongue out, while holding up a box for a wireless lavalier microphone to the camera.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:06:24",
+    "raw_command": "Do you know what time is it?",
+    "cleaned_command": "Do you know what time is it?",
+    "handler": "Skill:HelloSkill",
+    "response": "It is currently 9:06 PM on Thursday, sir. According to your schedule, you are in the 8:00–11:00 PM Gaming and Free Time block, so it’s the perfect time to unwind. Your next scheduled block is Wind Down starting at 11:00 PM, so you have a bit more leisure time before then.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:06:49",
+    "raw_command": "Can you open YouTube for me?",
+    "cleaned_command": "Can you open YouTube for me?",
+    "handler": "ComputerRouter",
+    "response": "Opening YouTube in your personal profile, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:06:57",
+    "raw_command": "Can you close the browser, please?",
+    "cleaned_command": "Can you close the browser, please?",
+    "handler": "ComputerRouter",
+    "response": "I couldn't find an open window or app for 'browser,', sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:07:05",
+    "raw_command": "And it's close YouTube for me.",
+    "cleaned_command": "And it's close YouTube for me.",
+    "handler": "ComputerRouter",
+    "response": "Closing Youtube for you, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:07:14",
+    "raw_command": "Can you provide details about me?",
+    "cleaned_command": "Can you provide details about me?",
+    "handler": "Fallback:Gemini",
+    "response": "Your full name is Mark Vencent L. Juntilla, and you are currently pursuing a Bachelor of Science in Information Technology in Sulop, Davao del Sur. You are actively working on projects like BoardEase and Maki-CLI, with a favorite color of dark navy blue. On the personal side, your dog is named Cooper, and you prefer using VS Code for your Python development.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 21:07:50",
+    "raw_command": "We have an ability to update my knowledge base, especially my dog name. It's not Cooper, it's Milo.",
+    "cleaned_command": "We have an ability to update my knowledge base, especially my dog name. It's not Cooper, it's Milo.",
+    "handler": "ComputerRouter",
+    "response": "Opening your Knowledge Base folder.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 21:08:06",
+    "raw_command": "I want you to update the... My name's dog. It's Milo, not Cooper.",
+    "cleaned_command": "I want you to update the... My name's dog. It's Milo, not Cooper.",
+    "handler": "Fallback:Gemini",
+    "response": "I have updated your Knowledge Base, sir. I’ve corrected the record so your dog’s name is now Milo. Cooper is no longer listed as your dog.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 21:08:26",
+    "raw_command": "Okay, what's the name of my dog?",
+    "cleaned_command": "Okay, what's the name of my dog?",
+    "handler": "Fallback:Gemini",
+    "response": "Your dog's name is Milo, sir.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 21:08:45",
+    "raw_command": "Okay, thank you Maki.",
+    "cleaned_command": "Okay, thank you Maki.",
+    "handler": "Fallback:Gemini",
+    "response": "You’re welcome, sir. Let me know if there’s anything else I can help with.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 21:08:54",
+    "raw_command": "Maki.",
+    "cleaned_command": "",
+    "handler": "DirectAcknowledgment",
+    "response": "Yes, sir? I'm listening.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 22:56:06",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 22:56:14",
+    "raw_command": "Well...",
+    "cleaned_command": "Well...",
+    "handler": "Fallback:Gemini",
+    "response": "Is something on your mind, sir? I’m here if you need anything or just want to talk.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-17 22:56:29",
+    "raw_command": "let's prepare for client work.",
+    "cleaned_command": "let's prepare for client work.",
+    "handler": "Skill:RoutineSkill",
+    "response": "Your client content upload block isn't scheduled until 9:00 AM, sir. But since you want to get ahead of your tasks, I've opened your client Chrome profile with Metricool and all your social dashboards.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-17 22:56:53",
+    "raw_command": "Close the browser, Maki.",
+    "cleaned_command": "Close the browser, Maki.",
+    "handler": "ComputerRouter",
+    "response": "Closing MakiAI for you, sir.",
     "is_fallback": false,
     "flagged_for_review": false
   }

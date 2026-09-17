@@ -526,6 +526,101 @@
                         </div>
                     </form>
 
+                    <!-- 7. Interview & Routine Workspace Scheduler Form Template -->
+                    <form id="modal-form-interview" class="situational-form" onsubmit="event.preventDefault();" hidden>
+                        <div class="form-group mb-3">
+                            <label class="form-label text-muted small mb-2">Event Category</label>
+                            <div class="category-pills" id="interview-category-pills">
+                                <button type="button" class="category-pill active" data-category="Interview"><span class="pill-icon">🎙️</span> Interview</button>
+                                <button type="button" class="category-pill" data-category="School"><span class="pill-icon">🎓</span> Online Class</button>
+                                <button type="button" class="category-pill" data-category="Work"><span class="pill-icon">💼</span> Client Work</button>
+                                <button type="button" class="category-pill" data-category="Projects"><span class="pill-icon">💻</span> Coding</button>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="modal-interview-title" class="form-label text-muted small mb-1">Company / Subject / Meeting Title</label>
+                            <input type="text" id="modal-interview-title" class="form-control" placeholder="e.g. Essence Marketing and Design Interview" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-7">
+                                <label for="modal-interview-date" class="form-label text-muted small mb-1">Date</label>
+                                <input type="date" id="modal-interview-date" class="form-control" required>
+                            </div>
+                            <div class="col-5">
+                                <label for="modal-interview-time" class="form-label text-muted small mb-1">Start Time</label>
+                                <input type="time" id="modal-interview-time" class="form-control" value="09:00" required>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label text-muted small mb-2">Meeting Platform</label>
+                            <div class="category-pills" id="interview-platform-pills">
+                                <button type="button" class="category-pill active" data-platform="Google Meet"><span class="pill-icon">📹</span> Google Meet</button>
+                                <button type="button" class="category-pill" data-platform="Zoom"><span class="pill-icon">🟦</span> Zoom</button>
+                                <button type="button" class="category-pill" data-platform="Teams"><span class="pill-icon">👥</span> Teams</button>
+                                <button type="button" class="category-pill" data-platform="Custom"><span class="pill-icon">🌐</span> Custom URL</button>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="modal-interview-link" class="form-label text-muted small mb-1">Meeting / Class URL or Code</label>
+                            <input type="text" id="modal-interview-link" class="form-control" placeholder="https://meet.google.com/xyz-abcd-efg">
+                        </div>
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label for="modal-interview-profile" class="form-label text-muted small mb-1">Chrome Profile</label>
+                                <select id="modal-interview-profile" class="form-control form-select">
+                                    <option value="Default" selected>Default (Personal / School)</option>
+                                    <option value="Profile 1">Profile 1 (Client Marketing)</option>
+                                    <option value="Profile 2">Profile 2</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="modal-interview-lead-time" class="form-label text-muted small mb-1">Auto-Prep Lead Time</label>
+                                <select id="modal-interview-lead-time" class="form-control form-select">
+                                    <option value="15" selected>15 Minutes Before</option>
+                                    <option value="30">30 Minutes Before</option>
+                                    <option value="60">1 Hour Before</option>
+                                    <option value="5">5 Minutes Before</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer-actions d-flex gap-2 justify-content-end">
+                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Cancel</button>
+                            <button type="button" class="btn action-btn send-btn modal-btn-save" id="modal-interview-save-btn">
+                                <span>Save Routine & Schedule 🚀</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- 8. Job Hunting Dual Niche Picker Form Template -->
+                    <form id="modal-form-job-niche" class="situational-form" onsubmit="event.preventDefault();" hidden>
+                        <div class="form-group mb-3 text-center">
+                            <p class="text-muted small mb-3">Which niche would you like to prepare and launch workspaces for, sir?</p>
+                            <div class="d-flex flex-column gap-2" id="job-niche-options-wrap">
+                                <button type="button" class="btn action-btn send-btn text-start p-3 w-100 job-niche-btn mb-2" data-niche="job_hunting_ai_video">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <div class="fw-bold fs-6">🎬 AI Video Creator</div>
+                                            <div class="small opacity-75">Dual Profiles • OnlineJobs, LinkedIn, ChatGPT, Gemini, Portfolio & Resume</div>
+                                        </div>
+                                        <span>➔</span>
+                                    </div>
+                                </button>
+                                <button type="button" class="btn action-btn send-btn text-start p-3 w-100 job-niche-btn" data-niche="job_hunting_smm">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <div class="fw-bold fs-6">📱 Social Media Manager (SMM)</div>
+                                            <div class="small opacity-75">Dual Profiles • OnlineJobs, LinkedIn, Indeed, ChatGPT, Canva Portfolio & Resume</div>
+                                        </div>
+                                        <span>➔</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal-footer-actions d-flex gap-2 justify-content-end mt-3">
+                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Cancel</button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>

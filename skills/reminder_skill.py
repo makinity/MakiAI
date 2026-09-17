@@ -185,8 +185,25 @@ Rules:
             # 1. If UI bridge is connected, open interactive modal for confirmation
             if hasattr(self, "ui_bridge") and self.ui_bridge:
                 try:
-                    category = "Meeting" if any(k in reminder_text.lower() for k in ["meeting", "call", "interview", "zoom", "session"]) else (
-                        "Personal" if any(k in reminder_text.lower() for k in ["workout", "gym", "doctor", "medicine", "water", "sleep"]) else "Task"
+                    is_interview = any(k in (text.lower() + " " + reminder_text.lower()) for k in ["interview", "meeting", "zoom", "google meet", "class"])
+                    if is_interview:
+                        platform = "Google Meet" if "meet" in text.lower() else ("Zoom" if "zoom" in text.lower() else ("Teams" if "teams" in text.lower() else "Custom"))
+                        category = "Interview" if "interview" in text.lower() else ("Online Class" if "class" in text.lower() else "Interview")
+                        draft = {
+                            "title": reminder_text,
+                            "category": category,
+                            "date": reminder_dt.strftime("%Y-%m-%d"),
+                            "time": reminder_dt.strftime("%H:%M"),
+                            "platform": platform,
+                            "link": "",
+                            "lead_time": 15 if category == "Online Class" else 30,
+                            "profile": "Default",
+                        }
+                        self.ui_bridge.set_active_modal("interview", draft)
+                        return f"I've opened the interview and workspace schedule card for {reminder_text} at {friendly_time}, sir. Please provide the meeting link or confirm on screen."
+
+                    category = "Task" if any(k in reminder_text.lower() for k in ["task", "homework", "code", "study"]) else (
+                        "Personal" if any(k in reminder_text.lower() for k in ["workout", "gym", "doctor", "medicine", "water", "sleep"]) else "Reminder"
                     )
                     draft = {
                         "id": f"rem_{int(datetime.now().timestamp())}",

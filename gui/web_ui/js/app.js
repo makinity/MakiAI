@@ -121,6 +121,22 @@
         elements.modalClipEnd = document.getElementById("modal-clip-end");
         elements.modalClipTitle = document.getElementById("modal-clip-title");
         elements.clipFormatPills = Array.from(document.querySelectorAll("#clip-format-pills .category-pill"));
+
+        // Interview & Routine inputs
+        elements.modalFormInterview = document.getElementById("modal-form-interview");
+        elements.modalInterviewSaveBtn = document.getElementById("modal-interview-save-btn");
+        elements.modalInterviewTitle = document.getElementById("modal-interview-title");
+        elements.modalInterviewDate = document.getElementById("modal-interview-date");
+        elements.modalInterviewTime = document.getElementById("modal-interview-time");
+        elements.modalInterviewLink = document.getElementById("modal-interview-link");
+        elements.modalInterviewProfile = document.getElementById("modal-interview-profile");
+        elements.modalInterviewLeadTime = document.getElementById("modal-interview-lead-time");
+        elements.interviewCategoryPills = Array.from(document.querySelectorAll("#interview-category-pills .category-pill"));
+        elements.interviewPlatformPills = Array.from(document.querySelectorAll("#interview-platform-pills .category-pill"));
+
+        // Job Hunting Niche Picker
+        elements.modalFormJobNiche = document.getElementById("modal-form-job-niche");
+        elements.jobNicheBtns = Array.from(document.querySelectorAll(".job-niche-btn"));
     }
 
     function bindEvents() {
@@ -188,6 +204,36 @@
         }
         if (elements.modalClipRenderBtn) {
             elements.modalClipRenderBtn.addEventListener("click", handleRenderClipModal);
+        }
+        if (elements.modalInterviewSaveBtn) {
+            elements.modalInterviewSaveBtn.addEventListener("click", handleSaveInterview);
+        }
+
+        if (elements.jobNicheBtns) {
+            elements.jobNicheBtns.forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const nicheId = btn.dataset.niche;
+                    if (nicheId && state.bridge && typeof state.bridge.launch_routine === "function") {
+                        state.bridge.launch_routine(nicheId);
+                        handleDismissModal();
+                    }
+                });
+            });
+        }
+
+        // Auto-change link placeholder on platform pill click
+        if (elements.interviewPlatformPills) {
+            elements.interviewPlatformPills.forEach((pill) => {
+                pill.addEventListener("click", () => {
+                    const platform = pill.dataset.platform;
+                    if (elements.modalInterviewLink && !elements.modalInterviewLink.value) {
+                        if (platform === "Google Meet") elements.modalInterviewLink.placeholder = "https://meet.google.com/xyz-abcd-efg";
+                        else if (platform === "Zoom") elements.modalInterviewLink.placeholder = "https://zoom.us/j/123456789";
+                        else if (platform === "Teams") elements.modalInterviewLink.placeholder = "https://teams.microsoft.com/l/meetup-join/...";
+                        else elements.modalInterviewLink.placeholder = "https://...";
+                    }
+                });
+            });
         }
 
         // Password visibility toggles
@@ -572,7 +618,9 @@
             elements.modalFormHomework,
             elements.modalFormProject,
             elements.modalFormEmail,
-            elements.modalFormClip
+            elements.modalFormClip,
+            elements.modalFormInterview,
+            elements.modalFormJobNiche
         ];
         allForms.forEach((f) => { if (f) f.hidden = true; });
 
@@ -678,6 +726,38 @@
             if (elements.modalFormClip) elements.modalFormClip.hidden = false;
             if (elements.modalOverlay) elements.modalOverlay.hidden = false;
             window.setTimeout(() => elements.modalClipTitle && elements.modalClipTitle.focus(), 120);
+
+        } else if (type === "interview" || type === "routine") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "Schedule Interview / Workspace Routine";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Proactive Workspace Engine";
+            if (elements.modalInterviewTitle) elements.modalInterviewTitle.value = data.title || data.name || data.company || "";
+            if (elements.modalInterviewDate) elements.modalInterviewDate.value = data.date || data.target_date || getTodayDateStr();
+            if (elements.modalInterviewTime) elements.modalInterviewTime.value = data.time || data.target_time || "09:00";
+            if (elements.modalInterviewLink) elements.modalInterviewLink.value = data.link || data.url || "";
+            if (elements.modalInterviewProfile) elements.modalInterviewProfile.value = data.chrome_profile || "Default";
+            if (elements.modalInterviewLeadTime) elements.modalInterviewLeadTime.value = String(data.lead_time_minutes || 15);
+
+            const targetCat = data.category || "Interview";
+            if (elements.interviewCategoryPills) {
+                elements.interviewCategoryPills.forEach((p) => {
+                    p.classList.toggle("active", p.dataset.category === targetCat);
+                });
+            }
+            const targetPlatform = data.platform || "Google Meet";
+            if (elements.interviewPlatformPills) {
+                elements.interviewPlatformPills.forEach((p) => {
+                    p.classList.toggle("active", p.dataset.platform === targetPlatform);
+                });
+            }
+            if (elements.modalFormInterview) elements.modalFormInterview.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
+            window.setTimeout(() => elements.modalInterviewTitle && elements.modalInterviewTitle.focus(), 120);
+
+        } else if (type === "job_niche") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "Job Hunting Niche Selection";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Dual-Profile Workspace Provisioning";
+            if (elements.modalFormJobNiche) elements.modalFormJobNiche.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
         }
     }
 
@@ -898,6 +978,44 @@
             console.error("[Modal] Render clip error:", err);
         } finally {
             if (elements.modalClipRenderBtn) elements.modalClipRenderBtn.disabled = false;
+        }
+    }
+
+    async function handleSaveInterview() {
+        if (!state.bridge || typeof state.bridge.save_routine !== "function") {
+            handleDismissModal();
+            return;
+        }
+
+        const activeCatPill = elements.interviewCategoryPills ? elements.interviewCategoryPills.find((p) => p.classList.contains("active")) : null;
+        const category = activeCatPill ? activeCatPill.dataset.category : "Interview";
+
+        const activePlatPill = elements.interviewPlatformPills ? elements.interviewPlatformPills.find((p) => p.classList.contains("active")) : null;
+        const platform = activePlatPill ? activePlatPill.dataset.platform : "Google Meet";
+
+        const payload = {
+            title: elements.modalInterviewTitle ? elements.modalInterviewTitle.value.trim() : "Scheduled Session",
+            category: category,
+            date: elements.modalInterviewDate ? elements.modalInterviewDate.value.trim() : "",
+            time: elements.modalInterviewTime ? elements.modalInterviewTime.value.trim() : "09:00",
+            platform: platform,
+            link: elements.modalInterviewLink ? elements.modalInterviewLink.value.trim() : "",
+            chrome_profile: elements.modalInterviewProfile ? elements.modalInterviewProfile.value : "Default",
+            lead_time_minutes: elements.modalInterviewLeadTime ? parseInt(elements.modalInterviewLeadTime.value) : 15,
+        };
+
+        if (elements.modalInterviewSaveBtn) elements.modalInterviewSaveBtn.disabled = true;
+
+        try {
+            const res = await state.bridge.save_routine(payload);
+            applyBackendState(res);
+            if (elements.modalOverlay) elements.modalOverlay.hidden = true;
+            state.activeModal = null;
+            renderAll();
+        } catch (err) {
+            console.error("[Modal] Save interview error:", err);
+        } finally {
+            if (elements.modalInterviewSaveBtn) elements.modalInterviewSaveBtn.disabled = false;
         }
     }
 

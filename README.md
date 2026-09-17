@@ -6,7 +6,7 @@
 
 ## 🌟 Overview
 
-**MakiAI** is a personalized desktop companion designed for high-productivity development, academic workflows, multi-monitor window management, and hands-free computer control. It bridges low-latency conversational AI with native Windows operating system automation, webcam physical vision, screen debugging, and project scaffolding.
+**MakiAI** is a personalized desktop companion designed for high-productivity development, academic workflows, proactive routine provisioning, multi-monitor window management, and hands-free computer control. It bridges low-latency conversational AI with native Windows operating system automation, webcam physical vision, screen debugging, multi-profile Chrome orchestration, and project scaffolding.
 
 ---
 
@@ -16,35 +16,44 @@
 - **Kiro CLI Integration**: Spawns visible or headless instances of `kiro-cli` (Claude Sonnet 4.5 / DeepSeek 3.2 / Qwen3 Coder) to write full-stack code, scripts, and applications on command.
 - **Interactive Workspace**: Opens terminal sessions directly in your active development directories (`C:\development\...`).
 
-### 🏗️ 2. 11-Stage Project Planning & Scaffolding
+### 🚀 2. Proactive Routine & Workspace Provisioning Engine
+- **Autonomous Lead-Time Provisioning**: Monitors your schedule and automatically launches browser tabs, applications, and documents 15–30 minutes before events begin.
+- **College Class Workspaces**: Automatically launches Google Meet, Google Classroom, Facebook research tabs, and VS Code for **BAT-600** and **ICC-600**.
+- **Client Workflows**: Boots dedicated Chrome profiles with Metricool, Instagram, Facebook, YouTube, Astra AI Creator Stats, and ChatGPT for content management.
+- **Dual-Niche Job Hunting Engine**:
+  - **AI Video Creator**: Opens dual Chrome profiles (OnlineJobs.ph, LinkedIn, Gmail, ChatGPT, Gemini, Portfolio) and launches `C:\VA\Documents\Resume\AI Video`.
+  - **Social Media Manager (SMM)**: Opens dual Chrome profiles (OnlineJobs.ph, LinkedIn, Indeed, ChatGPT, Gemini, Canva Portfolio) and launches `C:\VA\Documents\Resume\SMM Resume`.
+- **Smart Scheduling Reasoning**: On-demand manual triggers provide polite, context-aware feedback when activated off-schedule (*"It's not your scheduled time yet, sir... but since you'd like to get an early start, I've prepared your workspace..."*).
+
+### 🏗️ 3. 11-Stage Project Planning & Scaffolding
 - **Standardized Architecture**: Reads Knowledge Base coding guidelines (`config/coding-standards.md`, `architecture.md`) and conducts structured planning sessions (Idea, Tech Stack, Database, API, Milestones).
 - **Auto-Documentation**: Generates all 7 standardized specification documents into `C:\Knowledge-Base\projects\<name>\`.
 
-### 📅 3. Real-Time Routine & Schedule Intelligence (English & Tagalog)
+### 📅 4. Real-Time Routine & Schedule Intelligence (English & Tagalog)
 - **Time-Block Aware**: Synchronized with `workflows/time-management.md` and Philippine Standard Time (UTC+8) to report current active blocks and daily agendas.
 - **Bilingual Briefings**: Fluent in English, Tagalog, and Taglish (*"Ano schedule ko today?"*, *"Anong agenda ko bukas?"*).
 - **Night Wrap-Up & Morning Briefing**: Summarizes accomplishments and prepares tomorrow's tasks.
 
-### 📝 4. Academic Hub & Automated Homework Generation
+### 📝 5. Academic Hub & Automated Homework Generation
 - **Rubric-Based Document Authoring**: Reads templates dropped into `C:\MakiSync Storage\School\Temp-Guide\` and formats complete multi-page `.docx` assignments, lab reports, or essays into `C:\MakiSync Storage\School\Assignments\<Date>\`.
 - **Deadlines Tracking**: View, add, and complete academic milestones in `workflows/deadlines.md`.
 
-### 👁️ 5. Multimodal Dual-Vision (Webcam + Screen)
+### 👁️ 6. Multimodal Dual-Vision (Webcam + Screen)
 - **Physical World Observer**: Uses your webcam to identify held objects, recognize activities, check posture, and monitor surroundings in real-time.
 - **Screen Vision & Error Debugging**: Captures active displays to analyze terminal stack traces, UI errors, or code snippets with Gemini Vision OCR.
 
-### 🪟 6. Multi-Monitor Window Management & Auto-Tiling
+### 🪟 7. Multi-Monitor Window Management & Auto-Tiling
 - **Smart Window Tiling**: Organizes desktop apps into clean side-by-side, 3-column, or 2x2 grid layouts without overlaps or gaps.
 - **Multi-Monitor Relocation**: Moves applications seamlessly between primary and secondary displays (*"Move Chrome to my second monitor"*).
 
-### 🌐 7. Chrome Multi-Profile Site Launcher
-- **Profile-Aware Launching**: Directly targets dedicated Google Chrome user profiles (Personal, Work, Developer) for YouTube, GitHub, Facebook, Canva, and custom web apps.
+### 🌐 8. Chrome Multi-Profile Site Launcher
+- **Profile-Aware Launching**: Directly targets dedicated Google Chrome user profiles (Personal, Client, Developer) for YouTube, GitHub, Facebook, Canva, and custom web apps.
 
-### 📁 8. Smart Storage & Whisper Normalization
+### 📁 9. Smart Storage & Whisper Normalization
 - **Phonetic STT Correction**: Automatically normalizes speech-to-text artifacts (e.g., *"magazine storage"* or *"cable storage"* ➔ `C:\MakiSync Storage\MakiAI\Screenshots`).
 - **File Organization**: Cleans and sorts folders by file type and searches Knowledge Base documents.
 
-### 🔊 9. Neural Voice Engine & System Telemetry
+### 🔊 10. Neural Voice Engine & System Telemetry
 - **Calibrated British Neural Voice**: High-fidelity, natural speech (`en-GB-RyanNeural`) with intelligent audio ducking during speech output.
 - **Hardware Telemetry**: Real-time battery life, CPU/RAM utilization, brightness, volume scaling, and power state controls (lock, sleep, shutdown).
 
@@ -55,7 +64,7 @@
 | Layer | Technology |
 |---|---|
 | **Core & OS** | Python 3.11+, Windows Win32 API, `psutil`, `pycaw`, `pygetwindow` |
-| **GUI & Visuals** | PyQt6, Custom Dark/Glassmorphism Theme, Dynamic Activity Indicators |
+| **GUI & Visuals** | PyQt6 / Web UI Bridge, Custom Dark/Glassmorphism Theme, Interactive Situational Modals |
 | **Primary AI Inference** | Groq API (`llama-3.3-70b-versatile` — ultra-low latency) |
 | **Multimodal & Fallback AI**| Google Gemini API (`gemini-2.5-flash`, `gemini-2.5-flash-lite`) |
 | **Speech-to-Text (STT)** | `faster-whisper` (OpenAI Whisper local quantization) |
@@ -63,6 +72,7 @@
 | **Wake Word Engine** | Picovoice Porcupine (`"Hey Maki"`) + Push-to-Talk (`Right Alt`) |
 | **Autonomous Coding** | Kiro CLI (`kiro-cli.exe`), Claude 3.5 Sonnet / DeepSeek V3 / Qwen Coder |
 | **Computer Vision** | OpenCV (`cv2`), PIL, Gemini Multimodal Vision API |
+| **Routine & Workspace Engine**| Dynamic Chrome Local State profile resolver, Windows Explorer automation |
 | **Cloud & Integrations** | Composio API (GitHub, Notion, Google Calendar, Discord) |
 
 ---
@@ -72,12 +82,14 @@
 ```
 MakiAI/
 ├── main.py                     # Main application entry point & lifecycle manager
+├── config/                     # Configuration definitions
+│   └── routines.json           # Scheduled classes, client blocks & job-hunting presets
 ├── core/                       # Central system orchestration
 │   ├── orchestrator.py         # Intent dispatching, skill execution & LLM fallbacks
 │   └── state_manager.py        # System state tracking (idle, listening, thinking, speaking)
-├── gui/                        # PyQt6 desktop user interface
-│   ├── app.py                  # Main window layout and sidebar controls
-│   ├── components/             # Reusable UI widgets (chat bubbles, status indicators)
+├── gui/                        # Desktop & Web user interface
+│   ├── ui_bridge.py            # Python-to-WebUI interactive modal bridge
+│   ├── web_ui/                 # HTML5/JS Glassmorphic Dashboard & Modal Forms
 │   └── styles/                 # Dark glassmorphism QSS styling
 ├── services/                   # Modular subsystem services
 │   ├── ai/                     # Groq & Gemini API clients, Context Builder
@@ -89,9 +101,11 @@ MakiAI/
 │   ├── media/                  # Spotify & native Windows media controls
 │   ├── memory/                 # Multi-session memory persistence
 │   ├── reminder/               # Background task scheduler & notifications
+│   ├── routines/               # Autonomous routine monitoring daemon & workspace launcher
 │   ├── storage/                # MakiSync storage path handlers & utilities
 │   └── voice/                  # Porcupine wake word, STT, Edge-TTS & audio ducking
 ├── skills/                     # High-level domain capabilities
+│   ├── routine_skill.py        # On-demand workspace preparation & modal triggers
 │   ├── goodmorning_skill.py    # Morning routine & daily schedule briefing
 │   ├── goodnight_skill.py      # Evening wrap-up & tomorrow preview
 │   ├── deadline_skill.py       # Deadlines tracking & milestone logging
@@ -169,7 +183,8 @@ python main.py
 
 1. **Wake Word**: Say **`"Hey Maki, [command]"`** for hands-free operation.
 2. **Push-to-Talk (PTT)**: Hold the **`Right Alt`** key while speaking, then release to execute instantly.
-3. **Desktop Chat UI**: Click the chat bar at the bottom of the MakiAI window to type commands directly.
+3. **Interactive UI Modals**: Dynamic on-screen cards for selecting job-hunting niches or scheduling interview links.
+4. **Desktop Chat UI**: Click the chat bar at the bottom of the MakiAI window to type commands directly.
 
 ---
 
@@ -177,6 +192,11 @@ python main.py
 
 | Category | Example Voice Prompt | Expected Action |
 |---|---|---|
+| **Job Hunting (Interactive)** | *"Maki, let's hunt a job"* / *"Let's do job hunting"* | Prompts for niche selection and displays GUI modal |
+| **Job Hunting (AI Video)** | *"Hunt for AI video creator jobs"* | Opens dual Chrome profiles (OnlineJobs, LinkedIn, ChatGPT, Gemini, Portfolio) + AI Video Resume folder |
+| **Job Hunting (SMM)** | *"Let's hunt for SMM jobs"* | Opens dual Chrome profiles (OnlineJobs, LinkedIn, Indeed, Canva) + SMM Resume folder |
+| **Online Class Prep** | *"Prep for class"* / *"Prep for online class"* | Detects schedule and opens Google Meet, Google Classroom, Facebook & VS Code |
+| **Client Work Prep** | *"Prep for client work"* / *"Prep for work"* | Opens client Chrome profile with Metricool and social platforms |
 | **Schedule & Routine** | *"Good morning Maki"* / *"Ano schedule ko today?"* | Reads today's time-table from `time-management.md` |
 | **Tomorrow's Plan** | *"What is my schedule tomorrow?"* / *"Ano schedule ko bukas?"* | Previews upcoming activities for the next calendar day |
 | **Autonomous Coding** | *"Open Kiro for TaskMaster"* | Spawns Kiro CLI in target project directory |
@@ -199,10 +219,13 @@ python main.py
 
 ## 🧪 Testing & Diagnostics
 
-MakiAI includes a comprehensive diagnostic suite to test intent routing, LLM context generation, and speech normalization:
+MakiAI includes dedicated test suites to verify routine provisioning, intent routing, and LLM context generation:
 
 ```bash
-# Run the complete 65+ command diagnostic matrix
+# Run the Dual-Niche Job Hunting and Routine Engine E2E Verification
+python scratch/verify_job_hunting_e2e.py
+
+# Run the complete command diagnostic matrix
 python scratch/test_all_commands.py
 ```
 

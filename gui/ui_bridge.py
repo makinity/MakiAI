@@ -36,6 +36,7 @@ class MakiUIApi:
         wake_word_service: Optional[WakeWordService] = None,
         ptt_service: Optional[PushToTalkService] = None,
         reminder_service: Optional[ReminderService] = None,
+        routine_engine: Optional[Any] = None,
     ):
         self.orchestrator = orchestrator
         self.state_manager = state_manager
@@ -45,6 +46,7 @@ class MakiUIApi:
         self.wake_word_service = wake_word_service
         self.ptt_service = ptt_service
         self.reminder_service = reminder_service
+        self.routine_engine = routine_engine
 
         self.bot_name = self.settings.get_app_name()
         self._lock = threading.Lock()
@@ -436,6 +438,35 @@ class MakiUIApi:
         self.tts_service.speak(confirmation)
 
         return {"ok": True, "message": confirmation, **self.get_ui_state()}
+
+    def trigger_interview_modal(self, data: Optional[Dict[str, Any]] = None) -> None:
+        """Trigger the interactive Interview & Routine scheduling modal in the frontend."""
+        data = data or {}
+        self.set_active_modal("interview", data)
+
+    def save_routine(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Save structured interview or routine schedule via RoutineEngine."""
+        if not payload or not isinstance(payload, dict):
+            return {"ok": False, "message": "Invalid routine payload"}
+
+        if self.routine_engine:
+            res = self.routine_engine.save_interview_or_routine(payload)
+            self.clear_active_modal()
+            msg = res.get("message", "Routine saved successfully, sir.")
+            self.add_activity("assistant", msg)
+            self.tts_service.speak(msg)
+            return {"ok": True, "message": msg, **self.get_ui_state()}
+
+        self.clear_active_modal()
+        return {"ok": False, "message": "Routine engine not available", **self.get_ui_state()}
+
+    def launch_routine(self, routine_id: str) -> Dict[str, Any]:
+        """Manually trigger provisioning of a routine workspace."""
+        if self.routine_engine:
+            msg = self.routine_engine.launch_routine(routine_id)
+            self.add_activity("assistant", msg)
+            return {"ok": True, "message": msg, **self.get_ui_state()}
+        return {"ok": False, "message": "Routine engine not available", **self.get_ui_state()}
 
     def generate_homework(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """Compile and generate formatted .docx assignment via HomeworkSkill."""
