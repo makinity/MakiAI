@@ -444,6 +444,43 @@ class MakiUIApi:
         data = data or {}
         self.set_active_modal("interview", data)
 
+    def show_task_review(self, task_data: Dict[str, Any]) -> None:
+        """Trigger the Task Review & Approval card in the desktop frontend."""
+        task_data = task_data or {}
+        self.set_active_modal("task_review", task_data)
+
+    def show_morning_mission(self, mission_data: Dict[str, Any]) -> None:
+        """Trigger the Today's Mission & Timeline Digest modal in the desktop frontend."""
+        mission_data = mission_data or {}
+        self.set_active_modal("morning_mission", mission_data)
+
+    def approve_task(self, task_id: str, action: str = "open", target_path: str = "") -> Dict[str, Any]:
+        """Handle human-in-the-loop task approval."""
+        import os
+        import subprocess
+        from pathlib import Path
+
+        self.clear_active_modal()
+        target_path = target_path.strip()
+
+        if action == "open" and target_path:
+            p = Path(target_path)
+            if p.exists():
+                try:
+                    os.startfile(str(p))
+                    msg = f"Task {task_id} approved. Opening {p.name} now, sir."
+                except Exception as e:
+                    subprocess.Popen(["explorer.exe", str(p.parent if p.is_file() else p)])
+                    msg = f"Task {task_id} approved. Opened folder for {p.name}, sir."
+            else:
+                msg = f"Task {task_id} approved, sir."
+        else:
+            msg = f"Task {task_id} approved and completed, sir."
+
+        self.add_activity("assistant", msg)
+        self.tts_service.speak(msg)
+        return {"ok": True, "message": msg, **self.get_ui_state()}
+
     def save_routine(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """Save structured interview or routine schedule via RoutineEngine."""
         if not payload or not isinstance(payload, dict):

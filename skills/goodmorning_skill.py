@@ -65,6 +65,60 @@ class GoodMorningSkill(BaseSkill):
 
         return "\n".join(schedule_rows)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ui_bridge = None
+
+    def set_ui_bridge(self, ui_bridge) -> None:
+        """Connect UI bridge to trigger interactive morning mission modal."""
+        self.ui_bridge = ui_bridge
+
+    def _trigger_mission_modal_if_available(self, day_name: str, date_str: str, day_schedule: str) -> None:
+        """Parse schedule and deadlines, then push Today's Mission modal to UI."""
+        if not hasattr(self, "ui_bridge") or not self.ui_bridge:
+            return
+
+        timeline_items = []
+        if day_schedule:
+            for line in day_schedule.splitlines():
+                if line.startswith("- "):
+                    parts = line[2:].split(":", 1)
+                    if len(parts) == 2:
+                        t_slot = parts[0].strip()
+                        act = parts[1].strip()
+                        routine_id = ""
+                        if "bat" in act.lower():
+                            routine_id = "online_class_bat600"
+                        elif "icc" in act.lower():
+                            routine_id = "online_class_icc600"
+                        elif "job" in act.lower() or "hunt" in act.lower():
+                            routine_id = "job_hunting_ai_video"
+                        elif "client" in act.lower() or "content" in act.lower():
+                            routine_id = "client_content_work"
+
+                        timeline_items.append({
+                            "time": t_slot,
+                            "title": act,
+                            "desc": f"Planned block for {day_name}",
+                            "routine_id": routine_id,
+                        })
+
+        deadlines_text = ""
+        if self.kb_reader:
+            d_content = self.kb_reader.read("workflows/deadlines.md")
+            if d_content:
+                urgent = [l for l in d_content.splitlines() if "- [ ]" in l][:3]
+                if urgent:
+                    deadlines_text = "\n".join(urgent)
+
+        mission_data = {
+            "date_label": f"{day_name}, {date_str}",
+            "active_block": "Daily Operating Schedule",
+            "timeline_items": timeline_items,
+            "deadlines_text": deadlines_text or "No pending deadlines logged.",
+        }
+        self.ui_bridge.show_morning_mission(mission_data)
+
     def execute(self, text: str) -> str:
         """Generate the time-aware schedule briefing from KB workflow files."""
         now = datetime.now()
@@ -76,6 +130,7 @@ class GoodMorningSkill(BaseSkill):
             day_name = target_date.strftime("%A")
             date_str = target_date.strftime("%B %d, %Y")
             day_schedule = self._get_day_schedule(day_name)
+            self._trigger_mission_modal_if_available(day_name, date_str, day_schedule)
 
             prompt = f"""
 The current real-time clock is {now.strftime("%I:%M %p")} on {now.strftime("%A, %B %d, %Y")}.
@@ -101,6 +156,7 @@ Constraints:
             time_str = now.strftime("%I:%M %p")
             hour = now.hour
             day_schedule = self._get_day_schedule(day_name)
+            self._trigger_mission_modal_if_available(day_name, date_str, day_schedule)
 
             if 5 <= hour < 12:
                 greeting = "Good morning"

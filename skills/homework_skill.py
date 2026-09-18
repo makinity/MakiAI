@@ -125,10 +125,21 @@ Write the actual homework document content.
         self.last_generated_docx = output_path
 
         if output_path:
+            if hasattr(self, "ui_bridge") and self.ui_bridge:
+                task_data = {
+                    "task_id": f"TQ-{int(datetime.now().timestamp()) % 10000:04d}",
+                    "title": f"Academic Document: {output_path.stem}",
+                    "badge": "🎓 Academic .docx Ready",
+                    "summary": f"MakiAI generated the complete academic document based on your guide rubric. Ready for your review and submission.",
+                    "filename": output_path.name,
+                    "output_path": str(output_path),
+                }
+                self.ui_bridge.show_task_review(task_data)
+
             subprocess.Popen(f'start "" "{output_path}"', shell=True)
             return (
                 f"Your homework is ready, sir. "
-                f"I've saved it as {output_path.name} in your Assignments folder and opened it for you."
+                f"I've saved it as {output_path.name} in your Assignments folder and opened it for review."
             )
 
         return "I generated the homework but couldn't save the file, sir. Please check your permissions."

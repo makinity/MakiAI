@@ -36,7 +36,7 @@ class BaseSkill(ABC):
             kb_reader:       KBReader for reading KB files.
             kb_writer:       KBWriter for writing KB files.
         """
-        self.gemini = gemini_service
+        self.gemini = gemini_service or kwargs.get("gemini")
         self.context_builder = context_builder
         self.kb_reader = kb_reader
         self.kb_writer = kb_writer

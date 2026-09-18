@@ -621,6 +621,74 @@
                         </div>
                     </form>
 
+                    <!-- 9. Human-in-the-Loop Task Review & Approval Card Template -->
+                    <form id="modal-form-task-review" class="situational-form" onsubmit="event.preventDefault();" hidden>
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                            <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-50 px-2 py-1" id="task-review-badge">
+                                🛡️ Task Review
+                            </span>
+                            <span class="small text-muted font-monospace" id="task-review-id">TQ-0001</span>
+                        </div>
+
+                        <h5 class="fw-bold mb-2 text-light" id="task-review-title">Generated Document / Task Output</h5>
+                        <p class="text-muted small mb-3" id="task-review-summary">
+                            MakiAI has prepared the output for your review. Please inspect the summary and approve.
+                        </p>
+
+                        <div class="glass-subpanel p-3 rounded mb-3" id="task-review-file-box">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="fs-5">📄</span>
+                                <span class="fw-semibold small text-light" id="task-review-filename">Assignment_Output.docx</span>
+                            </div>
+                            <div class="small text-muted font-monospace text-truncate" id="task-review-filepath" style="font-size: 0.78rem;">
+                                C:\MakiSync Storage\School\Assignments\Output.docx
+                            </div>
+                        </div>
+
+                        <div class="modal-footer-actions d-flex gap-2 justify-content-end mt-3">
+                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel" id="task-review-dismiss-btn">Dismiss</button>
+                            <button type="button" class="btn btn-outline-info" id="task-review-copy-btn">
+                                <span>📋 Copy Path</span>
+                            </button>
+                            <button type="button" class="btn action-btn send-btn" id="task-review-approve-btn">
+                                <span>Approve & Open 🚀</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- 10. Today's Mission & Timeline Digest Template -->
+                    <form id="modal-form-morning-mission" class="situational-form" onsubmit="event.preventDefault();" hidden>
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fs-5">🌅</span>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-light" id="mission-date-label">Friday, September 18, 2026</h6>
+                                    <span class="small text-muted" id="mission-active-block">Active: Morning Routine</span>
+                                </div>
+                            </div>
+                            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 py-1">
+                                Today's Schedule
+                            </span>
+                        </div>
+
+                        <div class="timeline-container mb-3" id="mission-timeline-list" style="max-height: 280px; overflow-y: auto;">
+                            <!-- Dynamic Timeline Items rendered here -->
+                        </div>
+
+                        <div class="glass-subpanel p-2 rounded mb-3" id="mission-deadlines-wrap">
+                            <div class="small fw-bold text-warning mb-1 d-flex align-items-center gap-1">
+                                <span>📌</span> Academic & Client Deadlines Due
+                            </div>
+                            <div class="small text-muted" id="mission-deadlines-list" style="font-size: 0.8rem;">
+                                No urgent deadlines for today, sir.
+                            </div>
+                        </div>
+
+                        <div class="modal-footer-actions d-flex gap-2 justify-content-end">
+                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Close</button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>

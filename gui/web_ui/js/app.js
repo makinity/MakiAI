@@ -137,6 +137,25 @@
         // Job Hunting Niche Picker
         elements.modalFormJobNiche = document.getElementById("modal-form-job-niche");
         elements.jobNicheBtns = Array.from(document.querySelectorAll(".job-niche-btn"));
+
+        // Task Review & Approval Card elements
+        elements.modalFormTaskReview = document.getElementById("modal-form-task-review");
+        elements.taskReviewBadge = document.getElementById("task-review-badge");
+        elements.taskReviewId = document.getElementById("task-review-id");
+        elements.taskReviewTitle = document.getElementById("task-review-title");
+        elements.taskReviewSummary = document.getElementById("task-review-summary");
+        elements.taskReviewFilename = document.getElementById("task-review-filename");
+        elements.taskReviewFilepath = document.getElementById("task-review-filepath");
+        elements.taskReviewApproveBtn = document.getElementById("task-review-approve-btn");
+        elements.taskReviewCopyBtn = document.getElementById("task-review-copy-btn");
+        elements.taskReviewDismissBtn = document.getElementById("task-review-dismiss-btn");
+
+        // Morning Mission Timeline Digest elements
+        elements.modalFormMorningMission = document.getElementById("modal-form-morning-mission");
+        elements.missionDateLabel = document.getElementById("mission-date-label");
+        elements.missionActiveBlock = document.getElementById("mission-active-block");
+        elements.missionTimelineList = document.getElementById("mission-timeline-list");
+        elements.missionDeadlinesList = document.getElementById("mission-deadlines-list");
     }
 
     function bindEvents() {
@@ -219,6 +238,45 @@
                     }
                 });
             });
+        }
+
+        // Task Review Action Buttons
+        if (elements.taskReviewApproveBtn) {
+            elements.taskReviewApproveBtn.addEventListener("click", async () => {
+                const task = state.currentReviewTask || {};
+                if (state.bridge && typeof state.bridge.approve_task === "function") {
+                    try {
+                        const res = await state.bridge.approve_task(task.task_id || "TQ-0001", "open", task.output_path || "");
+                        applyBackendState(res);
+                        handleDismissModal();
+                        renderAll();
+                    } catch (err) {
+                        console.error("[TaskReview] Approve error:", err);
+                    }
+                } else {
+                    handleDismissModal();
+                }
+            });
+        }
+
+        if (elements.taskReviewCopyBtn) {
+            elements.taskReviewCopyBtn.addEventListener("click", () => {
+                const task = state.currentReviewTask || {};
+                const path = task.output_path || "";
+                if (path && navigator.clipboard) {
+                    navigator.clipboard.writeText(path);
+                    if (elements.taskReviewCopyBtn) {
+                        elements.taskReviewCopyBtn.innerHTML = "<span>✅ Copied!</span>";
+                        setTimeout(() => {
+                            if (elements.taskReviewCopyBtn) elements.taskReviewCopyBtn.innerHTML = "<span>📋 Copy Path</span>";
+                        }, 1800);
+                    }
+                }
+            });
+        }
+
+        if (elements.taskReviewDismissBtn) {
+            elements.taskReviewDismissBtn.addEventListener("click", handleDismissModal);
         }
 
         // Auto-change link placeholder on platform pill click
@@ -620,7 +678,9 @@
             elements.modalFormEmail,
             elements.modalFormClip,
             elements.modalFormInterview,
-            elements.modalFormJobNiche
+            elements.modalFormJobNiche,
+            elements.modalFormTaskReview,
+            elements.modalFormMorningMission
         ];
         allForms.forEach((f) => { if (f) f.hidden = true; });
 
@@ -757,6 +817,66 @@
             if (elements.modalHeading) elements.modalHeading.textContent = "Job Hunting Niche Selection";
             if (elements.modalKicker) elements.modalKicker.textContent = "Dual-Profile Workspace Provisioning";
             if (elements.modalFormJobNiche) elements.modalFormJobNiche.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
+
+        } else if (type === "task_review") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "Task Review & Approval";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Human-in-the-Loop Engine";
+            if (elements.taskReviewBadge) elements.taskReviewBadge.textContent = data.badge || "🛡️ Ready for Review";
+            if (elements.taskReviewId) elements.taskReviewId.textContent = data.task_id || `TQ-${Math.floor(1000 + Math.random() * 9000)}`;
+            if (elements.taskReviewTitle) elements.taskReviewTitle.textContent = data.title || "Generated Document / Output";
+            if (elements.taskReviewSummary) elements.taskReviewSummary.textContent = data.summary || "MakiAI has prepared the output for your review. Please inspect and approve.";
+            if (elements.taskReviewFilename) elements.taskReviewFilename.textContent = data.filename || "Output_File";
+            if (elements.taskReviewFilepath) elements.taskReviewFilepath.textContent = data.output_path || "C:\\MakiSync Storage";
+
+            state.currentReviewTask = data;
+
+            if (elements.modalFormTaskReview) elements.modalFormTaskReview.hidden = false;
+            if (elements.modalOverlay) elements.modalOverlay.hidden = false;
+
+        } else if (type === "morning_mission") {
+            if (elements.modalHeading) elements.modalHeading.textContent = "Today's Mission & Timeline";
+            if (elements.modalKicker) elements.modalKicker.textContent = "Daily Operating Digest";
+            if (elements.missionDateLabel) elements.missionDateLabel.textContent = data.date_label || new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+            if (elements.missionActiveBlock) elements.missionActiveBlock.textContent = `Active: ${data.active_block || "Morning Schedule"}`;
+
+            if (elements.missionTimelineList) {
+                elements.missionTimelineList.innerHTML = "";
+                const items = data.timeline_items || [];
+                if (items.length === 0) {
+                    elements.missionTimelineList.innerHTML = `<p class="text-muted small p-2">No scheduled timeline items, sir.</p>`;
+                } else {
+                    items.forEach((item) => {
+                        const div = document.createElement("div");
+                        div.className = "d-flex align-items-start gap-2 mb-2 p-2 rounded glass-subpanel";
+                        div.innerHTML = `
+                            <span class="badge bg-secondary bg-opacity-50 text-info font-monospace" style="font-size: 0.75rem;">${item.time || "--:--"}</span>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small text-light">${item.title}</div>
+                                <div class="small text-muted" style="font-size: 0.75rem;">${item.desc || ""}</div>
+                            </div>
+                            ${item.routine_id ? `<button type="button" class="btn btn-sm btn-outline-primary mission-launch-btn px-2 py-0" data-routine="${item.routine_id}" style="font-size: 0.72rem;">Launch</button>` : ""}
+                        `;
+                        elements.missionTimelineList.appendChild(div);
+                    });
+
+                    elements.missionTimelineList.querySelectorAll(".mission-launch-btn").forEach((btn) => {
+                        btn.addEventListener("click", () => {
+                            const rId = btn.dataset.routine;
+                            if (rId && state.bridge && typeof state.bridge.launch_routine === "function") {
+                                state.bridge.launch_routine(rId);
+                                handleDismissModal();
+                            }
+                        });
+                    });
+                }
+            }
+
+            if (elements.missionDeadlinesList) {
+                elements.missionDeadlinesList.innerHTML = data.deadlines_html || (data.deadlines_text ? `<p class="mb-0">${data.deadlines_text}</p>` : "No urgent deadlines for today, sir.");
+            }
+
+            if (elements.modalFormMorningMission) elements.modalFormMorningMission.hidden = false;
             if (elements.modalOverlay) elements.modalOverlay.hidden = false;
         }
     }
