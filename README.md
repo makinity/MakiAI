@@ -5,13 +5,14 @@
 
 <p align="center">
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=20&duration=3000&pause=1000&color=00D2FF&center=true&vCenter=true&width=750&lines=Autonomous+Workspace+Provisioning+%26+Routine+Engine;Dual-Vision+Webcam+Observer+%26+Screen+OCR+Debugger;24%2F7+Discord+Live+VoIP+Voice+%26+Telegram+Remote+Bridge;Ultra-Low+Latency+Multi-Brain+(Groq+Qwen%2FLLaMA+%2B+Gemini+3.6);Composio+Cloud+Inboxes+(Gmail%2C+Facebook%2C+Notion);100%25+BYOA+(Bring+Your+Own+API+Keys)+Architecture" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=20&duration=3000&pause=1000&color=FF9D00&center=true&vCenter=true&width=750&lines=Stark+Solar+Arc+3D+Reactor+Interface;Autonomous+Workspace+Provisioning+%26+Routine+Engine;Dual-Vision+Webcam+Observer+%26+Screen+OCR+Debugger;24%2F7+Discord+Live+VoIP+Voice+%26+Telegram+Remote+Bridge;Ultra-Low+Latency+Multi-Brain+(Groq+Qwen%2FLLaMA+%2B+Gemini+3.6);100%25+BYOA+(Bring+Your+Own+API+Keys)+Architecture" alt="Typing SVG" />
   </a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.11+" />
   <img src="https://img.shields.io/badge/Windows-11_Win32-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows 11 Win32" />
+  <img src="https://img.shields.io/badge/Theme-Stark_Solar_Arc_(Gold_Amber)-FF9D00?style=for-the-badge&logo=electron&logoColor=black" alt="Stark Solar Arc" />
   <img src="https://img.shields.io/badge/Groq-Qwen_27B_%2F_LLaMA_70B-F55036?style=for-the-badge&logo=fastapi&logoColor=white" alt="Groq Fast Brain" />
   <img src="https://img.shields.io/badge/Google-Gemini_3.6_Flash-8E75C2?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini 3.6 Flash" />
   <img src="https://img.shields.io/badge/Composio-v3_SDK-00C49F?style=for-the-badge&logo=airplayvideo&logoColor=white" alt="Composio Cloud" />
@@ -26,9 +27,25 @@
 
 ## 📖 Overview
 
-**MakiAI** is a state-of-the-art, multi-modal autonomous desktop companion and Windows operating system orchestrator. Engineered for high-performance productivity, academic automation, client workflow management, and 24/7 remote accessibility, MakiAI combines local hardware-level OS control with a dual-brain neural reasoning engine and cloud workspace integrations.
+**MakiAI** is an autonomous desktop companion and Windows operating system orchestrator built with a **Cybernetic Stark Solar Arc** design aesthetic. Engineered for high-performance productivity, academic automation, client workflow management, and 24/7 remote accessibility, MakiAI combines local hardware-level OS control with a dual-brain neural reasoning engine and interactive holographic workflows.
 
-Whether triggered via local wake words, hardware Push-to-Talk, Discord voice channels, or Telegram mobile bots, MakiAI acts as an omniscient digital copilot that manages your windows, monitors hardware health, drafts academic assignments, synchronizes inboxes, and automates your entire daily schedule.
+Whether triggered via local wake words, hardware Push-to-Talk, Discord voice channels, or Telegram mobile bots, MakiAI acts as an omniscient digital copilot that manages your multi-monitor workspaces, monitors hardware health, drafts academic assignments, synchronizes inboxes, and automates your entire daily schedule.
+
+---
+
+## 🌟 What's New: Stark Solar Arc 3D Reactor & Holographic UI
+
+MakiAI features a modern **HTML5/WebGL/Canvas Desktop UI** powered by PyWebView, styled with an obsidian glassmorphism aesthetic and dynamic amber/gold accents (`#FF9D00`, `#FF6A00`, `#060402`):
+
+- **3D Geodesic Icosahedron Reactor Orb**: A real-time 3D rendered polyhedral sphere with depth-sorted vertices, glowing laser spires, and orbital accretion embers.
+- **Audio-Reactive State Indicators**:
+  - 🗣️ **Speaking Mode**: Harmonic vocal resonance pulses, outward-expanding acoustic soundwave ripples, and luminous solar flare needles.
+  - 🎙️ **Listening Mode**: Accretion vortex where ambient energy particles flow inward toward the core singularity, signifying voice ingestion.
+  - 🧠 **Thinking Mode**: High-speed counter-rotating gyroscope axes with quantum synaptic sparks traversing along wireframe edges.
+  - 🔍 **Searching / Tools Mode**: 360° holographic radar sweep beam and periodic sonar radar scan waves.
+  - 🌌 **Idle Mode**: Hypnotic 3.5-second cosmic respiration cycle with gentle Saturnian dust ring precession.
+- **Situational Glass Modals**: Dedicated interactive workflows for Deadlines, Voice Reminders, Academic Homework (.docx), Video Clipping, Project Scaffolding, and Morning Mission Briefings.
+- **In-App Live Settings Panel**: Hot-apply API keys, ElevenLabs voice IDs, wake word triggers, and storage roots on the fly without restarting.
 
 ---
 
@@ -36,7 +53,7 @@ Whether triggered via local wake words, hardware Push-to-Talk, Discord voice cha
 
 MakiAI is built with a **100% BYOA (Bring Your Own API / Architecture)** philosophy. You retain complete ownership and control over your keys, quotas, models, and personal data:
 
-- **Zero Vendor Lock-In:** Supply your own API keys for Groq, Google Gemini, ElevenLabs, Composio, Picovoice, Discord, and Telegram in a local `.env` file.
+- **Zero Vendor Lock-In:** Supply your own API keys for Groq, Google Gemini, ElevenLabs, Composio, Picovoice, Discord, and Telegram in a local `.env` file or via the in-app Settings panel.
 - **Dynamic Multi-Tier Fallback:** If your primary high-speed engine (e.g., Groq) hits a daily rate limit or network timeout, MakiAI's `AIService` automatically seamlessly hot-swaps to your secondary model (e.g., Gemini 3.6 Flash) without interrupting ongoing tasks or conversations.
 - **Audio Fallback Hierarchy:** High-fidelity ElevenLabs voice synthesis gracefully falls back to free Microsoft Edge Neural TTS (`en-GB-RyanNeural`) if credits expire.
 - **Local-First Knowledge & Memory:** Personal files, memories, and schedules reside locally on your filesystem (`C:\Knowledge-Base` and `C:\MakiSync Storage`), shielded from third-party hosting.
@@ -56,7 +73,7 @@ flowchart TB
         SCR["🖥️ Dual-Screen OCR Capture (Gemini Vision)"]
     end
 
-    subgraph DualBrain["🧠 Central Orchestrator & Dynamic Multi-Brain (BYOA)"]
+    subgraph CoreEngine["🧠 Core Orchestrator & Multi-Brain (BYOA)"]
         ORCH["Core Orchestrator & Skill Router"]
         CTX["Context Builder & Knowledge Base RAG"]
         GROQ["⚡ Groq Qwen-3.8-27B / LLaMA-3.3-70B (Sub-Second Fast Brain)"]
@@ -65,11 +82,18 @@ flowchart TB
         KB[("📚 C:/Knowledge-Base/ (Local Markdown DB)")]
     end
 
+    subgraph Frontend["💻 Stark Solar Arc Desktop Interface"]
+        CANVAS["☀️ 3D Geodesic Reactor Orb (Dynamic State Visualizer)"]
+        DOCK["🎛️ Obsidian Control Dock (Status, Command, Activity, Settings)"]
+        MODALS["📋 Situational Modals (Deadlines, Reminders, Homework, Clips)"]
+        BRIDGE["⚡ PyWebView JS-Python Bridge API"]
+    end
+
     subgraph Plugins["🔌 Plugin & Cloud Ecosystem"]
         COMP["🔗 Composio v3 SDK (Gmail, Facebook Pages, Notion, Calendar)"]
         DDG["🌐 DuckDuckGo Live Web Search & Synthesis"]
         KIRO["💻 Kiro CLI Autonomous Coding Engine"]
-        EL["🎙️ ElevenLabs / Edge-TTS Ryan Audio Ducking"]
+        EL["🎙️ ElevenLabs / Edge-TTS Audio Ducking Engine"]
     end
 
     subgraph Actuators["⚙️ Windows OS Actuators & Subsystems"]
@@ -89,6 +113,8 @@ flowchart TB
     ORCH <--> GROQ
     ORCH <--> GEM
     ORCH <--> Plugins
+    ORCH <--> BRIDGE
+    BRIDGE <--> Frontend
     ORCH --> Actuators
 ```
 
@@ -180,7 +206,7 @@ pip install "discord.py[voice]"
 ```
 
 ### 5. Configure Your Environment Variables (`.env`)
-Create a `.env` file in the root directory and insert your BYOA API keys and local preferences:
+Create a `.env` file in the root directory or configure them interactively in the desktop app's Settings panel:
 
 ```ini
 # ==============================================================================
@@ -253,7 +279,7 @@ python main.py
 ### 🎙️ 1. Local Desktop Voice Interaction
 - **Hands-Free Wake Word:** Say **"Hey Maki"** followed by your command or question.
 - **Global Push-to-Talk (PTT):** Hold the `Right Alt` key while speaking from anywhere in Windows, even when other games or full-screen apps are focused.
-- **Live State Awareness:** The system transitions cleanly between `idle` ➔ `listening` ➔ `thinking` ➔ `speaking`, automatically ducking background music while talking.
+- **Live State Awareness:** The 3D Reactor Orb dynamically shifts animations (`idle` ➔ `listening` ➔ `thinking` ➔ `speaking`), automatically ducking background music while talking.
 
 ### 🪟 2. Window & Workspace Tiling
 - Ask MakiAI to move windows across your monitors:
