@@ -328,7 +328,7 @@ def main() -> None:
         height=820,
         min_size=(980, 680),
         resizable=True,
-        background_color="#040715",
+        background_color="#060402",
     )
 
     webview.start(debug=False)

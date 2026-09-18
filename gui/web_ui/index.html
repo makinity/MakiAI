@@ -10,6 +10,11 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
         crossorigin="anonymous"
     >
+    <style>
+        html, body {
+            background-color: #060402 !important;
+        }
+    </style>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
@@ -241,14 +246,18 @@
                             <label for="setting-gemini-key" class="form-label">Google Gemini API Key</label>
                             <div class="password-input-wrap">
                                 <input type="password" id="setting-gemini-key" class="form-control" placeholder="AIzaSy...">
-                                <button type="button" class="btn-toggle-vis" data-target="setting-gemini-key" title="Toggle visibility">&#128065;</button>
+                                <button type="button" class="btn-toggle-vis" data-target="setting-gemini-key" title="Toggle visibility">
+                                    <svg viewBox="0 0 24 24" class="vis-icon" aria-hidden="true" style="width: 1.1rem; height: 1.1rem; fill: currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5ZM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5Zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3Z"/></svg>
+                                </button>
                             </div>
                         </div>
                         <div class="form-item">
                             <label for="setting-groq-key" class="form-label">Groq API Key (Fast Fallback)</label>
                             <div class="password-input-wrap">
                                 <input type="password" id="setting-groq-key" class="form-control" placeholder="gsk_...">
-                                <button type="button" class="btn-toggle-vis" data-target="setting-groq-key" title="Toggle visibility">&#128065;</button>
+                                <button type="button" class="btn-toggle-vis" data-target="setting-groq-key" title="Toggle visibility">
+                                    <svg viewBox="0 0 24 24" class="vis-icon" aria-hidden="true" style="width: 1.1rem; height: 1.1rem; fill: currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5ZM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5Zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3Z"/></svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -262,7 +271,9 @@
                             <label for="setting-eleven-key" class="form-label">ElevenLabs API Key</label>
                             <div class="password-input-wrap">
                                 <input type="password" id="setting-eleven-key" class="form-control" placeholder="sk_...">
-                                <button type="button" class="btn-toggle-vis" data-target="setting-eleven-key" title="Toggle visibility">&#128065;</button>
+                                <button type="button" class="btn-toggle-vis" data-target="setting-eleven-key" title="Toggle visibility">
+                                    <svg viewBox="0 0 24 24" class="vis-icon" aria-hidden="true" style="width: 1.1rem; height: 1.1rem; fill: currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5ZM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5Zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3Z"/></svg>
+                                </button>
                             </div>
                         </div>
                         <div class="form-item">
@@ -302,7 +313,7 @@
 
         <!-- Situational Interactive Modal Component -->
         <div class="modal-overlay" id="interactive-modal-overlay" hidden>
-            <div class="interactive-modal glass-panel" id="situational-modal-card">
+            <div class="interactive-modal glass-panel modal-card" id="situational-modal-card">
                 
                 <!-- Modal Header -->
                 <div class="modal-header">
@@ -327,10 +338,22 @@
                         <div class="form-group mb-3">
                             <label class="form-label text-muted small mb-2">Category</label>
                             <div class="category-pills" id="deadline-category-pills">
-                                <button type="button" class="category-pill active" data-category="School"><span class="pill-icon">🎓</span> School</button>
-                                <button type="button" class="category-pill" data-category="Work"><span class="pill-icon">💼</span> Work / Client</button>
-                                <button type="button" class="category-pill" data-category="Projects"><span class="pill-icon">🚀</span> Projects</button>
-                                <button type="button" class="category-pill" data-category="Personal"><span class="pill-icon">👤</span> Personal</button>
+                                <button type="button" class="category-pill active" data-category="School">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82Z"/></svg>
+                                    School
+                                </button>
+                                <button type="button" class="category-pill" data-category="Work">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2Zm-6 0h-4V4h4v2Z"/></svg>
+                                    Work / Client
+                                </button>
+                                <button type="button" class="category-pill" data-category="Projects">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="m13.13 2.18-1.58.53A10.005 10.005 0 0 0 4.18 10.1l-.53 1.58c-.14.42-.03.88.29 1.19l3.19 3.19c.31.31.77.42 1.19.29l1.58-.53a10.005 10.005 0 0 0 7.39-7.39l.53-1.58a1.002 1.002 0 0 0-.29-1.19l-3.19-3.19a1.002 1.002 0 0 0-1.21-.29Zm-2.25 7.44a2 2 0 1 1 2.83-2.83 2 2 0 0 1-2.83 2.83Z"/></svg>
+                                    Projects
+                                </button>
+                                <button type="button" class="category-pill" data-category="Personal">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z"/></svg>
+                                    Personal
+                                </button>
                             </div>
                         </div>
                         <div class="form-group mb-3">
@@ -352,13 +375,14 @@
                             <div class="priority-selector" id="deadline-priority-selector">
                                 <label class="priority-opt"><input type="radio" name="deadline-priority" value="Low"><span class="priority-badge low">Low</span></label>
                                 <label class="priority-opt"><input type="radio" name="deadline-priority" value="Normal" checked><span class="priority-badge normal">Normal</span></label>
-                                <label class="priority-opt"><input type="radio" name="deadline-priority" value="Urgent"><span class="priority-badge urgent">🔴 Urgent</span></label>
+                                <label class="priority-opt"><input type="radio" name="deadline-priority" value="Urgent"><span class="priority-badge urgent">Urgent</span></label>
                             </div>
                         </div>
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Cancel</button>
-                            <button type="button" class="btn action-btn send-btn modal-btn-save" id="modal-deadline-save-btn">
-                                <span>Save to Deadlines 💾</span>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel">Cancel</button>
+                            <button type="button" class="btn btn-stark-primary modal-btn-save" id="modal-deadline-save-btn">
+                                <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4Zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3Zm3-10H5V5h10v4Z"/></svg>
+                                <span>Save to Deadlines</span>
                             </button>
                         </div>
                     </form>
@@ -368,10 +392,22 @@
                         <div class="form-group mb-3">
                             <label class="form-label text-muted small mb-2">Reminder Type</label>
                             <div class="category-pills" id="reminder-category-pills">
-                                <button type="button" class="category-pill active" data-category="Task"><span class="pill-icon">📋</span> Task / Todo</button>
-                                <button type="button" class="category-pill" data-category="Meeting"><span class="pill-icon">📞</span> Meeting / Call</button>
-                                <button type="button" class="category-pill" data-category="Personal"><span class="pill-icon">👤</span> Personal / Health</button>
-                                <button type="button" class="category-pill" data-category="Followup"><span class="pill-icon">🔔</span> Follow-up</button>
+                                <button type="button" class="category-pill active" data-category="Task">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm-9 14-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8Z"/></svg>
+                                    Task / Todo
+                                </button>
+                                <button type="button" class="category-pill" data-category="Meeting">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4Z"/></svg>
+                                    Meeting / Call
+                                </button>
+                                <button type="button" class="category-pill" data-category="Personal">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z"/></svg>
+                                    Personal / Health
+                                </button>
+                                <button type="button" class="category-pill" data-category="Followup">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2Zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2Z"/></svg>
+                                    Follow-up
+                                </button>
                             </div>
                         </div>
                         <div class="form-group mb-3">
@@ -400,9 +436,10 @@
                             </div>
                         </div>
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Cancel</button>
-                            <button type="button" class="btn action-btn send-btn modal-btn-save" id="modal-reminder-save-btn">
-                                <span>Set Reminder ⏰</span>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel">Cancel</button>
+                            <button type="button" class="btn btn-stark-primary modal-btn-save" id="modal-reminder-save-btn">
+                                <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2ZM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8Zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                                <span>Set Reminder</span>
                             </button>
                         </div>
                     </form>
@@ -420,10 +457,22 @@
                         <div class="form-group mb-3">
                             <label class="form-label text-muted small mb-2">Academic Format</label>
                             <div class="category-pills" id="homework-format-pills">
-                                <button type="button" class="category-pill active" data-format="Standard Academic"><span class="pill-icon">📄</span> Standard Academic</button>
-                                <button type="button" class="category-pill" data-format="APA 7th Edition"><span class="pill-icon">📚</span> APA 7th</button>
-                                <button type="button" class="category-pill" data-format="Q&A Reviewer"><span class="pill-icon">💡</span> Q&A Reviewer</button>
-                                <button type="button" class="category-pill" data-format="Technical Essay"><span class="pill-icon">✍️</span> Essay</button>
+                                <button type="button" class="category-pill active" data-format="Standard Academic">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6Zm2 16H8v-2h8v2Zm0-4H8v-2h8v2Zm-3-5V3.5L18.5 9H13Z"/></svg>
+                                    Standard Academic
+                                </button>
+                                <button type="button" class="category-pill" data-format="APA 7th Edition">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6Zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2Zm0 14H8V4h12v12Z"/></svg>
+                                    APA 7th
+                                </button>
+                                <button type="button" class="category-pill" data-format="Q&A Reviewer">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1Zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7Z"/></svg>
+                                    Q&A Reviewer
+                                </button>
+                                <button type="button" class="category-pill" data-format="Technical Essay">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25ZM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83Z"/></svg>
+                                    Essay
+                                </button>
                             </div>
                         </div>
                         <div class="form-group mb-4">
@@ -431,9 +480,10 @@
                             <input type="text" id="modal-homework-path" class="form-control" value="C:\MakiSync Storage\School" readonly>
                         </div>
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Cancel</button>
-                            <button type="button" class="btn action-btn send-btn modal-btn-save" id="modal-homework-gen-btn">
-                                <span>Generate Word Doc (.docx) 📝</span>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel">Cancel</button>
+                            <button type="button" class="btn btn-stark-primary modal-btn-save" id="modal-homework-gen-btn">
+                                <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6Zm2 16H8v-2h8v2Zm0-4H8v-2h8v2Zm-3-5V3.5L18.5 9H13Z"/></svg>
+                                <span>Generate Word Doc (.docx)</span>
                             </button>
                         </div>
                     </form>
@@ -451,10 +501,22 @@
                         <div class="form-group mb-3">
                             <label class="form-label text-muted small mb-2">Technology Stack</label>
                             <div class="category-pills" id="project-stack-pills">
-                                <button type="button" class="category-pill active" data-stack="Vite + React"><span class="pill-icon">⚡</span> Vite + React</button>
-                                <button type="button" class="category-pill" data-stack="Next.js + Tailwind"><span class="pill-icon">▲</span> Next.js</button>
-                                <button type="button" class="category-pill" data-stack="Python + FastAPI"><span class="pill-icon">🐍</span> FastAPI</button>
-                                <button type="button" class="category-pill" data-stack="HTML / CSS / JS"><span class="pill-icon">🌐</span> Vanilla Web</button>
+                                <button type="button" class="category-pill active" data-stack="Vite + React">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M11 21h-1l1-7H7.5c-.88 0-.33-.75-.31-.78C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .73.3.43.74L11 21Z"/></svg>
+                                    Vite + React
+                                </button>
+                                <button type="button" class="category-pill" data-stack="Next.js + Tailwind">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M12 2 1 21h22L12 2Zm0 3.99L19.53 19H4.47L12 5.99Z"/></svg>
+                                    Next.js
+                                </button>
+                                <button type="button" class="category-pill" data-stack="Python + FastAPI">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 14H4V8h16v10Zm-2-3H6v-2h12v2Z"/></svg>
+                                    FastAPI
+                                </button>
+                                <button type="button" class="category-pill" data-stack="HTML / CSS / JS">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93Zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39Z"/></svg>
+                                    Vanilla Web
+                                </button>
                             </div>
                         </div>
                         <div class="form-group mb-4">
@@ -462,9 +524,10 @@
                             <input type="text" id="modal-project-path" class="form-control" value="c:\development\Python">
                         </div>
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Cancel</button>
-                            <button type="button" class="btn action-btn send-btn modal-btn-save" id="modal-project-scaffold-btn">
-                                <span>Scaffold Project 🚀</span>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel">Cancel</button>
+                            <button type="button" class="btn btn-stark-primary modal-btn-save" id="modal-project-scaffold-btn">
+                                <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M12 2.5s-4 4.5-4 10.5c0 1.83.5 3.5 1.25 4.86L6.5 19.5l.75 1.5 3.5-1.5c.4.15.82.27 1.25.35V22h2v-2.15c.43-.08.85-.2 1.25-.35l3.5 1.5.75-1.5-2.75-1.64c.75-1.36 1.25-3.03 1.25-4.86 0-6-4-10.5-4-10.5Zm0 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2Z"/></svg>
+                                <span>Scaffold Project</span>
                             </button>
                         </div>
                     </form>
@@ -484,9 +547,10 @@
                             <textarea id="modal-email-body" class="form-control form-textarea" rows="5" placeholder="Write or review your email message..."></textarea>
                         </div>
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Discard Draft</button>
-                            <button type="button" class="btn action-btn send-btn modal-btn-save" id="modal-email-send-btn">
-                                <span>Send Email ✉️</span>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel">Discard Draft</button>
+                            <button type="button" class="btn btn-stark-primary modal-btn-save" id="modal-email-send-btn">
+                                <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z"/></svg>
+                                <span>Send Email</span>
                             </button>
                         </div>
                     </form>
@@ -510,8 +574,14 @@
                         <div class="form-group mb-3">
                             <label class="form-label text-muted small mb-2">Export Format</label>
                             <div class="category-pills" id="clip-format-pills">
-                                <button type="button" class="category-pill active" data-ratio="9:16"><span class="pill-icon">📱</span> 9:16 Shorts / TikTok</button>
-                                <button type="button" class="category-pill" data-ratio="16:9"><span class="pill-icon">🖥️</span> 16:9 Landscape YouTube</button>
+                                <button type="button" class="category-pill active" data-ratio="9:16">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99ZM17 19H7V5h10v14Z"/></svg>
+                                    9:16 Shorts / TikTok
+                                </button>
+                                <button type="button" class="category-pill" data-ratio="16:9">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M20 3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h6l-2 2v1h8v-1l-2-2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 13H4V5h16v11Z"/></svg>
+                                    16:9 Landscape YouTube
+                                </button>
                             </div>
                         </div>
                         <div class="form-group mb-4">
@@ -519,9 +589,10 @@
                             <input type="text" id="modal-clip-title" class="form-control" placeholder="Highlight Clip 01">
                         </div>
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Cancel</button>
-                            <button type="button" class="btn action-btn send-btn modal-btn-save" id="modal-clip-render-btn">
-                                <span>Render & Slice 🎬</span>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel">Cancel</button>
+                            <button type="button" class="btn btn-stark-primary modal-btn-save" id="modal-clip-render-btn">
+                                <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4Z"/></svg>
+                                <span>Render & Slice</span>
                             </button>
                         </div>
                     </form>
@@ -531,10 +602,22 @@
                         <div class="form-group mb-3">
                             <label class="form-label text-muted small mb-2">Event Category</label>
                             <div class="category-pills" id="interview-category-pills">
-                                <button type="button" class="category-pill active" data-category="Interview"><span class="pill-icon">🎙️</span> Interview</button>
-                                <button type="button" class="category-pill" data-category="School"><span class="pill-icon">🎓</span> Online Class</button>
-                                <button type="button" class="category-pill" data-category="Work"><span class="pill-icon">💼</span> Client Work</button>
-                                <button type="button" class="category-pill" data-category="Projects"><span class="pill-icon">💻</span> Coding</button>
+                                <button type="button" class="category-pill active" data-category="Interview">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3Zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-2.08c3.39-.49 6-3.39 6-6.92h-2Z"/></svg>
+                                    Interview
+                                </button>
+                                <button type="button" class="category-pill" data-category="School">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82Z"/></svg>
+                                    Online Class
+                                </button>
+                                <button type="button" class="category-pill" data-category="Work">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2Zm-6 0h-4V4h4v2Z"/></svg>
+                                    Client Work
+                                </button>
+                                <button type="button" class="category-pill" data-category="Projects">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 14H4V8h16v10Zm-2-3H6v-2h12v2Z"/></svg>
+                                    Coding
+                                </button>
                             </div>
                         </div>
                         <div class="form-group mb-3">
@@ -554,10 +637,22 @@
                         <div class="form-group mb-3">
                             <label class="form-label text-muted small mb-2">Meeting Platform</label>
                             <div class="category-pills" id="interview-platform-pills">
-                                <button type="button" class="category-pill active" data-platform="Google Meet"><span class="pill-icon">📹</span> Google Meet</button>
-                                <button type="button" class="category-pill" data-platform="Zoom"><span class="pill-icon">🟦</span> Zoom</button>
-                                <button type="button" class="category-pill" data-platform="Teams"><span class="pill-icon">👥</span> Teams</button>
-                                <button type="button" class="category-pill" data-platform="Custom"><span class="pill-icon">🌐</span> Custom URL</button>
+                                <button type="button" class="category-pill active" data-platform="Google Meet">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4Z"/></svg>
+                                    Google Meet
+                                </button>
+                                <button type="button" class="category-pill" data-platform="Zoom">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M20 3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h6l-2 2v1h8v-1l-2-2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 13H4V5h16v11Z"/></svg>
+                                    Zoom
+                                </button>
+                                <button type="button" class="category-pill" data-platform="Teams">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M16.5 13c-1.2 0-3.07.34-4.5 1-1.43-.66-3.3-1-4.5-1C5.33 13 1 14.08 1 16.25V19h22v-2.75c0-2.17-4.33-3.25-6.5-3.25ZM7.5 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3Zm9 0c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3Z"/></svg>
+                                    Teams
+                                </button>
+                                <button type="button" class="category-pill" data-platform="Custom">
+                                    <svg viewBox="0 0 24 24" class="pill-icon" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93Zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39Z"/></svg>
+                                    Custom URL
+                                </button>
                             </div>
                         </div>
                         <div class="form-group mb-3">
@@ -584,9 +679,10 @@
                             </div>
                         </div>
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Cancel</button>
-                            <button type="button" class="btn action-btn send-btn modal-btn-save" id="modal-interview-save-btn">
-                                <span>Save Routine & Schedule 🚀</span>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel">Cancel</button>
+                            <button type="button" class="btn btn-stark-primary modal-btn-save" id="modal-interview-save-btn">
+                                <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M12 2.5s-4 4.5-4 10.5c0 1.83.5 3.5 1.25 4.86L6.5 19.5l.75 1.5 3.5-1.5c.4.15.82.27 1.25.35V22h2v-2.15c.43-.08.85-.2 1.25-.35l3.5 1.5.75-1.5-2.75-1.64c.75-1.36 1.25-3.03 1.25-4.86 0-6-4-10.5-4-10.5Zm0 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2Z"/></svg>
+                                <span>Save Routine & Schedule</span>
                             </button>
                         </div>
                     </form>
@@ -596,19 +692,25 @@
                         <div class="form-group mb-3 text-center">
                             <p class="text-muted small mb-3">Which niche would you like to prepare and launch workspaces for, sir?</p>
                             <div class="d-flex flex-column gap-2" id="job-niche-options-wrap">
-                                <button type="button" class="btn action-btn send-btn text-start p-3 w-100 job-niche-btn mb-2" data-niche="job_hunting_ai_video">
+                                <button type="button" class="btn btn-stark-secondary text-start p-3 w-100 job-niche-btn mb-2" data-niche="job_hunting_ai_video">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
-                                            <div class="fw-bold fs-6">🎬 AI Video Creator</div>
+                                            <div class="fw-bold fs-6 d-flex align-items-center gap-2">
+                                                <svg viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem; fill: var(--accent);" aria-hidden="true"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4Z"/></svg>
+                                                AI Video Creator
+                                            </div>
                                             <div class="small opacity-75">Dual Profiles • OnlineJobs, LinkedIn, ChatGPT, Gemini, Portfolio & Resume</div>
                                         </div>
                                         <span>➔</span>
                                     </div>
                                 </button>
-                                <button type="button" class="btn action-btn send-btn text-start p-3 w-100 job-niche-btn" data-niche="job_hunting_smm">
+                                <button type="button" class="btn btn-stark-secondary text-start p-3 w-100 job-niche-btn" data-niche="job_hunting_smm">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
-                                            <div class="fw-bold fs-6">📱 Social Media Manager (SMM)</div>
+                                            <div class="fw-bold fs-6 d-flex align-items-center gap-2">
+                                                <svg viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem; fill: var(--accent);" aria-hidden="true"><path d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99ZM17 19H7V5h10v14Z"/></svg>
+                                                Social Media Manager (SMM)
+                                            </div>
                                             <div class="small opacity-75">Dual Profiles • OnlineJobs, LinkedIn, Indeed, ChatGPT, Canva Portfolio & Resume</div>
                                         </div>
                                         <span>➔</span>
@@ -617,15 +719,16 @@
                             </div>
                         </div>
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end mt-3">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Cancel</button>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel">Cancel</button>
                         </div>
                     </form>
 
                     <!-- 9. Human-in-the-Loop Task Review & Approval Card Template -->
                     <form id="modal-form-task-review" class="situational-form" onsubmit="event.preventDefault();" hidden>
-                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
-                            <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-50 px-2 py-1" id="task-review-badge">
-                                🛡️ Task Review
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-warning border-opacity-25">
+                            <span class="badge timeline-badge px-2 py-1 d-flex align-items-center gap-1" id="task-review-badge">
+                                <svg viewBox="0 0 24 24" class="badge-icon" aria-hidden="true"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm-2 16-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8Z"/></svg>
+                                <span>Task Review</span>
                             </span>
                             <span class="small text-muted font-monospace" id="task-review-id">TQ-0001</span>
                         </div>
@@ -637,7 +740,7 @@
 
                         <div class="glass-subpanel p-3 rounded mb-3" id="task-review-file-box">
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="fs-5">📄</span>
+                                <svg viewBox="0 0 24 24" style="width: 1.25rem; height: 1.25rem; fill: var(--accent);" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6Zm2 16H8v-2h8v2Zm0-4H8v-2h8v2Zm-3-5V3.5L18.5 9H13Z"/></svg>
                                 <span class="fw-semibold small text-light" id="task-review-filename">Assignment_Output.docx</span>
                             </div>
                             <div class="small text-muted font-monospace text-truncate" id="task-review-filepath" style="font-size: 0.78rem;">
@@ -646,27 +749,29 @@
                         </div>
 
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end mt-3">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel" id="task-review-dismiss-btn">Dismiss</button>
-                            <button type="button" class="btn btn-outline-info" id="task-review-copy-btn">
-                                <span>📋 Copy Path</span>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel" id="task-review-dismiss-btn">Dismiss</button>
+                            <button type="button" class="btn btn-stark-secondary" id="task-review-copy-btn">
+                                <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1Zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2Zm0 16H8V7h11v14Z"/></svg>
+                                <span>Copy Path</span>
                             </button>
-                            <button type="button" class="btn action-btn send-btn" id="task-review-approve-btn">
-                                <span>Approve & Open 🚀</span>
+                            <button type="button" class="btn btn-stark-primary" id="task-review-approve-btn">
+                                <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M12 2.5s-4 4.5-4 10.5c0 1.83.5 3.5 1.25 4.86L6.5 19.5l.75 1.5 3.5-1.5c.4.15.82.27 1.25.35V22h2v-2.15c.43-.08.85-.2 1.25-.35l3.5 1.5.75-1.5-2.75-1.64c.75-1.36 1.25-3.03 1.25-4.86 0-6-4-10.5-4-10.5Zm0 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2Z"/></svg>
+                                <span>Approve & Open</span>
                             </button>
                         </div>
                     </form>
 
                     <!-- 10. Today's Mission & Timeline Digest Template -->
                     <form id="modal-form-morning-mission" class="situational-form" onsubmit="event.preventDefault();" hidden>
-                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-warning border-opacity-25">
                             <div class="d-flex align-items-center gap-2">
-                                <span class="fs-5">🌅</span>
+                                <svg viewBox="0 0 24 24" class="section-icon" aria-hidden="true"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5ZM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1Zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1ZM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1Zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1ZM5.99 4.58a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.02 0-1.41L5.99 4.58Zm12.37 12.37a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.02 0-1.41l-1.06-1.06Zm1.06-10.96a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.02.39 1.41 0l1.06-1.06ZM7.05 18.36a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.02.39 1.41 0l1.06-1.06Z"/></svg>
                                 <div>
                                     <h6 class="fw-bold mb-0 text-light" id="mission-date-label">Friday, September 18, 2026</h6>
                                     <span class="small text-muted" id="mission-active-block">Active: Morning Routine</span>
                                 </div>
                             </div>
-                            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 py-1">
+                            <span class="badge timeline-badge px-2 py-1">
                                 Today's Schedule
                             </span>
                         </div>
@@ -675,17 +780,18 @@
                             <!-- Dynamic Timeline Items rendered here -->
                         </div>
 
-                        <div class="glass-subpanel p-2 rounded mb-3" id="mission-deadlines-wrap">
-                            <div class="small fw-bold text-warning mb-1 d-flex align-items-center gap-1">
-                                <span>📌</span> Academic & Client Deadlines Due
+                        <div class="glass-subpanel p-3 rounded mb-3" id="mission-deadlines-wrap">
+                            <div class="small fw-bold text-warning mb-2 d-flex align-items-center gap-2">
+                                <svg viewBox="0 0 24 24" class="section-icon" aria-hidden="true"><path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3Z"/></svg>
+                                <span>Academic & Client Deadlines Due</span>
                             </div>
-                            <div class="small text-muted" id="mission-deadlines-list" style="font-size: 0.8rem;">
+                            <div class="small text-muted d-flex flex-column gap-2" id="mission-deadlines-list" style="font-size: 0.85rem;">
                                 No urgent deadlines for today, sir.
                             </div>
                         </div>
 
                         <div class="modal-footer-actions d-flex gap-2 justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary modal-btn-cancel">Close</button>
+                            <button type="button" class="btn btn-stark-secondary modal-btn-cancel">Close</button>
                         </div>
                     </form>
 

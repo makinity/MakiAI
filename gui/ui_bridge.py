@@ -303,18 +303,18 @@ class MakiUIApi:
         app_state = self.state_manager.get_state()
         is_speaking = self.tts_service.is_speaking()
 
-        # Map AppState to frontend state vocabulary ("ready", "listening", "processing", "error")
+        # Map AppState to frontend state vocabulary ("ready", "listening", "thinking", "speaking", "searching", "error")
         if is_speaking:
-            frontend_state = "processing"
+            frontend_state = "speaking"
             status_label = "Speaking..."
         elif app_state == AppState.LISTENING:
             frontend_state = "listening"
             status_label = "Listening..."
         elif app_state == AppState.THINKING:
-            frontend_state = "processing"
+            frontend_state = "thinking"
             status_label = "Thinking..."
         else:
-            frontend_state = "ready"
+            frontend_state = "idle"
             status_label = "Ready" if self._auto_listen_enabled else "Voice Standby Paused"
 
         with self._lock:

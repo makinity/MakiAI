@@ -848,14 +848,14 @@
                 } else {
                     items.forEach((item) => {
                         const div = document.createElement("div");
-                        div.className = "d-flex align-items-start gap-2 mb-2 p-2 rounded glass-subpanel";
+                        div.className = "d-flex align-items-center gap-2 mb-2 p-2 rounded glass-subpanel";
                         div.innerHTML = `
-                            <span class="badge bg-secondary bg-opacity-50 text-info font-monospace" style="font-size: 0.75rem;">${item.time || "--:--"}</span>
-                            <div class="flex-grow-1">
-                                <div class="fw-semibold small text-light">${item.title}</div>
-                                <div class="small text-muted" style="font-size: 0.75rem;">${item.desc || ""}</div>
+                            <span class="timeline-badge">${escapeHtml(item.time || "--:--")}</span>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="fw-semibold small text-light text-truncate">${escapeHtml(item.title)}</div>
+                                <div class="small text-muted" style="font-size: 0.75rem;">${escapeHtml(item.desc || "")}</div>
                             </div>
-                            ${item.routine_id ? `<button type="button" class="btn btn-sm btn-outline-primary mission-launch-btn px-2 py-0" data-routine="${item.routine_id}" style="font-size: 0.72rem;">Launch</button>` : ""}
+                            ${item.routine_id ? `<button type="button" class="btn btn-stark-secondary mission-launch-btn px-2 py-1" data-routine="${escapeHtml(item.routine_id)}" style="font-size: 0.75rem;">Launch</button>` : ""}
                         `;
                         elements.missionTimelineList.appendChild(div);
                     });
@@ -873,7 +873,45 @@
             }
 
             if (elements.missionDeadlinesList) {
-                elements.missionDeadlinesList.innerHTML = data.deadlines_html || (data.deadlines_text ? `<p class="mb-0">${data.deadlines_text}</p>` : "No urgent deadlines for today, sir.");
+                elements.missionDeadlinesList.innerHTML = "";
+                const rawText = data.deadlines_text || "";
+                if (!rawText || rawText.includes("No pending deadlines") || rawText.includes("No urgent deadlines")) {
+                    elements.missionDeadlinesList.innerHTML = `<div class="small text-muted">No urgent deadlines pending for today, sir.</div>`;
+                } else {
+                    const lines = rawText.split(/\r?\n/).filter((l) => l.trim().length > 0);
+                    lines.forEach((line) => {
+                        const cleanLine = line.replace(/^[-*]\s*\[[ x]\]\s*/i, "").trim();
+                        // Parse **Title** — Due: Date (Priority)
+                        let title = cleanLine;
+                        let due = "";
+                        let priority = "Normal";
+
+                        const boldMatch = cleanLine.match(/\*\*(.*?)\*\*/);
+                        if (boldMatch) {
+                            title = boldMatch[1];
+                            const rest = cleanLine.replace(boldMatch[0], "").replace(/^[—–-]\s*/, "").trim();
+                            const dueMatch = rest.match(/Due:\s*([^(]+)/i);
+                            if (dueMatch) due = dueMatch[1].trim();
+                            const prioMatch = rest.match(/\(([^)]+)\)/);
+                            if (prioMatch) priority = prioMatch[1].trim();
+                        }
+
+                        const chip = document.createElement("div");
+                        chip.className = "task-card-chip";
+                        const isUrgent = priority.toLowerCase().includes("urgent");
+                        chip.innerHTML = `
+                            <div class="d-flex align-items-center gap-2 min-w-0">
+                                <svg viewBox="0 0 24 24" style="width: 1rem; height: 1rem; fill: ${isUrgent ? '#ff5544' : 'var(--accent)'}; flex-shrink: 0;" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm-9 14-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8Z"/></svg>
+                                <div class="min-w-0">
+                                    <div class="fw-semibold small text-light text-truncate">${escapeHtml(title)}</div>
+                                    ${due ? `<div class="small text-muted" style="font-size: 0.75rem;">Due: ${escapeHtml(due)}</div>` : ""}
+                                </div>
+                            </div>
+                            <span class="priority-badge ${isUrgent ? 'urgent' : 'normal'}" style="font-size: 0.72rem; padding: 0.25rem 0.55rem;">${escapeHtml(priority)}</span>
+                        `;
+                        elements.missionDeadlinesList.appendChild(chip);
+                    });
+                }
             }
 
             if (elements.modalFormMorningMission) elements.modalFormMorningMission.hidden = false;
@@ -1324,6 +1362,16 @@
             return itemType === "assistant" || itemType === "system";
         });
         return latestItem ? String(latestItem.text || "") : String(state.status.label || "");
+    }
+
+    function escapeHtml(value) {
+        if (value === null || value === undefined) return "";
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     function titleCase(value) {

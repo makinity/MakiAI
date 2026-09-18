@@ -84,26 +84,32 @@ class GoodMorningSkill(BaseSkill):
         if day_schedule:
             for line in day_schedule.splitlines():
                 if line.startswith("- "):
-                    parts = line[2:].split(":", 1)
-                    if len(parts) == 2:
-                        t_slot = parts[0].strip()
-                        act = parts[1].strip()
-                        routine_id = ""
-                        if "bat" in act.lower():
-                            routine_id = "online_class_bat600"
-                        elif "icc" in act.lower():
-                            routine_id = "online_class_icc600"
-                        elif "job" in act.lower() or "hunt" in act.lower():
-                            routine_id = "job_hunting_ai_video"
-                        elif "client" in act.lower() or "content" in act.lower():
-                            routine_id = "client_content_work"
+                    # Robust regex match for time formats like "9:00-10:00", "09:00 - 10:00 AM", "12:00 PM"
+                    match = re.match(r"^-\s*(\d{1,2}:\d{2}(?:\s*[-–]\s*\d{1,2}:\d{2})?(?:\s*[AaPp][Mm])?|\d{1,2}\s*[AaPp][Mm]):?\s*(.*)$", line)
+                    if match:
+                        t_slot = match.group(1).strip()
+                        act = match.group(2).strip()
+                    else:
+                        parts = line[2:].split(":", 1)
+                        t_slot = parts[0].strip() if len(parts) > 1 else "--:--"
+                        act = parts[1].strip() if len(parts) > 1 else line[2:].strip()
 
-                        timeline_items.append({
-                            "time": t_slot,
-                            "title": act,
-                            "desc": f"Planned block for {day_name}",
-                            "routine_id": routine_id,
-                        })
+                    routine_id = ""
+                    if "bat" in act.lower():
+                        routine_id = "online_class_bat600"
+                    elif "icc" in act.lower():
+                        routine_id = "online_class_icc600"
+                    elif "job" in act.lower() or "hunt" in act.lower():
+                        routine_id = "job_hunting_ai_video"
+                    elif "client" in act.lower() or "content" in act.lower():
+                        routine_id = "client_content_work"
+
+                    timeline_items.append({
+                        "time": t_slot,
+                        "title": act,
+                        "desc": f"Planned block for {day_name}",
+                        "routine_id": routine_id,
+                    })
 
         deadlines_text = ""
         if self.kb_reader:
