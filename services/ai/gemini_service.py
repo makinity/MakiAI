@@ -40,8 +40,8 @@ class GeminiService:
             api_key:      Gemini API key (GEMINI_API_KEY in .env)
             groq_api_key: Groq API key (GROQ_API_KEY in .env)
         """
-        self._gemini_key = api_key
-        self._groq_key = groq_api_key
+        self._gemini_key = api_key or os.getenv("GEMINI_API_KEY", "")
+        self._groq_key = groq_api_key or os.getenv("GROQ_API_KEY", "")
         self._history: list[dict] = []
         self._initialized = False
         self._provider = None       # "groq" or "gemini"
@@ -337,18 +337,26 @@ CRITICAL RULES:
 
                 except Exception as e:
                     err_str = str(e).lower()
+                    if ("tokens per day" in err_str or "tpd" in err_str or "daily" in err_str):
+                        print(f"[AIService] Groq daily token quota reached.")
+                        break
                     if "429" in err_str or "rate limit" in err_str or "quota" in err_str:
                         if attempt == 0:
                             import time
-                            time.sleep(1.5)
+                            time.sleep(1.0)
                             continue
                     print(f"[AIService] Groq error on {model_name}: {e}")
                     break
+            else:
+                continue
+            if "tokens per day" in err_str or "tpd" in err_str:
+                break
 
 
         # Fallback to Gemini if all Groq models fail or are rate limited (one-shot, no loop)
         if self._gemini_client and depth == 0:
-            print("[AIService] Groq unavailable — using Gemini fallback.")
+            print("[AIService] Groq daily quota reached — switching to Gemini.")
+            self._provider = "gemini"
             return self._send_gemini(user_text, bounded_ctx, depth=depth + 1)
 
         return "I had trouble thinking. Please try again."
