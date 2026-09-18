@@ -61,10 +61,11 @@ class NewProjectSkill(BaseSkill):
         self.ui_bridge = ui_bridge
 
     def _empty_project_data(self) -> Dict[str, Any]:
+        user_name = os.getenv("USER_NAME", "User")
         return {
             "name": "NewProject",
             "summary": "",
-            "target_users": "Mark Vencent Juntilla (Personal / Client)",
+            "target_users": f"{user_name} (Personal / Client)",
             "platform": "Web (Next.js App Router)",
             "core_problem": "",
             "stack": "Next.js 14/15 (App Router, TypeScript) + Tailwind CSS",
@@ -123,7 +124,7 @@ Follow Stage 1 of the 11-Stage Knowledge Base Project Planning Lifecycle:
 Extract/Propose:
 - Project Name (PascalCase, e.g. TaskMaster, MunchBite)
 - Summary: 1 clear sentence
-- Target Users: (e.g. Personal productivity for Mark, or client-facing)
+- Target Users: (e.g. Personal productivity for user, or client-facing)
 - Platform: Web (Next.js) / Backend (Laravel) / Mobile (React Native) / Desktop (C#)
 - Core Problem Solved: 1 sentence
 

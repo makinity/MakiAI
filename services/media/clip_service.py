@@ -25,10 +25,11 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
 from services.voice.audio_transcriber import AudioTranscriber
+from services.storage.maki_sync import MAKI_SYNC_ROOT
 
 
-CLIPS_BASE_DIR = Path(r"C:\MakiSync Storage\MakiAI\Clips")
-RECORDINGS_BASE_DIR = Path(r"C:\MakiSync Storage\MakiAI\Recordings")
+CLIPS_BASE_DIR = MAKI_SYNC_ROOT / "MakiAI" / "Clips"
+RECORDINGS_BASE_DIR = MAKI_SYNC_ROOT / "MakiAI" / "Recordings"
 
 
 def check_ffmpeg() -> bool:

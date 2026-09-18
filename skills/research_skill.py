@@ -115,7 +115,9 @@ Return ONLY the clean 2-6 word search query. No quotes, no explanations."""
 
         context_str = "\n".join(formatted_results)
 
-        prompt = f"""You are MakiAI, personal assistant to Mark (sir).
+        app_name = os.getenv("APP_NAME", "MakiAI")
+        user_name = os.getenv("USER_NAME", "Mark")
+        prompt = f"""You are {app_name}, personal assistant to {user_name} (sir).
 Here are the live search results from {provider} for the query: "{query}"
 
 {context_str}
@@ -144,8 +146,10 @@ If there are specific numbers, dates, or names, state them clearly."""
             return f"I wasn't able to open that link, sir. {page_content}"
 
         instruction = question if question else "Summarize the key information from this page."
+        app_name = os.getenv("APP_NAME", "MakiAI")
+        user_name = os.getenv("USER_NAME", "Mark")
 
-        prompt = f"""You are MakiAI, personal assistant to Mark (sir).
+        prompt = f"""You are {app_name}, personal assistant to {user_name} (sir).
 Sir asked you to inspect the web page at: {url}
 Sir's question / instruction: "{instruction}"
 

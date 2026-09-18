@@ -37,7 +37,7 @@ from telegram.ext import (
 from services.voice.audio_transcriber import AudioTranscriber
 from services.storage.maki_sync import StorageSecurityGuard, MAKI_SYNC_ROOT
 
-TEMP_GUIDE_DIR = Path(r"C:\MakiSync Storage\School\Temp-Guide")
+TEMP_GUIDE_DIR = MAKI_SYNC_ROOT / "School" / "Temp-Guide"
 
 
 def _format_size(size_bytes: int) -> str:

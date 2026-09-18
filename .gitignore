@@ -2,10 +2,15 @@
 .env
 
 # ─── Auth & Data ─────────────────────────────────────────────────────────────
+data/*.json
 data/auth.dat
 data/logs/
 data/*.db
 data/*.db-*
+
+# ─── User Personal Routines ──────────────────────────────────────────────────
+config/routines.json
+!config/routines.example.json
 
 # ─── Python ──────────────────────────────────────────────────────────────────
 __pycache__/

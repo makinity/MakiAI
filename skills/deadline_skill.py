@@ -208,10 +208,11 @@ class DeadlineSkill(BaseSkill):
         from datetime import datetime
         today = datetime.now().strftime("%A, %B %d, %Y")
 
+        user_name = os.getenv("USER_NAME", "Mark")
         prompt = f"""
 Today is {today}.
 
-Here are Mark's current deadlines from workflows/deadlines.md:
+Here are {user_name}'s current deadlines from workflows/deadlines.md:
 {content}
 
 Summarize the pending deadlines clearly, warmly, and concisely for sir:

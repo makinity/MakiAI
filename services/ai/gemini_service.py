@@ -279,12 +279,16 @@ class GeminiService:
         """Send via Groq API with streaming for faster response and model rotation on 429."""
         # Bound system context to 15,000 chars so full workflow tables and KB context fit comfortably
         bounded_ctx = system_context[:15000] if len(system_context) > 15000 else system_context
-        messages = []
-        base_prompt = bounded_ctx if bounded_ctx else """You are MakiAI, a personal AI assistant for Mark Vencent Juntilla inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise and spoken aloud in clear English. No markdown or bullet points.
+        app_name = os.getenv("APP_NAME", "MakiAI")
+        user_name = os.getenv("USER_NAME", "Sir")
+        kb_path = os.getenv("KB_PATH", r"C:\Knowledge-Base")
+        storage_path = os.getenv("MAKI_SYNC_PATH", r"C:\MakiSync Storage")
+
+        base_prompt = bounded_ctx if bounded_ctx else f"""You are {app_name}, a personal AI assistant for {user_name} inspired by Jarvis from Iron Man. Always address the user as 'sir'. Be warm, conversational, and natural. Keep responses concise and spoken aloud in clear English. No markdown or bullet points.
 
 You have full access to:
-- C:\\Knowledge Base\\ — sir's schedule, deadlines, projects, preferences
-- C:\\MakiSync Storage\\ — organized file storage (School, Work, Personal, Freelance, MakiAI with Screenshots/Photos/Recordings in date folders)
+- {kb_path} — user's schedule, deadlines, projects, preferences
+- {storage_path} — organized file storage (School, Work, Personal, Freelance, {app_name} with Screenshots/Photos/Recordings in date folders)
 You CAN search, open, and manage files in these locations."""
         
         system_prompt = f"""{base_prompt}
@@ -414,11 +418,12 @@ CRITICAL RULES:
         if pil_img.mode in ("RGBA", "P"):
             pil_img = pil_img.convert("RGB")
 
-        # System prompt
+        app_name = os.getenv("APP_NAME", "MakiAI")
+        user_name = os.getenv("USER_NAME", "Sir")
         prompt = (
             f"{system_context}\n\nUser Question about Screen: {user_text}"
             if system_context else
-            f"You are MakiAI, personal AI assistant for Mark Vencent Juntilla. Address the user as 'sir'.\n"
+            f"You are {app_name}, personal AI assistant for {user_name}. Address the user as 'sir'.\n"
             f"Analyze the attached computer screen capture and answer the user's question directly:\n"
             f"User Question: {user_text}\n"
             f"Be concise, clear, and direct. If analyzing code or an error, state the cause and fix clearly. Avoid excessive markdown."

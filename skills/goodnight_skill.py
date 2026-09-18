@@ -58,12 +58,13 @@ Constraints:
         Returns:
             Confirmation response string.
         """
+        user_name = os.getenv("USER_NAME", "Mark")
         if not missed_tasks.strip() or missed_tasks.lower() in ["nothing", "none", "nope", "no"]:
             # Clear carryover
             content = self.kb_reader.read("workflows/carryover.md")
             cleared = self._ask_gemini(
                 f"The current carryover.md is:\n\n{content}\n\n"
-                "Mark said he finished everything today. "
+                f"{user_name} said they finished everything today. "
                 "Rewrite carryover.md to show it's clean — no pending tasks. "
                 "Keep the file structure but mark everything as done or cleared."
             )
@@ -74,7 +75,7 @@ Constraints:
         current = self.kb_reader.read("workflows/carryover.md")
         updated = self._ask_gemini(
             f"The current carryover.md is:\n\n{current}\n\n"
-            f"Mark missed or didn't finish these tasks today: {missed_tasks}\n\n"
+            f"{user_name} missed or didn't finish these tasks today: {missed_tasks}\n\n"
             "Update carryover.md to include these as pending carry-over tasks for tomorrow. "
             "Keep the existing file structure. Return the full updated file content."
         )

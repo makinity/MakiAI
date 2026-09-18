@@ -129,7 +129,8 @@ class MemoryService:
         if not memories:
             return ""
 
-        lines = ["## Mark's Memories (things he asked me to remember):"]
+        user_name = os.getenv("USER_NAME", "Mark")
+        lines = [f"## {user_name}'s Memories (things they asked me to remember):"]
         for mem in memories:
             lines.append(f"- {mem['key']}: {mem['value']}")
         return "\n".join(lines)

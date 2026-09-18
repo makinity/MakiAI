@@ -227,6 +227,12 @@ class SettingsService:
     def get_app_name(self) -> str:
         return self.get_env("APP_NAME", "MakiAI")
 
+    def get_user_name(self) -> str:
+        return self.get_env("USER_NAME", "Mark")
+
+    def get_maki_sync_path(self) -> str:
+        return self.get_env("MAKI_SYNC_PATH", r"C:\MakiSync Storage")
+
     def is_debug(self) -> bool:
         return self.get_env("DEBUG", "false").lower() == "true"
 

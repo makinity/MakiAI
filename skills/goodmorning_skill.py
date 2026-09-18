@@ -57,7 +57,8 @@ class GoodMorningSkill(BaseSkill):
         if target_col_idx == -1:
             return ""
 
-        schedule_rows = [f"### Mark's Planned Schedule for {target_day_name}:"]
+        user_name = os.getenv("USER_NAME", "Mark")
+        schedule_rows = [f"### {user_name}'s Planned Schedule for {target_day_name}:"]
         for row in table_lines:
             time_slot = row[0]
             activity = row[target_col_idx]

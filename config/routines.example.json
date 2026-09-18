@@ -1,0 +1,97 @@
+{
+  "settings": {
+    "auto_launch_enabled": true,
+    "default_lead_time_minutes": 15,
+    "voice_briefing_enabled": true,
+    "audio_ducking_enabled": true
+  },
+  "routines": {
+    "online_class_example": {
+      "id": "online_class_example",
+      "name": "Online Class (Example)",
+      "category": "School",
+      "lead_time_minutes": 15,
+      "days": [
+        "Monday",
+        "Wednesday"
+      ],
+      "schedule_time": "13:00",
+      "chrome_profile": "Default",
+      "links": [
+        "https://meet.google.com",
+        "https://classroom.google.com",
+        "https://gemini.google.com"
+      ],
+      "apps": [],
+      "storage_folder": "Notes/School",
+      "voice_announcement": "Sir, your online class begins in 15 minutes. I have prepared your meeting room and research tabs."
+    },
+    "coding_session_example": {
+      "id": "coding_session_example",
+      "name": "Software Development Session",
+      "category": "Projects",
+      "lead_time_minutes": 5,
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "schedule_time": "14:00",
+      "chrome_profile": "Default",
+      "links": [
+        "https://github.com",
+        "https://chatgpt.com"
+      ],
+      "apps": [
+        "code"
+      ],
+      "storage_folder": "",
+      "voice_announcement": "Sir, your development block is starting. VS Code and GitHub are ready."
+    },
+    "job_hunting_example": {
+      "id": "job_hunting_example",
+      "name": "Job Hunting & Outreach",
+      "category": "Work",
+      "lead_time_minutes": 10,
+      "days": [
+        "Monday",
+        "Wednesday",
+        "Friday"
+      ],
+      "schedule_time": "10:00",
+      "chrome_profile": "Default",
+      "links": [
+        "https://www.linkedin.com/jobs",
+        "https://www.indeed.com"
+      ],
+      "apps": [],
+      "storage_folder": "Documents/Resume",
+      "voice_announcement": "Sir, your job hunting and outreach session is ready."
+    },
+    "client_work_example": {
+      "id": "client_work_example",
+      "name": "Client Work & Marketing",
+      "category": "Work",
+      "lead_time_minutes": 15,
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "schedule_time": "09:00",
+      "chrome_profile": "Default",
+      "links": [
+        "https://app.metricool.com",
+        "https://www.instagram.com",
+        "https://chatgpt.com"
+      ],
+      "apps": [],
+      "storage_folder": "Clients",
+      "voice_announcement": "Sir, your client marketing session is starting. I have opened your workspace."
+    }
+  }
+}

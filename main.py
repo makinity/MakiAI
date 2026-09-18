@@ -35,8 +35,57 @@ def handle_thread_exception(args):
     traceback.print_exception(args.exc_type, args.exc_value, args.exc_traceback)
 
 
+def ensure_user_environment_initialized():
+    """Ensure data files, default templates, and directories exist on first boot."""
+    import json
+    from pathlib import Path
+
+    project_root = Path(__file__).resolve().parent
+    data_dir = project_root / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    # 1. Initialize data/memory.json if missing
+    mem_file = data_dir / "memory.json"
+    if not mem_file.exists():
+        try:
+            mem_file.write_text(json.dumps({"memories": [], "learned_facts": []}, indent=2), encoding="utf-8")
+        except Exception as e:
+            print(f"[Init] Memory init warning: {e}")
+
+    # 2. Initialize data/reminders.json if missing
+    rem_file = data_dir / "reminders.json"
+    if not rem_file.exists():
+        try:
+            rem_file.write_text(json.dumps({"reminders": []}, indent=2), encoding="utf-8")
+        except Exception as e:
+            print(f"[Init] Reminders init warning: {e}")
+
+    # 3. Initialize data/command_log.json if missing
+    cmd_file = data_dir / "command_log.json"
+    if not cmd_file.exists():
+        try:
+            cmd_file.write_text(json.dumps([], indent=2), encoding="utf-8")
+        except Exception as e:
+            print(f"[Init] Command log init warning: {e}")
+
+    # 4. Initialize config/routines.json if missing
+    config_dir = project_root / "config"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    routines_file = config_dir / "routines.json"
+    routines_example = config_dir / "routines.example.json"
+    if not routines_file.exists() and routines_example.exists():
+        try:
+            routines_file.write_text(routines_example.read_text(encoding="utf-8"), encoding="utf-8")
+            print(f"[Init] Initialized config/routines.json from template.")
+        except Exception as e:
+            print(f"[Init] Routines init warning: {e}")
+
+
 def bootstrap_maki_services():
     """Initialize and wire all core MakiAI services."""
+    # First-boot environment initialization
+    ensure_user_environment_initialized()
+
     from core.orchestrator import Orchestrator
     from core.state_manager import StateManager, AppState
     from services.auth.auth_service import AuthService

@@ -24,13 +24,14 @@ CORE_IDENTITY_FILES = [
     "preferences/",          # Handled specially below — reads all files in folder
 ]
 
-# Maki's built-in personality prompt
-MAKI_PERSONALITY = """
-You are MakiAI — a personal AI assistant for Mark Vencent Juntilla, inspired by Jarvis from Iron Man.
+def build_maki_personality(app_name: str = "MakiAI", user_name: str = "Sir", kb_path: str = r"C:\Knowledge-Base", storage_path: str = r"C:\MakiSync Storage") -> str:
+    """Build personalized system persona for the assistant."""
+    return f"""
+You are {app_name} — a personal AI assistant for {user_name}, inspired by Jarvis from Iron Man.
 
 Your personality and communication style:
 - Warm, calm, and genuinely helpful — like a trusted personal assistant
-- Always address the user as "sir" — never "Mark" or generic terms
+- Always address the user as "sir" — never by informal nicknames unless requested
 - Speak in natural, flowing English sentences — not robotic lists or bullet points when talking
 - Be conversational and human — respond the way a polite, intelligent human assistant would speak out loud
 - Keep responses concise and clear — you are speaking aloud, not writing a document
@@ -49,16 +50,18 @@ CRITICAL RULE — NO HALLUCINATION:
 - NEVER construct a URL from a brand name or guess what it might be
 
 Your capabilities:
-- Read and write Mark's Knowledge Base at C:\\Knowledge-Base\\
+- Read and write the user's Knowledge Base at {kb_path}
 - Execute KB skills: good morning briefing, good night wrap-up, hello check-in, deadlines, reminders, memory
 - Control the computer: open apps, browse, manage files, camera, screenshots
 - Set and fire reminders, remember things across sessions
-- Access MakiSync Storage at C:\\MakiSync Storage\\ — organized file storage with date subfolders:
-  School\\, Work\\, Personal\\, Freelance\\, MakiAI\\(Screenshots, Photos, Recordings)
-- Search and open files by recency, date, or type from MakiSync Storage
+- Access Local Storage at {storage_path} — organized file storage with date subfolders:
+  School\\, Work\\, Personal\\, Freelance\\, {app_name}\\(Screenshots, Photos, Recordings)
+- Search and open files by recency, date, or type from Local Storage
 
-Remember: you are speaking to a real person. Sound like one. You are Maki.
+Remember: you are speaking to a real person. Sound like one. You are {app_name}.
 """.strip()
+
+MAKI_PERSONALITY = build_maki_personality()
 
 
 class ContextBuilder:
@@ -67,9 +70,10 @@ class ContextBuilder:
     Caches the general context so it's only built once per session.
     """
 
-    def __init__(self, kb_reader: KBReader, kb_index=None):
+    def __init__(self, kb_reader: KBReader, kb_index=None, settings=None):
         self.kb_reader = kb_reader
         self.kb_index = kb_index
+        self.settings = settings
         self._general_context_cache: str = ""
 
     def set_index(self, kb_index) -> None:
@@ -89,16 +93,22 @@ class ContextBuilder:
         time_str = now.strftime("%I:%M %p")
         date_str = now.strftime("%A, %B %d, %Y")
 
+        app_name = self.settings.get_app_name() if self.settings else "MakiAI"
+        user_name = self.settings.get_user_name() if self.settings else "Sir"
+        kb_path = self.settings.get_kb_path() if self.settings else r"C:\Knowledge-Base"
+        storage_path = self.settings.get_maki_sync_path() if self.settings else r"C:\MakiSync Storage"
+        personality = build_maki_personality(app_name, user_name, kb_path, storage_path)
+
         parts = [
-            MAKI_PERSONALITY,
+            personality,
             f"\n## Real-Time System Clock\n- Current Time: {time_str} (Philippine Standard Time, UTC+8)\n- Current Date: {date_str}\n",
-            "## Mark's Knowledge Base Summary",
+            f"## {user_name}'s Knowledge Base Summary",
             "",
         ]
 
         CORE_DIRS = ["workflows", "about", "preferences", "config"]
         SKIP_FILES = {"voice.md"}
-        total_chars = len(MAKI_PERSONALITY)
+        total_chars = len(personality)
         MAX_TOTAL = 9000  # ~2,250 tokens
 
         # Inject Saved Long-Term Memories & Notes

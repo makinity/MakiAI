@@ -22,10 +22,11 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 from skills.base_skill import BaseSkill
+from services.storage.maki_sync import MAKI_SYNC_ROOT
 
 
-TEMP_GUIDE_PATH = Path(r"C:\MakiSync Storage\School\Temp-Guide")
-ASSIGNMENTS_PATH = Path(r"C:\MakiSync Storage\School\Assignments")
+TEMP_GUIDE_PATH = MAKI_SYNC_ROOT / "School" / "Temp-Guide"
+ASSIGNMENTS_PATH = MAKI_SYNC_ROOT / "School" / "Assignments"
 
 
 class HomeworkSkill(BaseSkill):
@@ -93,11 +94,11 @@ class HomeworkSkill(BaseSkill):
                 "Please add your guide files first, then ask me again."
             )
 
-        # Build prompt with guides + instructions
+        user_name = os.getenv("USER_NAME", "the student")
         prompt = f"""
-You are creating a homework document for Mark Vencent Juntilla (a student).
+You are creating an academic homework document for {user_name}.
 
-HOMEWORK INSTRUCTIONS FROM STUDENT:
+HOMEWORK INSTRUCTIONS:
 {instructions}
 
 GUIDE FILES CONTENT (follow these formats exactly):

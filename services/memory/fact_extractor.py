@@ -24,8 +24,8 @@ SKIP_PATTERNS = [
 ]
 
 
-EXTRACTION_PROMPT = """You are the Memory Extraction Engine for MakiAI, a personal AI assistant for Mark Vencent Juntilla.
-Analyze the following conversational turn between the user (Mark) and MakiAI.
+EXTRACTION_PROMPT = """You are the Memory Extraction Engine for an intelligent personal AI assistant.
+Analyze the following conversational turn between the user and the assistant.
 Extract ONLY durable, long-term, factual knowledge about the user, their preferences, their contacts, their active projects/assignments, their hardware/environment, or their daily routines.
 
 CATEGORIES:
@@ -39,7 +39,7 @@ CATEGORIES:
 RULES:
 1. Extract ONLY facts that are permanently or semi-permanently true.
 2. DO NOT extract transient commands, one-time requests (e.g. "open Chrome", "what time is it", "play a song"), or temporary feelings.
-3. State each fact clearly in third-person starting with "Mark" or "User" (e.g., "Mark prefers Python for automation scripts").
+3. State each fact clearly in third-person starting with "User" (e.g., "User prefers Python for automation scripts").
 4. If no durable facts are present in this turn, return an empty list: {"facts": []}.
 5. Return ONLY a valid JSON object. Do not include markdown code blocks or conversational commentary.
 

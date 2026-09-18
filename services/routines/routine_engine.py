@@ -52,11 +52,24 @@ class RoutineEngine:
         self._load_config()
 
     def _load_config(self) -> dict:
-        """Load routines configuration from disk."""
+        """Load routines configuration from disk, auto-initializing from example template if missing."""
         with _LOCK:
             if not self.config_path.exists():
+                example_path = self.config_path.parent / "routines.example.json"
+                if example_path.exists():
+                    try:
+                        with open(example_path, "r", encoding="utf-8") as f_ex:
+                            self.config = json.load(f_ex)
+                        self.config_path.parent.mkdir(parents=True, exist_ok=True)
+                        with open(self.config_path, "w", encoding="utf-8") as f_out:
+                            json.dump(self.config, f_out, indent=2, ensure_ascii=False)
+                        print(f"[RoutineEngine] Initialized routines.json from {example_path.name}")
+                        return self.config
+                    except Exception as e:
+                        print(f"[RoutineEngine] Failed to initialize from template: {e}")
                 self.config_path.parent.mkdir(parents=True, exist_ok=True)
-                return {"settings": {}, "routines": {}}
+                self.config = {"settings": {}, "routines": {}}
+                return self.config
             try:
                 with open(self.config_path, "r", encoding="utf-8") as f:
                     self.config = json.load(f)

@@ -35,11 +35,12 @@ Structure:
       └── Recordings\\     2026-09-11\\ ...
 """
 
+import os
 from pathlib import Path
 from datetime import datetime
 
 
-MAKI_SYNC_ROOT = Path(r"C:\MakiSync Storage")
+MAKI_SYNC_ROOT = Path(os.getenv("MAKI_SYNC_PATH", r"C:\MakiSync Storage"))
 
 # Full folder tree — all leaf folders get date subfolders at runtime
 FOLDER_STRUCTURE = {
@@ -281,8 +282,8 @@ def _is_date(name: str) -> bool:
 # ─── Storage Security & Sandboxing Guard ──────────────────────────────────────
 
 ALLOWED_WRITE_ROOTS = [
-    Path(r"C:\MakiSync Storage"),
-    Path(r"C:\Knowledge-Base"),
+    MAKI_SYNC_ROOT,
+    Path(os.getenv("KB_PATH", r"C:\Knowledge-Base")),
     Path(__file__).resolve().parents[2] / "data",
     Path(__file__).resolve().parents[2] / "logs",
 ]
