@@ -1,95 +1,5 @@
 [
   {
-    "timestamp": "2026-09-16 23:55:08",
-    "raw_command": "Check the recent messages on my Facebook page",
-    "cleaned_command": "Check the recent messages on my Facebook page",
-    "handler": "Skill:ComposioSkill",
-    "response": "Your latest Facebook page message is from MakiSync saying “hello world.” Would you like to reply, sir?",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:55:20",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:55:24",
-    "raw_command": "Reply saying welcome to MakiAI.",
-    "cleaned_command": "Reply saying welcome to MakiAI.",
-    "handler": "Skill:ComposioSkill",
-    "response": "I've sent your reply \"welcome to MakiAI\" directly to Mark Liones Juntilla on Facebook Messenger, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:55:41",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:55:50",
-    "raw_command": "Tis, Tis, Tis, Tis.",
-    "cleaned_command": "Tis, Tis, Tis, Tis.",
-    "handler": "Fallback:Gemini",
-    "response": "Understood, sir. Would you like me to send “Tis, Tis, Tis, Tis.” as a reply to the latest message, or is there something else I can help with?",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 23:56:02",
-    "raw_command": "Tampak.",
-    "cleaned_command": "Tampak.",
-    "handler": "Fallback:Gemini",
-    "response": "Sure thing, sir. Would you like me to open your Facebook page, or should I display the recent messages again?",
-    "is_fallback": true,
-    "flagged_for_review": true
-  },
-  {
-    "timestamp": "2026-09-16 23:58:11",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:58:20",
-    "raw_command": "Maki.",
-    "cleaned_command": "",
-    "handler": "DirectAcknowledgment",
-    "response": "Yes, sir? I'm listening.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:58:28",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
-    "timestamp": "2026-09-16 23:58:36",
-    "raw_command": "Thank you.",
-    "cleaned_command": "Thank you.",
-    "handler": "DirectAcknowledgment",
-    "response": "You're welcome, sir.",
-    "is_fallback": false,
-    "flagged_for_review": false
-  },
-  {
     "timestamp": "2026-09-16 23:58:42",
     "raw_command": "Thank you.",
     "cleaned_command": "Thank you.",
@@ -1798,5 +1708,95 @@
     "response": "I heard: what is my schedule today. Full AI will be connected once your API key is set.",
     "is_fallback": true,
     "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-18 10:19:07",
+    "raw_command": "Hi",
+    "cleaned_command": "Hi",
+    "handler": "Skill:HelloSkill",
+    "response": "Good morning, sir. It is 10:19 AM on Friday, September 18, 2026, and you are currently in your Job Hunting block, which runs until noon. After your lunch break, you have flexible time in the afternoon to handle any late homework or meetings, followed by your evening gaming session. I don’t see any urgent deadlines or saved notes for today, so feel free to use this time to send out those 10 to 15 quality applications.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-18 10:19:43",
+    "raw_command": "What is my schedule today?",
+    "cleaned_command": "What is my schedule today?",
+    "handler": "Skill:GoodMorningSkill",
+    "response": "Good morning, sir. It is 10:19 AM on Friday, September 18, 2026. You are currently in your job hunting block, which runs until noon. After your lunch break, you have more job hunting sessions until three in the afternoon, followed by three hours of focused coding. Is there anything you would like to add to your day, sir?",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-18 10:21:08",
+    "raw_command": "Maki.",
+    "cleaned_command": "",
+    "handler": "DirectAcknowledgment",
+    "response": "Yes, sir? I'm listening.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-18 10:21:19",
+    "raw_command": "Please prepare for job hunting today for social media manager position.",
+    "cleaned_command": "Please prepare for job hunting today for social media manager position.",
+    "handler": "Skill:RoutineSkill",
+    "response": "Sir, your Social Media Manager job hunting workspace is ready with dual Chrome profiles, job portals, Canva portfolio, and SMM resume folder.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-18 10:22:23",
+    "raw_command": "Bye. Go back to sleep now.",
+    "cleaned_command": "Bye. Go back to sleep now.",
+    "handler": "ComputerRouter",
+    "response": "Going to sleep.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-18 10:22:44",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-18 10:22:50",
+    "raw_command": "Thank you.",
+    "cleaned_command": "Thank you.",
+    "handler": "DirectAcknowledgment",
+    "response": "You're welcome, sir.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-18 10:22:56",
+    "raw_command": "Bye.",
+    "cleaned_command": "Bye.",
+    "handler": "Fallback:Gemini",
+    "response": "Goodbye, sir. Rest well.",
+    "is_fallback": true,
+    "flagged_for_review": true
+  },
+  {
+    "timestamp": "2026-09-18 10:28:27",
+    "raw_command": "please prepare for client work.",
+    "cleaned_command": "please prepare for client work.",
+    "handler": "Skill:RoutineSkill",
+    "response": "Your client content upload block isn't scheduled until 9:00 AM, sir. But since you want to get ahead of your tasks, I've opened your client Chrome profile with Metricool and all your social dashboards.",
+    "is_fallback": false,
+    "flagged_for_review": false
+  },
+  {
+    "timestamp": "2026-09-18 10:28:44",
+    "raw_command": "Maki.",
+    "cleaned_command": "",
+    "handler": "DirectAcknowledgment",
+    "response": "Yes, sir? I'm listening.",
+    "is_fallback": false,
+    "flagged_for_review": false
   }
 ]

@@ -5099,3 +5099,93 @@ This document records the user voice/text commands, analysis, step-by-step inter
 * **Maki Spoken Response:** `"I heard: what is my schedule today. Full AI will be connected once your API key is set."`
 
 ---
+
+### 🔹 Live Session Command — 10:19:07 AM
+* **Spoken / Typed Command:** `"Hi"`
+* **Extracted Payload:** `"Hi"`
+* **Matched Handler:** `Skill:HelloSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Good morning, sir. It is 10:19 AM on Friday, September 18, 2026, and you are currently in your Job Hunting block, which runs until noon. Aft..."`
+
+---
+
+### 🔹 Live Session Command — 10:19:43 AM
+* **Spoken / Typed Command:** `"What is my schedule today?"`
+* **Extracted Payload:** `"What is my schedule today?"`
+* **Matched Handler:** `Skill:GoodMorningSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Good morning, sir. It is 10:19 AM on Friday, September 18, 2026. You are currently in your job hunting block, which runs until noon. After y..."`
+
+---
+
+### 🔹 Live Session Command — 10:21:08 AM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---
+
+### 🔹 Live Session Command — 10:21:19 AM
+* **Spoken / Typed Command:** `"Please prepare for job hunting today for social media manager position."`
+* **Extracted Payload:** `"Please prepare for job hunting today for social media manager position."`
+* **Matched Handler:** `Skill:RoutineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Sir, your Social Media Manager job hunting workspace is ready with dual Chrome profiles, job portals, Canva portfolio, and SMM resume folder..."`
+
+---
+
+### 🔹 Live Session Command — 10:22:23 AM
+* **Spoken / Typed Command:** `"Bye. Go back to sleep now."`
+* **Extracted Payload:** `"Bye. Go back to sleep now."`
+* **Matched Handler:** `ComputerRouter`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Going to sleep."`
+
+---
+
+### 🔹 Live Session Command — 10:22:44 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:22:50 AM
+* **Spoken / Typed Command:** `"Thank you."`
+* **Extracted Payload:** `"Thank you."`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"You're welcome, sir."`
+
+---
+
+### 🔹 Live Session Command — 10:22:56 AM
+* **Spoken / Typed Command:** `"Bye."`
+* **Extracted Payload:** `"Bye."`
+* **Matched Handler:** `Fallback:Gemini`
+* **Status:** ⚠️ **Fallback / Needs Calibration**
+* **Maki Spoken Response:** `"Goodbye, sir. Rest well."`
+
+---
+
+### 🔹 Live Session Command — 10:28:27 AM
+* **Spoken / Typed Command:** `"please prepare for client work."`
+* **Extracted Payload:** `"please prepare for client work."`
+* **Matched Handler:** `Skill:RoutineSkill`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Your client content upload block isn't scheduled until 9:00 AM, sir. But since you want to get ahead of your tasks, I've opened your client ..."`
+
+---
+
+### 🔹 Live Session Command — 10:28:44 AM
+* **Spoken / Typed Command:** `"Maki."`
+* **Extracted Payload:** `""`
+* **Matched Handler:** `DirectAcknowledgment`
+* **Status:** ✅ **Optimal & Routed**
+* **Maki Spoken Response:** `"Yes, sir? I'm listening."`
+
+---

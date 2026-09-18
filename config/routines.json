@@ -80,18 +80,16 @@
         "Saturday"
       ],
       "schedule_time": "09:00",
-      "chrome_profile": "Profile 64",
+      "chrome_profile": "Profile 66",
       "links": [
-        "https://app.metricool.com/evolution/instagram?blogId=6895147&userId=5311033",
-        "https://www.facebook.com/studymodegreek/",
-        "https://www.instagram.com/studymodegr/",
-        "https://www.youtube.com/@studymodegr",
+        "https://www.instagram.com/martinaestudia/",
+        "https://www.youtube.com/@martinaestudia",
         "https://creators.astra-ai.co/dashboard/stats",
         "https://chatgpt.com"
       ],
       "apps": [],
       "storage_folder": "Clients",
-      "voice_announcement": "Sir, your Content Upload Assistant session is starting. I have opened your client Chrome profile with Metricool, Facebook, Instagram, YouTube, and Astra AI creator stats."
+      "voice_announcement": "Sir, your Content Upload Assistant session for Astra AI is starting. I have opened your client Chrome profile with Instagram, YouTube, Astra AI creator stats, and ChatGPT."
     },
     "job_hunting_ai_video": {
       "id": "job_hunting_ai_video",
