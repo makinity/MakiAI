@@ -6,6 +6,7 @@ Triggered by: "good morning", "what's my schedule today", "morning briefing"
 Reads: time-management.md, carryover.md, deadlines.md
 """
 
+import os
 from datetime import datetime, timedelta
 from skills.base_skill import BaseSkill
 

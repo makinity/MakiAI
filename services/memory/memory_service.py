@@ -6,6 +6,7 @@ Memories are saved in data/memory.json as key-value pairs.
 Used by MemorySkill and injected into Gemini context.
 """
 
+import os
 import json
 import uuid
 from datetime import datetime

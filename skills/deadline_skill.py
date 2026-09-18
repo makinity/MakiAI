@@ -7,6 +7,7 @@ Reads: workflows/deadlines.md
 Writes: workflows/deadlines.md
 """
 
+import os
 import re
 import time
 from datetime import datetime, timedelta

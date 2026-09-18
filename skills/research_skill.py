@@ -7,6 +7,7 @@ Supports:
   2. Direct URL Reading & Summarization ("read this link...", "check https://...", "summarize this page...")
 """
 
+import os
 import re
 import urllib.parse
 import webbrowser

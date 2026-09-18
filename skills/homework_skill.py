@@ -18,6 +18,7 @@ Guide path: C:\\MakiSync Storage\\School\\Temp-Guide\\
 Output path: C:\\MakiSync Storage\\School\\Assignments\\<YYYY-MM-DD>\\
 """
 
+import os
 import subprocess
 from pathlib import Path
 from datetime import datetime

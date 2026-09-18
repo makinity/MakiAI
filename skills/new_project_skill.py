@@ -17,6 +17,7 @@ At Stage 11 (Approval), automatically writes the complete 6-file suite:
   - ui.md (if web/mobile)
 """
 
+import os
 import re
 from datetime import datetime
 from typing import Dict, Any, List

@@ -8,6 +8,7 @@ Reads: time-management.md, carryover.md
 Writes: carryover.md (after Mark answers)
 """
 
+import os
 from datetime import datetime, timedelta
 from skills.base_skill import BaseSkill
 
