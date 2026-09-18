@@ -1,11 +1,11 @@
 """
 MakiAI — Good Night Skill
 Generates the night wrap-up and asks about missed tasks.
-After Mark responds, updates carryover.md.
+After the user responds, updates carryover.md.
 
 Triggered by: "good night", "wrap up my day", "end of day"
 Reads: time-management.md, carryover.md
-Writes: carryover.md (after Mark answers)
+Writes: carryover.md (after user answers)
 """
 
 import os
@@ -50,16 +50,16 @@ Constraints:
 
     def update_carryover(self, missed_tasks: str) -> str:
         """
-        Update carryover.md with tasks Mark missed today.
-        Called after Mark answers the follow-up question.
+        Update carryover.md with tasks missed today.
+        Called after user answers the follow-up question.
 
         Args:
-            missed_tasks: Mark's answer about what he didn't finish.
+            missed_tasks: User's answer about what wasn't finished.
 
         Returns:
             Confirmation response string.
         """
-        user_name = os.getenv("USER_NAME", "Mark")
+        user_name = os.getenv("USER_NAME", "User")
         if not missed_tasks.strip() or missed_tasks.lower() in ["nothing", "none", "nope", "no"]:
             # Clear carryover
             content = self.kb_reader.read("workflows/carryover.md")

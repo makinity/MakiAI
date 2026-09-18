@@ -93,7 +93,7 @@ class FactStore:
                 conn.commit()
                 return fact_id
 
-            # 2. Key-overlap check (e.g. "Mark's preferred editor is VS Code" vs "Mark prefers VS Code editor")
+            # 2. Key-overlap check (e.g. "User's preferred editor is VS Code" vs "User prefers VS Code editor")
             cursor.execute("SELECT id, fact FROM user_facts WHERE category = ?", (category_clean,))
             rows = cursor.fetchall()
             STOPWORDS = {"that", "this", "with", "from", "have", "been", "will", "about", "your", "user", "mark"}

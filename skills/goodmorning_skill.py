@@ -1,6 +1,6 @@
 """
 MakiAI — Good Morning Skill
-Generates Mark's morning briefing from KB workflow files.
+Generates the user's morning briefing from KB workflow files.
 
 Triggered by: "good morning", "what's my schedule today", "morning briefing"
 Reads: time-management.md, carryover.md, deadlines.md
@@ -58,7 +58,7 @@ class GoodMorningSkill(BaseSkill):
         if target_col_idx == -1:
             return ""
 
-        user_name = os.getenv("USER_NAME", "Mark")
+        user_name = os.getenv("USER_NAME", "User")
         schedule_rows = [f"### {user_name}'s Planned Schedule for {target_day_name}:"]
         for row in table_lines:
             time_slot = row[0]

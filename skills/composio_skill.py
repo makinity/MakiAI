@@ -313,7 +313,7 @@ RULES:
                 
                 # Clean prompt to create meaningful body if user didn't write a full letter
                 app_name = os.getenv("APP_NAME", "MakiAI")
-                user_name = os.getenv("USER_NAME", "Mark")
+                user_name = os.getenv("USER_NAME", "User")
                 clean_body = re.sub(r"^(?:draft|send|write|compose|sample)\s+(?:an?\s+)?(?:test\s+)?(?:email|gmail|message)\s+(?:to\s+[\w\.-]+@[\w\.-]+\.\w+\s*)?(?:about\s+[^,\.]+)?", "", user_prompt, flags=re.IGNORECASE).strip(" '\"\t\n\r:-")
                 body_content = clean_body if len(clean_body) > 10 else f"Hello,\n\nThis is a sample update sent via {app_name}.\n\nBest regards,\n{user_name}"
 

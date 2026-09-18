@@ -5,6 +5,7 @@ direct base64 JPEG encoding, and multimodal AI analysis to answer physical conte
 questions (user activity, posture, held objects, and people in the background).
 """
 
+import os
 import io
 import time
 import base64
@@ -140,8 +141,10 @@ def analyze_camera_feed(user_query: str, ai_service) -> str:
     if pil_img is None or error_msg:
         return error_msg or "I was unable to capture a frame from your webcam, sir. Please try again."
 
+    app_name = os.getenv("APP_NAME", "MakiAI")
+    user_name = os.getenv("USER_NAME", "User")
     system_instruction = (
-        "You are MakiAI, personal AI assistant for Mark Vencent Juntilla. Address the user as 'sir'.\n"
+        f"You are {app_name}, personal AI assistant for {user_name}. Address the user as 'sir'.\n"
         "You are looking directly through the user's laptop webcam in real-time.\n"
         "Pay special attention to:\n"
         "1. The user's current physical activity, posture, and facial expressions (e.g. typing, writing, drinking, eating, reading, smiling, working).\n"

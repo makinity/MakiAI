@@ -466,7 +466,7 @@ class TelegramRemoteService:
             return
         query = " ".join(context.args).strip() if context.args else ""
         if not query:
-            await update.message.reply_text("Please specify a filename, sir. Example: `/file capstone paper` or `/file Mark_CV`", parse_mode="Markdown")
+            await update.message.reply_text("Please specify a filename, sir. Example: `/file capstone paper` or `/file resume`", parse_mode="Markdown")
             return
         await self._find_and_send_file(query, update, context)
 

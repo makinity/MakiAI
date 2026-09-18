@@ -20,7 +20,7 @@ class MemoryService:
     """
     Long-term memory store for MakiAI.
 
-    Memories are simple key-value pairs — Mark tells Maki to remember
+    Memories are simple key-value pairs — the user tells Maki to remember
     something and Maki can recall it in any future session.
 
     Usage:
@@ -130,7 +130,7 @@ class MemoryService:
         if not memories:
             return ""
 
-        user_name = os.getenv("USER_NAME", "Mark")
+        user_name = os.getenv("USER_NAME", "User")
         lines = [f"## {user_name}'s Memories (things they asked me to remember):"]
         for mem in memories:
             lines.append(f"- {mem['key']}: {mem['value']}")

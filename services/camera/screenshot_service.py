@@ -28,7 +28,7 @@ class ScreenshotService:
     Captures full screen or active window and saves as .png.
 
     Usage:
-        ss = ScreenshotService(save_path="C:\\Users\\Mark\\Pictures\\MakiAI")
+        ss = ScreenshotService(save_path="C:\\Users\\User\\Pictures\\MakiAI")
         result = ss.capture_full()
         result = ss.capture_window()
     """

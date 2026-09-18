@@ -910,8 +910,10 @@ class ComputerRouter:
             # Generative AI content
             prompt_cleaned = re.sub(r"^(can you|could you|please|just|hey maki|maki)[,\s]+", "", original, flags=re.IGNORECASE).strip()
             if self.ai_service:
+                app_name = os.getenv("APP_NAME", "MakiAI")
+                user_name = os.getenv("USER_NAME", "User")
                 system_instruction = (
-                    f"You are MakiAI — personal assistant for Mark Vencent Juntilla. "
+                    f"You are {app_name} — personal assistant for {user_name}. "
                     f"The user wants you to generate content to be written inside the file '{target_file.name}'. "
                     f"Generate the full, creative, high-quality content requested (story, essay, code, notes, paragraphs). "
                     f"Output ONLY the text to be placed inside the file. Do not include conversational greetings or conversational wrapper."

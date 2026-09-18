@@ -5,6 +5,7 @@ smart hybrid window/full-screen cropping, and multi-modal LLM analysis
 to debug errors, explain terminal crashes, and summarize documents on screen.
 """
 
+import os
 import io
 import re
 import time
@@ -148,8 +149,10 @@ class ScreenVisionService:
         if img is None:
             return "I was unable to capture your screen buffer, sir. Please try again."
 
+        app_name = os.getenv("APP_NAME", "MakiAI")
+        user_name = os.getenv("USER_NAME", "User")
         system_instruction = (
-            "You are MakiAI, personal AI assistant for Mark Vencent Juntilla. Address the user as 'sir'.\n"
+            f"You are {app_name}, personal AI assistant for {user_name}. Address the user as 'sir'.\n"
             "You are looking directly at what is on the user's computer screen.\n"
             "If the user asks to debug an error or crash: identify the error message, explain the root cause, and give the exact fix.\n"
             "If the user asks to summarize or explain: give a concise, intelligent, high-level summary.\n"

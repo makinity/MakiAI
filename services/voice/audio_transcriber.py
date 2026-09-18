@@ -17,7 +17,7 @@ from typing import Optional
 
 # Natural conversational vocabulary prompt to bias Whisper without triggering repetition loops
 VOCABULARY_PROMPT = (
-    "MakiAI assistant for Mark. Topics: Kiro, MakiSync, TaskMaster, MunchBite, Next.js, "
+    "MakiAI desktop assistant. Topics: Kiro, MakiSync, TaskMaster, MunchBite, Next.js, "
     "Canva, Upwork, Zoom, PHT, VS Code, Supabase, Tailwind, Python, FastAPI, React."
 )
 

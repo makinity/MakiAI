@@ -209,7 +209,7 @@ class DeadlineSkill(BaseSkill):
         from datetime import datetime
         today = datetime.now().strftime("%A, %B %d, %Y")
 
-        user_name = os.getenv("USER_NAME", "Mark")
+        user_name = os.getenv("USER_NAME", "User")
         prompt = f"""
 Today is {today}.
 

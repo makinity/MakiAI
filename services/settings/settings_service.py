@@ -228,7 +228,7 @@ class SettingsService:
         return self.get_env("APP_NAME", "MakiAI")
 
     def get_user_name(self) -> str:
-        return self.get_env("USER_NAME", "Mark")
+        return self.get_env("USER_NAME", "User")
 
     def get_maki_sync_path(self) -> str:
         return self.get_env("MAKI_SYNC_PATH", r"C:\MakiSync Storage")
