@@ -13,8 +13,9 @@ The active provider is selected at startup based on which key is available.
 Can be hot-swapped via update_api_key().
 """
 
-from typing import Optional
+import os
 import re
+from typing import Optional
 
 
 MAX_HISTORY_TURNS = 20

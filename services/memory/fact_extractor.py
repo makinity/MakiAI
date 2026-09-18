@@ -6,6 +6,7 @@ preferences, contacts, projects, and hardware setups into the FactStore.
 Runs in a non-blocking background daemon thread.
 """
 
+import os
 import json
 import re
 import threading
