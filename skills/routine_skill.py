@@ -22,14 +22,14 @@ class RoutineSkill(BaseSkill):
     REQUIRED_FILES = []
 
     TRIGGERS = [
-        r"\b(prep|prepare)\s+(for\s+)?(class|online\s+class|bat\s*600|icc\s*600|school)\b",
-        r"\b(prep|prepare)\s+(for\s+)?(client\s+work|content|marketing|work)\b",
-        r"\b(prep|prepare)\s+(for\s+)?(interview|zoom|google\s+meet|meeting)\b",
-        r"\b(prep|prepare)\s+(for\s+)?(coding|programming|dev|development)\b",
-        r"\b(prep|prepare|let'?s\s+do|let'?s)\s+(for\s+)?(job\s+hunting|job\s+search|jobs?|hunt\s+a\s+job|hunt\s+jobs?)\b",
+        r"\b(prep|prepare|start|launch|open|setup)\s+(?:for\s+)?(?:my\s+|the\s+|our\s+)?(class|online\s+class|bat\s*600|icc\s*600|school)\b",
+        r"\b(prep|prepare|start|launch|open|setup)\s+(?:for\s+)?(?:my\s+|the\s+|our\s+)?(client\s+work|client|content|marketing|work)\b",
+        r"\b(prep|prepare|start|launch|open|setup)\s+(?:for\s+)?(?:my\s+|the\s+|our\s+)?(interview|zoom|google\s+meet|meeting)\b",
+        r"\b(prep|prepare|start|launch|open|setup)\s+(?:for\s+)?(?:my\s+|the\s+|our\s+)?(coding|programming|dev|development)\b",
+        r"\b(prep|prepare|start|launch|open|setup|let'?s\s+do|let'?s)\s+(?:for\s+)?(?:my\s+|the\s+|our\s+)?(job\s+hunting|job\s+search|jobs?|hunt\s+a\s+job|hunt\s+jobs?)\b",
         r"\b(hunt|apply\s+for)\s+(a\s+)?(job|jobs|work)\b",
         r"\b(ai\s*video|smm|social\s+media)\s+(jobs?|job\s+hunting|hunt)\b",
-        r"\b(prep|prepare)\s+(for\s+)?(gaming|stream|games|leisure)\b",
+        r"\b(prep|prepare|start|launch|open|setup)\s+(?:for\s+)?(?:my\s+|the\s+|our\s+)?(gaming|stream|games|leisure)\b",
         r"\b(launch|start|open|run)\s+(the\s+)?(routine|workspace)\b",
         r"\b(set|schedule|add)\s+(an?\s+)?(interview|meeting\s+link|class\s+link)\b",
         r"\b(add|schedule)\s+(an?\s+)?interview\s+schedule\b",
