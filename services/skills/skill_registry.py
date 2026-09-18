@@ -187,3 +187,57 @@ class SkillRegistry:
                     "triggers": getattr(skill, "TRIGGERS", []),
                 })
         return catalog
+
+    def start_hot_reloader(self, on_reload_callback: Optional[Any] = None) -> None:
+        """
+        Start background filesystem watcher on skills/ directory.
+        Automatically hot-reloads skill modules and triggers on_reload_callback when changed.
+        """
+        import time
+
+        if getattr(self, "_watcher_active", False):
+            return
+
+        self._watcher_active = True
+        self._on_reload_callback = on_reload_callback
+
+        def _watcher_thread():
+            last_mtimes = {}
+            for p in self.skills_dir.glob("*.py"):
+                try:
+                    last_mtimes[str(p)] = p.stat().st_mtime
+                except Exception:
+                    pass
+
+            while getattr(self, "_watcher_active", False):
+                time.sleep(2.0)
+                changed = False
+                current_files = list(self.skills_dir.glob("*.py"))
+                current_paths = set(str(p) for p in current_files)
+
+                # Check for additions / deletions
+                if set(last_mtimes.keys()) != current_paths:
+                    changed = True
+
+                # Check for modifications
+                for p in current_files:
+                    try:
+                        mtime = p.stat().st_mtime
+                        if str(p) not in last_mtimes or last_mtimes[str(p)] != mtime:
+                            changed = True
+                            last_mtimes[str(p)] = mtime
+                    except Exception:
+                        pass
+
+                if changed:
+                    print("[SkillRegistry] Detected skill file modification on disk — auto hot-reloading...")
+                    self.reload_skills()
+                    if self._on_reload_callback:
+                        try:
+                            self._on_reload_callback()
+                        except Exception as e:
+                            print(f"[SkillRegistry] Reload callback error: {e}")
+
+        t = threading.Thread(target=_watcher_thread, daemon=True, name="SkillHotReloader")
+        t.start()
+        print("[SkillRegistry] Dynamic skill hot-reloader daemon active.")

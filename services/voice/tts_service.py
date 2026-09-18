@@ -182,6 +182,10 @@ class TTSService:
             if not success and self.use_fallback:
                 tmp_path, success = self._generate_edge_tts(text)
 
+            # ── Attempt 3: Windows Native SAPI5 (100% Offline Zero-Drop) ──────
+            if not success:
+                tmp_path, success = self._generate_sapi5(text)
+
             # ── Play continuous audio ─────────────────────────────────────────
             if success and tmp_path:
                 try:
@@ -309,6 +313,55 @@ class TTSService:
         except Exception as e:
             print(f"[TTSService] Edge TTS error: {e}")
             return None, False
+
+    # ─── Windows Native SAPI5 Fallback ───────────────────────────────────────
+
+    def _generate_sapi5(self, text: str) -> tuple[str | None, bool]:
+        """
+        Generate audio using Windows Native SAPI5 (100% offline, zero network drops).
+        Uses British/American desktop voices (Hazel/David).
+
+        Returns:
+            (tmp_file_path, success) tuple.
+        """
+        try:
+            import win32com.client
+            import pythoncom
+
+            pythoncom.CoInitialize()
+            voice = win32com.client.Dispatch("SAPI.SpVoice")
+            file_stream = win32com.client.Dispatch("SAPI.SpFileStream")
+
+            # Try to select British voice (Hazel) if available, otherwise default
+            for i in range(voice.GetVoices().Count):
+                v_desc = voice.GetVoices().Item(i).GetDescription()
+                if "hazel" in v_desc.lower() or "great britain" in v_desc.lower():
+                    voice.Voice = voice.GetVoices().Item(i)
+                    break
+
+            tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+            tmp_path = tmp.name
+            tmp.close()
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
+
+            file_stream.Open(tmp_path, 3)  # 3 = SSFMCreateForWrite
+            voice.AudioOutputStream = file_stream
+            voice.Speak(text)
+            file_stream.Close()
+
+            print("[TTSService] Windows SAPI5 audio generated (offline fallback).")
+            return tmp_path, True
+        except Exception as e:
+            print(f"[TTSService] SAPI5 fallback error: {e}")
+            return None, False
+        finally:
+            try:
+                pythoncom.CoUninitialize()
+            except Exception:
+                pass
 
     # ─── Audio Playback ───────────────────────────────────────────────────────
 

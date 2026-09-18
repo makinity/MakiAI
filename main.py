@@ -212,6 +212,7 @@ def bootstrap_maki_services():
     })
     skill_registry.discover_and_load()
     skill_router = SkillRouter(skill_registry)
+    skill_registry.start_hot_reloader(on_reload_callback=skill_router.reload)
 
     # 7. Wire Orchestrator
     orchestrator.set_services({

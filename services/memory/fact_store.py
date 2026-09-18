@@ -6,6 +6,7 @@ routines, hardware setups, and personal context.
 Used for context injection into LLM system prompts and autonomous personalization.
 """
 
+import re
 import sqlite3
 import threading
 from contextlib import contextmanager
@@ -38,7 +39,7 @@ class FactStore:
             conn.close()
 
     def _init_db(self) -> None:
-        """Create tables and indexes if they do not exist."""
+        """Create tables, FTS5 virtual index, and triggers if they do not exist."""
         with _LOCK, self._connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -56,6 +57,35 @@ class FactStore:
             """)
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_category ON user_facts(category)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_updated ON user_facts(updated_at DESC)")
+
+            # FTS5 Full-Text Search with BM25 for user facts
+            cursor.execute("""
+                CREATE VIRTUAL TABLE IF NOT EXISTS user_facts_fts USING fts5(
+                    fact,
+                    category,
+                    content='user_facts',
+                    content_rowid='id',
+                    tokenize='porter unicode61'
+                )
+            """)
+
+            # Triggers to keep FTS5 synchronized with user_facts table
+            cursor.execute("""
+                CREATE TRIGGER IF NOT EXISTS user_facts_ai AFTER INSERT ON user_facts BEGIN
+                    INSERT INTO user_facts_fts(rowid, fact, category) VALUES (new.id, new.fact, new.category);
+                END;
+            """)
+            cursor.execute("""
+                CREATE TRIGGER IF NOT EXISTS user_facts_ad AFTER DELETE ON user_facts BEGIN
+                    INSERT INTO user_facts_fts(user_facts_fts, rowid, fact, category) VALUES('delete', old.id, old.fact, old.category);
+                END;
+            """)
+            cursor.execute("""
+                CREATE TRIGGER IF NOT EXISTS user_facts_au AFTER UPDATE ON user_facts BEGIN
+                    INSERT INTO user_facts_fts(user_facts_fts, rowid, fact, category) VALUES('delete', old.id, old.fact, old.category);
+                    INSERT INTO user_facts_fts(rowid, fact, category) VALUES (new.id, new.fact, new.category);
+                END;
+            """)
             conn.commit()
 
     def save_fact(
@@ -138,14 +168,34 @@ class FactStore:
             return [dict(r) for r in cursor.fetchall()]
 
     def search_facts(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
-        """Search facts by query tokens."""
-        tokens = [t.lower() for t in query.split() if len(t) >= 3]
+        """Search facts using BM25 full-text search with token fallback."""
+        tokens = [re.sub(r"[^a-zA-Z0-9]", "", t.lower()) for t in query.split() if len(t) >= 3]
         if not tokens:
+            return []
+
+        match_query = " OR ".join([f'"{t}"*' for t in tokens if t])
+        if not match_query:
             return []
 
         with _LOCK, self._connection() as conn:
             cursor = conn.cursor()
-            # Construct LIKE conditions for each token
+            try:
+                sql = """
+                    SELECT u.*, bm25(user_facts_fts) as rank
+                    FROM user_facts u
+                    JOIN user_facts_fts fts ON u.id = fts.rowid
+                    WHERE user_facts_fts MATCH ?
+                    ORDER BY rank ASC
+                    LIMIT ?
+                """
+                cursor.execute(sql, (match_query, limit))
+                results = [dict(r) for r in cursor.fetchall()]
+                if results:
+                    return results
+            except Exception:
+                pass
+
+            # Fallback to LIKE clauses
             clauses = ["lower(fact) LIKE ?" for _ in tokens]
             params = [f"%{t}%" for t in tokens]
             sql = f"SELECT * FROM user_facts WHERE {' OR '.join(clauses)} ORDER BY updated_at DESC LIMIT ?"

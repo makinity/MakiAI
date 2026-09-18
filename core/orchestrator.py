@@ -16,6 +16,7 @@ from core.state_manager import StateManager, AppState
 from services.computer.computer_router import ComputerRouter
 from services.ai.kiro_service import KiroService
 from services.memory.fact_extractor import FactExtractor
+from services.ai.trace_service import ExecutionTraceService
 
 TRAINING_MD_PATH = Path(__file__).resolve().parents[1] / "training.md"
 COMMAND_LOG_PATH = Path(__file__).resolve().parents[1] / "data" / "command_log.json"
@@ -81,6 +82,9 @@ class Orchestrator:
         # Continuous Durable Fact & Memory Extractor
         self.fact_extractor = FactExtractor()
 
+        # Self-Healing Execution Trace & Error Feedback Service
+        self.trace_service = ExecutionTraceService()
+
     def set_services(self, services: dict) -> None:
         """Inject all backend services after initialization."""
         self.gemini_service = services.get("gemini") or services.get("gemini_service")
@@ -124,9 +128,9 @@ class Orchestrator:
                 self._speak(response)
         except Exception as e:
             print(f"[Orchestrator] Error handling command: {e}")
-            response = "I encountered an error. Please try again."
             handler_name = "Error"
             is_fallback = True
+            response = self.trace_service.self_heal(text.strip(), handler_name, str(e), self.gemini_service)
             self._speak(response)
         finally:
             # Asynchronously log command for self-improvement and training review

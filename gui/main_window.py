@@ -112,6 +112,7 @@ class MainWindow(QMainWindow):
         })
         self.skill_registry.discover_and_load()
         self.skill_router = SkillRouter(self.skill_registry)
+        self.skill_registry.start_hot_reloader(on_reload_callback=self.skill_router.reload)
 
         # ── Voice services ────────────────────────────────────────────────────
         self.tts_service = TTSService(
