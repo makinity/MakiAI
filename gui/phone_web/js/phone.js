@@ -1,6 +1,6 @@
 /**
- * MakiAI Mobile Web Phone — Client Engine
- * Full-duplex Web Audio capture + WebSocket streaming + Neural TTS playback
+ * MakiAI Mobile Web Phone — Multimodal Client Engine
+ * Full-duplex Web Audio capture + WebSocket streaming + Neural TTS playback + Live Video Switching
  */
 
 (function () {
@@ -11,15 +11,20 @@
         inCall: false,
         isMuted: false,
         speakerBoost: false,
+        videoMode: "orb", // "orb", "screen", "webcam", "phone_cam"
+        facingMode: "user", // "user" or "environment"
         ws: null,
         audioContext: null,
         mediaStream: null,
         audioInput: null,
         scriptProcessor: null,
+        audioPlayer: null,
         timerInterval: null,
         callStartEpoch: 0,
         audioQueue: [],
         isPlayingAudio: false,
+        phoneCamStream: null,
+        visionInterval: null,
         pin: localStorage.getItem("maki_phone_pin") || "",
     };
 
@@ -29,7 +34,14 @@
         brandName: document.getElementById("brand-name"),
         callStatusBadge: document.getElementById("call-status-badge"),
         callStatusText: document.getElementById("call-status-text"),
-        visualizerWrap: document.querySelector(".visualizer-wrap"),
+        visualizerWrap: document.getElementById("visualizer-wrap"),
+        remoteVideoWrap: document.getElementById("remote-video-wrap"),
+        remoteStreamImg: document.getElementById("remote-stream-img"),
+        videoOverlayBadge: document.getElementById("video-overlay-badge"),
+        localCamWrap: document.getElementById("local-cam-wrap"),
+        localCamFeed: document.getElementById("local-cam-feed"),
+        btnFlipCam: document.getElementById("btn-flip-cam"),
+        visionCanvas: document.getElementById("vision-snapshot-canvas"),
         callTimer: document.getElementById("call-timer"),
         callSubtext: document.getElementById("call-subtext"),
         transcriptContainer: document.getElementById("transcript-container"),
@@ -37,6 +49,7 @@
         btnMute: document.getElementById("btn-mute"),
         btnSpeaker: document.getElementById("btn-speaker"),
         quickChips: document.getElementById("quick-chips"),
+        videoModeBar: document.getElementById("video-mode-bar"),
         pinModal: document.getElementById("pin-modal"),
         pinInput: document.getElementById("pin-input"),
         btnPinCancel: document.getElementById("btn-pin-cancel"),
@@ -57,6 +70,21 @@
         elements.btnCallAction.addEventListener("click", toggleCall);
         elements.btnMute.addEventListener("click", toggleMute);
         elements.btnSpeaker.addEventListener("click", toggleSpeaker);
+
+        // Video Mode Buttons
+        if (elements.videoModeBar) {
+            elements.videoModeBar.addEventListener("click", (e) => {
+                const btn = e.target.closest(".mode-btn");
+                if (btn && btn.dataset.mode) {
+                    setVideoMode(btn.dataset.mode);
+                }
+            });
+        }
+
+        // Camera Flip Button
+        if (elements.btnFlipCam) {
+            elements.btnFlipCam.addEventListener("click", toggleCameraFacing);
+        }
 
         // Quick Command Chips
         if (elements.quickChips) {
@@ -165,7 +193,6 @@
             state.ws.onclose = (e) => {
                 console.log("[Phone] WebSocket closed:", e.code, e.reason);
                 if (e.code === 4001) {
-                    // PIN Authentication Required
                     elements.pinModal.hidden = false;
                     addTranscriptBubble("Authentication PIN required.", "system");
                 }
@@ -195,6 +222,9 @@
 
         // Start Mic Audio Processor
         startAudioCapture();
+
+        // Default to Orb mode
+        setVideoMode(state.videoMode || "orb", false);
     }
 
     function endCall() {
@@ -211,6 +241,9 @@
             state.timerInterval = null;
         }
         elements.callTimer.textContent = "00:00";
+
+        // Stop Phone Camera if active
+        stopPhoneCamera();
 
         // Stop Audio Capture
         if (state.scriptProcessor) {
@@ -236,9 +269,130 @@
             state.ws = null;
         }
 
+        // Reset visual view
+        setVideoMode("orb", false);
+
         // Clear audio queue
         state.audioQueue = [];
         state.isPlayingAudio = false;
+    }
+
+    // ─── Video Mode & Camera Management ──────────────────────────────────────
+
+    async function setVideoMode(mode, notifyServer = true) {
+        state.videoMode = mode;
+
+        // Update nav button states
+        if (elements.videoModeBar) {
+            elements.videoModeBar.querySelectorAll(".mode-btn").forEach((btn) => {
+                btn.classList.toggle("active", btn.dataset.mode === mode);
+            });
+        }
+
+        // Reset view visibility
+        elements.visualizerWrap.hidden = (mode !== "orb");
+        elements.remoteVideoWrap.hidden = (mode !== "screen" && mode !== "webcam");
+        elements.localCamWrap.hidden = (mode !== "phone_cam");
+
+        if (mode === "screen") {
+            elements.videoOverlayBadge.textContent = "💻 PC Screen Share";
+            stopPhoneCamera();
+        } else if (mode === "webcam") {
+            elements.videoOverlayBadge.textContent = "👁️ Laptop Built-in Cam";
+            stopPhoneCamera();
+        } else if (mode === "phone_cam") {
+            await startPhoneCamera();
+        } else {
+            // Orb
+            stopPhoneCamera();
+        }
+
+        // Notify server of new video mode
+        if (notifyServer && state.ws && state.ws.readyState === WebSocket.OPEN) {
+            state.ws.send(JSON.stringify({
+                type: "set_video_mode",
+                mode: mode,
+            }));
+        }
+    }
+
+    async function startPhoneCamera() {
+        try {
+            stopPhoneCamera();
+            state.phoneCamStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: state.facingMode,
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                },
+                audio: false,
+            });
+
+            if (elements.localCamFeed) {
+                elements.localCamFeed.srcObject = state.phoneCamStream;
+                elements.localCamFeed.play().catch(() => {});
+            }
+
+            // Start sending vision snapshots periodically
+            state.visionInterval = setInterval(sendVisionSnapshot, 1000);
+        } catch (err) {
+            console.error("[Phone] Camera start failed:", err);
+            addTranscriptBubble("Camera access error: " + err.message, "system");
+            setVideoMode("orb");
+        }
+    }
+
+    function stopPhoneCamera() {
+        if (state.visionInterval) {
+            clearInterval(state.visionInterval);
+            state.visionInterval = null;
+        }
+        if (state.phoneCamStream) {
+            state.phoneCamStream.getTracks().forEach((t) => t.stop());
+            state.phoneCamStream = null;
+        }
+        if (elements.localCamFeed) {
+            elements.localCamFeed.srcObject = null;
+        }
+    }
+
+    async function toggleCameraFacing() {
+        state.facingMode = state.facingMode === "user" ? "environment" : "user";
+        if (elements.localCamFeed) {
+            elements.localCamFeed.style.transform = state.facingMode === "user" ? "scaleX(-1)" : "none";
+        }
+        if (state.videoMode === "phone_cam") {
+            await startPhoneCamera();
+        }
+    }
+
+    function sendVisionSnapshot() {
+        if (!state.inCall || state.videoMode !== "phone_cam" || !elements.localCamFeed || !state.ws || state.ws.readyState !== WebSocket.OPEN) {
+            return;
+        }
+
+        try {
+            const canvas = elements.visionCanvas;
+            const video = elements.localCamFeed;
+            if (video.videoWidth === 0 || video.videoHeight === 0) return;
+
+            canvas.width = 480;
+            canvas.height = Math.round((video.videoHeight / video.videoWidth) * 480);
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.65);
+            const base64Data = dataUrl.split(",")[1];
+
+            if (base64Data) {
+                state.ws.send(JSON.stringify({
+                    type: "camera_frame",
+                    image_base64: base64Data,
+                }));
+            }
+        } catch (e) {
+            console.warn("[Phone] Snapshot send error:", e);
+        }
     }
 
     // ─── Audio Capture & Streaming ───────────────────────────────────────────
@@ -276,7 +430,7 @@
         return buf;
     }
 
-    // ─── Server Messages & Audio Playback ────────────────────────────────────
+    // ─── Server Messages & Video / Audio Playback ────────────────────────────
 
     function handleServerMessage(data) {
         if (typeof data === "string") {
@@ -305,6 +459,18 @@
                 } else {
                     setCallStatus("active", "Live Call");
                     elements.callSubtext.textContent = "Speak when ready...";
+                }
+                break;
+
+            case "set_video_mode":
+                if (msg.mode && msg.mode !== state.videoMode) {
+                    setVideoMode(msg.mode, false);
+                }
+                break;
+
+            case "video_frame":
+                if (msg.image_base64 && elements.remoteStreamImg) {
+                    elements.remoteStreamImg.src = `data:image/jpeg;base64,${msg.image_base64}`;
                 }
                 break;
 
@@ -408,7 +574,6 @@
 
     function sendTextCommand(text) {
         if (!state.inCall) {
-            // Auto-start call on chip press
             startCall().then(() => {
                 setTimeout(() => {
                     if (state.ws && state.ws.readyState === WebSocket.OPEN) {

@@ -154,6 +154,117 @@ html, body {
     50% { transform: scale(1.4); opacity: 1; }
 }
 
+/* Video Mode Switcher Nav */
+.video-mode-nav {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 4px 0;
+    margin-bottom: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.video-mode-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.mode-btn.active {
+    background: linear-gradient(135deg, rgba(255, 157, 0, 0.2), rgba(255, 85, 0, 0.25));
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+.mode-svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+}
+
+/* Stage Viewport */
+.stage-viewport {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+}
+
+.remote-video-wrap, .local-cam-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    height: 180px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+    border: 1px solid var(--border-active);
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remote-video-wrap[hidden], .local-cam-wrap[hidden], .visualizer-wrap[hidden] {
+    display: none !important;
+}
+
+.stream-surface {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: #000;
+}
+.local-cam-wrap .stream-surface {
+    object-fit: cover;
+    transform: scaleX(-1); /* mirror front camera */
+}
+
+.video-overlay-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--border-subtle);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+}
+
+.btn-flip-cam {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border-active);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
 /* Stage Area */
 .call-stage {
     flex: 1;
@@ -161,9 +272,9 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 12px;
     min-height: 0;
-    padding: 8px 0;
+    padding: 4px 0;
 }
 
 /* Reactor Orb Visualizer */

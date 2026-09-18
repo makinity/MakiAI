@@ -1,7 +1,11 @@
 """
-MakiAI — Mobile WebRTC / WebSocket HD Phone Calling Service
-Provides 100% free, low-latency, full-duplex live voice calling between mobile phones and MakiAI
-without any third-party telephony carrier fees or regional restrictions.
+MakiAI — Mobile WebRTC / WebSocket HD Phone & Video Calling Service
+Provides 100% free, low-latency, full-duplex live voice & video calling between mobile phones and MakiAI.
+Supports:
+  1. Voice Orb (Duplex Audio)
+  2. Laptop Screen Share (PC Desktop ➔ Phone in real time)
+  3. Laptop Webcam Feed (Built-in Camera ➔ Phone in real time)
+  4. Phone Camera Vision (Phone Camera ➔ Gemini Vision multimodal analysis)
 """
 
 import os
@@ -16,13 +20,24 @@ import threading
 from pathlib import Path
 from typing import Optional, Dict, Any
 
+try:
+    import cv2
+except ImportError:
+    cv2 = None
+
+try:
+    from PIL import Image, ImageGrab
+except ImportError:
+    Image = None
+    ImageGrab = None
+
 import uvicorn
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, Response
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from core.orchestrator import Orchestrator
-from core.state_manager import StateManager, AppState
+from core.state_manager import StateManager
 from services.voice.tts_service import TTSService
 from services.voice.stt_service import STTService
 from services.settings.settings_service import SettingsService
@@ -30,8 +45,7 @@ from services.settings.settings_service import SettingsService
 
 class PhoneCallService:
     """
-    FastAPI + WebSocket Live Mobile Web Phone Service.
-    Serves the Mobile Web Phone PWA and provides real-time streaming audio I/O.
+    FastAPI + WebSocket Live Mobile Web Phone & Video Calling Service.
     """
 
     def __init__(
@@ -52,6 +66,9 @@ class PhoneCallService:
         self.skill_router = skill_router
         self.port = self.settings.get_phone_bridge_port()
         self.pin = (self.settings.get_phone_bridge_pin() or "").strip()
+
+        self.active_video_mode = "orb"
+        self.latest_phone_camera_bytes: Optional[bytes] = None
 
         self._server: Optional[uvicorn.Server] = None
         self._thread: Optional[threading.Thread] = None
@@ -114,20 +131,31 @@ class PhoneCallService:
             await self._handle_live_call_session(websocket)
 
     async def _handle_live_call_session(self, websocket: WebSocket) -> None:
-        """Manages bidirectional audio streaming and VAD turn-taking for a phone call."""
-        # Send initial welcome metadata
+        """Manages bidirectional audio streaming, video channels, and VAD turn-taking."""
         await websocket.send_text(json.dumps({
             "type": "system_info",
             "bot_name": self.settings.get_app_name(),
         }))
 
-        # VAD & Buffer state (16kHz 16-bit mono PCM)
+        # VAD state
         pcm_buffer = bytearray()
         speaking = False
         silence_start: Optional[float] = None
-        last_speech_time = time.time()
         VAD_ENERGY_THRESHOLD = 350
         SILENCE_TIMEOUT_SECS = 0.85
+
+        # Video streaming task tracker
+        video_stream_task: Optional[asyncio.Task] = None
+
+        async def _start_video_loop(mode: str):
+            nonlocal video_stream_task
+            if video_stream_task and not video_stream_task.done():
+                video_stream_task.cancel()
+            self.active_video_mode = mode
+            if mode == "screen":
+                video_stream_task = asyncio.create_task(self._screen_stream_loop(websocket))
+            elif mode == "webcam":
+                video_stream_task = asyncio.create_task(self._webcam_stream_loop(websocket))
 
         try:
             while True:
@@ -138,7 +166,6 @@ class PhoneCallService:
                     chunk = message["bytes"]
                     pcm_buffer.extend(chunk)
 
-                    # Compute RMS energy of chunk
                     rms = 0
                     if len(chunk) >= 2:
                         rms = audioop.rms(chunk, 2)
@@ -148,47 +175,119 @@ class PhoneCallService:
                             speaking = True
                             await websocket.send_text(json.dumps({"type": "state", "state": "listening"}))
                         silence_start = None
-                        last_speech_time = time.time()
                     else:
                         if speaking:
                             if silence_start is None:
                                 silence_start = time.time()
                             elif (time.time() - silence_start) >= SILENCE_TIMEOUT_SECS:
-                                # User finished speaking their turn!
                                 spoken_pcm = bytes(pcm_buffer)
                                 pcm_buffer.clear()
                                 speaking = False
                                 silence_start = None
-
-                                # Process voice turn in background task
                                 asyncio.create_task(self._process_spoken_turn(websocket, spoken_pcm))
 
-                # Handle JSON control / text command messages (e.g. quick chips)
+                # Handle JSON messages
                 elif "text" in message and message["text"]:
                     try:
                         data = json.loads(message["text"])
                         msg_type = data.get("type", "")
+
                         if msg_type == "text_command":
                             cmd_text = data.get("text", "").strip()
                             if cmd_text:
                                 asyncio.create_task(self._process_text_turn(websocket, cmd_text))
+
+                        elif msg_type == "set_video_mode":
+                            req_mode = data.get("mode", "orb")
+                            await _start_video_loop(req_mode)
+
+                        elif msg_type == "camera_frame":
+                            b64_img = data.get("image_base64", "")
+                            if b64_img:
+                                self.latest_phone_camera_bytes = base64.b64decode(b64_img)
+
                     except Exception as e:
-                        print(f"[PhoneBridge] Error parsing JSON client message: {e}")
+                        print(f"[PhoneBridge] Error parsing JSON message: {e}")
 
         except WebSocketDisconnect:
             print(f"[PhoneBridge] Mobile call ended by client ({websocket.client.host})")
         except Exception as e:
             print(f"[PhoneBridge] WebSocket session error: {e}")
+        finally:
+            if video_stream_task and not video_stream_task.done():
+                video_stream_task.cancel()
+            self.active_video_mode = "orb"
+
+    # ─── Video Streaming Loops ────────────────────────────────────────────────
+
+    async def _screen_stream_loop(self, websocket: WebSocket) -> None:
+        """Stream laptop dual/single screen desktop frames to phone at 10-12 FPS."""
+        print("[PhoneBridge] 💻 PC Screen Share stream started")
+        try:
+            while self.active_video_mode == "screen":
+                if ImageGrab:
+                    screen = ImageGrab.grab()
+                    # Scale down for fast low-latency streaming (max width 640)
+                    w, h = screen.size
+                    target_w = 640
+                    target_h = int(h * (target_w / w))
+                    resized = screen.resize((target_w, target_h), Image.Resampling.BILINEAR)
+
+                    buf = io.BytesIO()
+                    resized.save(buf, format="JPEG", quality=55)
+                    b64_frame = base64.b64encode(buf.getvalue()).decode("ascii")
+
+                    await websocket.send_text(json.dumps({
+                        "type": "video_frame",
+                        "image_base64": b64_frame,
+                    }))
+                await asyncio.sleep(0.09)  # ~11 FPS
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            print(f"[PhoneBridge] Screen stream error: {e}")
+
+    async def _webcam_stream_loop(self, websocket: WebSocket) -> None:
+        """Stream laptop built-in webcam video to phone at 12-15 FPS."""
+        print("[PhoneBridge] 👁️ Laptop Webcam stream started")
+        cap = None
+        try:
+            if cv2:
+                cap = cv2.VideoCapture(0)
+                cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+            while self.active_video_mode == "webcam" and cap and cap.isOpened():
+                ret, frame = cap.read()
+                if ret:
+                    # Compress to JPEG
+                    _, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 55])
+                    b64_frame = base64.b64encode(buffer).decode("ascii")
+
+                    await websocket.send_text(json.dumps({
+                        "type": "video_frame",
+                        "image_base64": b64_frame,
+                    }))
+                await asyncio.sleep(0.07)  # ~14 FPS
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            print(f"[PhoneBridge] Webcam stream error: {e}")
+        finally:
+            if cap:
+                cap.release()
+                print("[PhoneBridge] Laptop Webcam stream released")
+
+    # ─── Speech & Vision Turn Processing ──────────────────────────────────────
 
     async def _process_spoken_turn(self, websocket: WebSocket, pcm_bytes: bytes) -> None:
-        """Transcribe spoken PCM audio with Groq Whisper, execute command, and stream audio response."""
-        if len(pcm_bytes) < 3200:  # Less than 0.1s
+        """Transcribe speech and handle intent with multimodal vision support."""
+        if len(pcm_bytes) < 3200:
             return
 
         try:
             await websocket.send_text(json.dumps({"type": "state", "state": "thinking"}))
 
-            # Encode PCM to WAV container in RAM
             wav_io = io.BytesIO()
             with wave.open(wav_io, "wb") as wf:
                 wf.setnchannels(1)
@@ -197,7 +296,6 @@ class PhoneCallService:
                 wf.writeframes(pcm_bytes)
             wav_bytes = wav_io.getvalue()
 
-            # Transcribe via Groq Whisper
             user_text = ""
             if self.stt_service and hasattr(self.stt_service, "_transcriber") and self.stt_service._transcriber:
                 user_text, _ = self.stt_service._transcriber.transcribe_wav_bytes(wav_bytes)
@@ -213,7 +311,6 @@ class PhoneCallService:
                 "text": clean_text
             }))
 
-            # Execute via Orchestrator
             await self._execute_and_reply(websocket, clean_text)
 
         except Exception as e:
@@ -230,36 +327,77 @@ class PhoneCallService:
         await self._execute_and_reply(websocket, text)
 
     async def _execute_and_reply(self, websocket: WebSocket, text: str) -> None:
-        """Execute command and synthesize neural audio for mobile playback."""
-        try:
-            loop = asyncio.get_event_loop()
-            response_text = await loop.run_in_executor(None, self.orchestrator.handle_command, text)
+        """Execute command, handle visual mode switching, and stream TTS response."""
+        lower_cmd = text.lower().strip()
 
-            if not response_text:
-                response_text = "Task completed, sir."
+        # 1. Voice Command Video Mode Switches
+        if any(p in lower_cmd for p in ["share your screen", "show your screen", "show me your desktop", "share desktop", "screenshare"]):
+            self.active_video_mode = "screen"
+            await websocket.send_text(json.dumps({"type": "set_video_mode", "mode": "screen"}))
+            asyncio.create_task(self._screen_stream_loop(websocket))
+            response_text = "Sharing my screen with your phone now, sir."
 
+        elif any(p in lower_cmd for p in ["show your camera", "show me your webcam", "turn on your camera", "turn on laptop camera", "laptop webcam"]):
+            self.active_video_mode = "webcam"
+            await websocket.send_text(json.dumps({"type": "set_video_mode", "mode": "webcam"}))
+            asyncio.create_task(self._webcam_stream_loop(websocket))
+            response_text = "Activating laptop camera now, sir."
+
+        elif any(p in lower_cmd for p in ["look at my camera", "turn on my camera", "look through my camera", "phone camera"]):
+            self.active_video_mode = "phone_cam"
+            await websocket.send_text(json.dumps({"type": "set_video_mode", "mode": "phone_cam"}))
+            response_text = "Looking through your phone camera now, sir. Point at anything you'd like me to analyze."
+
+        elif any(p in lower_cmd for p in ["turn off video", "stop video", "stop screenshare", "switch back to audio", "voice mode"]):
+            self.active_video_mode = "orb"
+            await websocket.send_text(json.dumps({"type": "set_video_mode", "mode": "orb"}))
+            response_text = "Switched back to voice mode, sir."
+
+        # 2. Multimodal Gemini Vision Question Check
+        elif (self.active_video_mode == "phone_cam" or any(p in lower_cmd for p in ["what am i holding", "what is this", "look at this", "what do you see", "analyze this", "read this"])) and self.latest_phone_camera_bytes:
+            try:
+                gemini = getattr(self.orchestrator, "gemini_service", None)
+                if gemini and hasattr(gemini, "generate_with_image"):
+                    loop = asyncio.get_event_loop()
+                    response_text = await loop.run_in_executor(
+                        None,
+                        lambda: gemini.generate_with_image(text, self.latest_phone_camera_bytes)
+                    )
+                else:
+                    response_text = "Vision engine is currently offline, sir."
+            except Exception as e:
+                print(f"[PhoneBridge] Vision query error: {e}")
+                response_text = "I couldn't analyze the camera image right now, sir."
+
+        # 3. Standard Orchestrator Command
+        else:
+            try:
+                loop = asyncio.get_event_loop()
+                response_text = await loop.run_in_executor(None, self.orchestrator.handle_command, text)
+                if not response_text:
+                    response_text = "Task completed, sir."
+            except Exception as e:
+                print(f"[PhoneBridge] Command execution error: {e}")
+                response_text = "I encountered an error executing that command, sir."
+
+        # Send assistant transcript to phone
+        await websocket.send_text(json.dumps({
+            "type": "assistant_transcript",
+            "text": response_text
+        }))
+
+        await websocket.send_text(json.dumps({"type": "state", "state": "speaking"}))
+
+        # Synthesize audio and stream back to phone
+        audio_bytes = await self._synthesize_audio(response_text)
+        if audio_bytes:
+            b64_audio = base64.b64encode(audio_bytes).decode("ascii")
             await websocket.send_text(json.dumps({
-                "type": "assistant_transcript",
-                "text": response_text
+                "type": "audio_chunk",
+                "audio_base64": b64_audio,
+                "format": "mp3"
             }))
-
-            await websocket.send_text(json.dumps({"type": "state", "state": "speaking"}))
-
-            # Synthesize audio to WAV bytes using Edge-TTS
-            audio_bytes = await self._synthesize_audio(response_text)
-
-            if audio_bytes:
-                b64_audio = base64.b64encode(audio_bytes).decode("ascii")
-                await websocket.send_text(json.dumps({
-                    "type": "audio_chunk",
-                    "audio_base64": b64_audio,
-                    "format": "mp3"
-                }))
-            else:
-                await websocket.send_text(json.dumps({"type": "state", "state": "idle"}))
-
-        except Exception as e:
-            print(f"[PhoneBridge] Error generating reply: {e}")
+        else:
             await websocket.send_text(json.dumps({"type": "state", "state": "idle"}))
 
     async def _synthesize_audio(self, text: str) -> Optional[bytes]:
@@ -268,7 +406,7 @@ class PhoneCallService:
         if not clean:
             return None
 
-        # Try ElevenLabs first if API key is present
+        # Try ElevenLabs first if configured
         eleven_key = self.settings.get_elevenlabs_api_key()
         voice_id = self.settings.get_elevenlabs_voice_id()
         if eleven_key and voice_id:
@@ -286,7 +424,7 @@ class PhoneCallService:
             except Exception as e:
                 print(f"[PhoneBridge] ElevenLabs synthesis failed, falling back to Edge-TTS: {e}")
 
-        # Default fast Edge-TTS synthesis
+        # Edge-TTS synthesis
         try:
             import edge_tts
             voice = self.settings.get_env("TTS_VOICE", "en-GB-RyanNeural")
@@ -323,7 +461,7 @@ class PhoneCallService:
 
         def _run():
             try:
-                print(f"[PhoneBridge] 📱 Mobile Web Phone live on http://0.0.0.0:{self.port}/call")
+                print(f"[PhoneBridge] 📱 Mobile Web Phone & Video live on http://0.0.0.0:{self.port}/call")
                 self._server.run()
             except Exception as e:
                 print(f"[PhoneBridge] Server error: {e}")
