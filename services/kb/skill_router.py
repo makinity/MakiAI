@@ -262,8 +262,8 @@ class SkillRouter:
                 if skill_id == "research" and re.search(r"^(?:open|launch|start|run)\s+(?:google\s+)?(?:chrome|browser)\b", cleaned, re.IGNORECASE):
                     continue
 
-                # 3. Collision Shield: "open github", "launch notion", "open discord", "open spotify" -> let ComputerRouter handle it
-                if skill_id == "composio" and re.search(r"^(?:open|launch|start|go\s+to)\s+(?:github|notion|discord|spotify|trello|gitlab)\b", cleaned, re.IGNORECASE):
+                # 3. Collision Shield: "open facebook", "open github", "launch notion", "open discord", "open spotify" -> let ComputerRouter handle it
+                if skill_id == "composio" and re.search(r"^(?:open|launch|start|go\s+to)\s+(?:facebook|fb|github|notion|discord|spotify|trello|gitlab)\b", cleaned, re.IGNORECASE):
                     continue
 
                 skill = self._skills.get(skill_id)

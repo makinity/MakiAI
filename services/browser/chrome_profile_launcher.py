@@ -18,8 +18,8 @@ SITE_PROFILE_MAP = {
     "facebook": {
         "display_name": "Facebook",
         "url": "https://www.facebook.com",
-        "profile": "Default",
-        "profile_label": "personal",
+        "profile": "juntillakingmaki@gmail.com",
+        "profile_label": "main",
         "aliases": ["facebook", "fb", "my facebook", "my fb"],
     },
     "github": {
@@ -183,6 +183,13 @@ class ChromeProfileLauncher:
 
         url = url_override or (site_info["url"] if site_info else service_key)
         target_profile = profile_override or (site_info["profile"] if site_info else "Default")
+        
+        # If target_profile is specified as an email address, resolve to Chrome profile directory
+        if "@" in target_profile:
+            resolved_dir = self.get_profile_for_email(target_profile)
+            if resolved_dir:
+                target_profile = resolved_dir
+
         display_name = site_info["display_name"] if site_info else service_key.title()
         profile_label = site_info.get("profile_label", target_profile) if site_info else target_profile
 
