@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#060402">
+    <title>MakiAI Mobile Phone</title>
+    <link rel="manifest" href="/call/manifest.json">
+    <link rel="stylesheet" href="/call/css/phone.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="phone-shell">
+        <div class="bg-glow bg-glow-1"></div>
+        <div class="bg-glow bg-glow-2"></div>
+        <div class="bg-grid"></div>
+
+        <!-- Top Navigation Bar -->
+        <header class="phone-header">
+            <div class="brand-badge">
+                <span class="status-dot" id="connection-dot"></span>
+                <span class="brand-name" id="brand-name">MakiAI</span>
+            </div>
+            <div class="call-badge" id="call-status-badge">
+                <span class="pulse-indicator"></span>
+                <span id="call-status-text">Standby</span>
+            </div>
+        </header>
+
+        <!-- Main Call Stage -->
+        <main class="call-stage">
+            <!-- Glowing Reactor Orb Visualizer -->
+            <div class="visualizer-wrap">
+                <div class="orb-halo" id="orb-halo"></div>
+                <div class="orb-core" id="orb-core">
+                    <div class="orb-layer orb-layer-1"></div>
+                    <div class="orb-layer orb-layer-2"></div>
+                    <div class="orb-layer orb-layer-3"></div>
+                </div>
+                <div class="audio-waves" id="audio-waves">
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                </div>
+            </div>
+
+            <!-- Call Info & Timer -->
+            <div class="call-info">
+                <h1 class="call-title" id="call-target-title">Maki Assistant</h1>
+                <div class="call-timer" id="call-timer">00:00</div>
+                <div class="call-subtext" id="call-subtext">Tap Call to speak with your PC</div>
+            </div>
+
+            <!-- Live Transcript Bubble Feed -->
+            <div class="transcript-container" id="transcript-container">
+                <div class="transcript-msg system-msg">
+                    <div class="msg-bubble">Live VoIP stream ready. Tap the call button below to start talking.</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Quick Command Chips -->
+        <div class="quick-chips" id="quick-chips">
+            <button class="chip" data-cmd="What is the weather today?">🌤️ Weather</button>
+            <button class="chip" data-cmd="What is on my schedule today?">📅 Schedule</button>
+            <button class="chip" data-cmd="Give me a system summary">💻 System</button>
+            <button class="chip" data-cmd="Take a screenshot of my PC">📸 Screenshot</button>
+        </div>
+
+        <!-- Bottom Call Control Dock -->
+        <footer class="call-dock">
+            <button class="dock-btn btn-secondary" id="btn-mute" title="Mute Microphone" disabled>
+                <svg viewBox="0 0 24 24" class="btn-svg" id="mic-icon">
+                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3Zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-2.08c3.39-.49 6-3.39 6-6.92h-2Z"/>
+                </svg>
+                <span class="btn-label">Mute</span>
+            </button>
+
+            <!-- Big Call Action Button -->
+            <button class="dock-btn btn-call" id="btn-call-action" title="Start Live Call">
+                <svg viewBox="0 0 24 24" class="call-svg" id="call-icon">
+                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
+                </svg>
+            </button>
+
+            <button class="dock-btn btn-secondary" id="btn-speaker" title="Speaker Boost">
+                <svg viewBox="0 0 24 24" class="btn-svg">
+                    <path d="M3 9v6h4l5 5V4L7 9H3Zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02ZM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77Z"/>
+                </svg>
+                <span class="btn-label">Speaker</span>
+            </button>
+        </footer>
+
+        <!-- Optional Passcode Modal -->
+        <div class="pin-modal-overlay" id="pin-modal" hidden>
+            <div class="pin-modal-card">
+                <h3>Enter Access PIN</h3>
+                <p>Authentication required to connect with MakiAI.</p>
+                <input type="password" id="pin-input" placeholder="••••" maxlength="8" autocomplete="off">
+                <div class="pin-actions">
+                    <button class="btn-cancel" id="btn-pin-cancel">Cancel</button>
+                    <button class="btn-submit" id="btn-pin-submit">Connect</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/call/js/phone.js"></script>
+</body>
+</html>

@@ -710,8 +710,22 @@ class MakiUIApi:
 
     # ─── Settings API ─────────────────────────────────────────────────────────
 
+    def _get_local_ip(self) -> str:
+        """Helper to resolve local LAN IP for phone pairing."""
+        import socket
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except Exception:
+            return "localhost"
+
     def get_settings(self) -> Dict[str, Any]:
         """Fetch current configuration values for the settings panel."""
+        local_ip = self._get_local_ip()
+        phone_port = self.settings.get_phone_bridge_port()
         return {
             "app_name": self.settings.get_app_name(),
             "wake_word": self.settings.get_wake_word(),
@@ -723,6 +737,10 @@ class MakiUIApi:
             "tts_fallback": self.settings.get("tts_fallback", True),
             "kb_path": self.settings.get_kb_path(),
             "user_location": self.settings.get_user_location(),
+            "phone_bridge_enabled": self.settings.is_phone_bridge_enabled(),
+            "phone_bridge_port": phone_port,
+            "phone_bridge_pin": self.settings.get_phone_bridge_pin(),
+            "local_call_url": f"http://{local_ip}:{phone_port}/call",
             "debug": self.settings.is_debug(),
         }
 
@@ -797,6 +815,14 @@ class MakiUIApi:
             if "user_location" in new_settings:
                 user_loc = str(new_settings["user_location"]).strip()
                 self.settings.set_user_location(user_loc)
+
+            # 8. Update Phone Bridge Settings
+            if "phone_bridge_enabled" in new_settings:
+                self.settings.set_env("PHONE_BRIDGE_ENABLED", "true" if new_settings["phone_bridge_enabled"] else "false")
+            if "phone_bridge_port" in new_settings and new_settings["phone_bridge_port"]:
+                self.settings.set_env("PHONE_BRIDGE_PORT", str(new_settings["phone_bridge_port"]).strip())
+            if "phone_bridge_pin" in new_settings:
+                self.settings.set_env("PHONE_BRIDGE_PIN", str(new_settings["phone_bridge_pin"]).strip())
 
             self.add_activity("system", "Settings saved and applied successfully.")
             return {"ok": True, "settings": self.get_settings()}

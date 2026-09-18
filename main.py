@@ -285,6 +285,23 @@ def bootstrap_maki_services():
     except Exception as e:
         print(f"[MakiAI] Discord service init error: {e}")
 
+    # 10. Mobile Web Phone VoIP Bridge (WebRTC / WebSocket HD Audio Calling)
+    try:
+        if settings.is_phone_bridge_enabled():
+            from services.remote.phone_call_service import PhoneCallService
+            phone_call_service = PhoneCallService(
+                settings_service=settings,
+                orchestrator=orchestrator,
+                state_manager=state_manager,
+                tts_service=tts_service,
+                stt_service=stt_service,
+                skill_router=skill_router,
+                port=settings.get_phone_bridge_port(),
+            )
+            phone_call_service.start()
+    except Exception as e:
+        print(f"[MakiAI] Mobile Phone bridge init error: {e}")
+
     return ui_api, settings
 
 

@@ -240,6 +240,18 @@ class SettingsService:
         self.set_env("USER_LOCATION", location.strip())
         self.set("user_location", location.strip())
 
+    def is_phone_bridge_enabled(self) -> bool:
+        return self.get_env("PHONE_BRIDGE_ENABLED", "true").lower() == "true"
+
+    def get_phone_bridge_port(self) -> int:
+        try:
+            return int(self.get_env("PHONE_BRIDGE_PORT", "5050"))
+        except ValueError:
+            return 5050
+
+    def get_phone_bridge_pin(self) -> str:
+        return self.get_env("PHONE_BRIDGE_PIN", "").strip()
+
     def is_debug(self) -> bool:
         return self.get_env("DEBUG", "false").lower() == "true"
 

@@ -62,6 +62,12 @@
         elements.settingTtsFallback = document.getElementById("setting-tts-fallback");
         elements.settingKbPath = document.getElementById("setting-kb-path");
         elements.settingUserLocation = document.getElementById("setting-user-location");
+        elements.settingPhoneEnabled = document.getElementById("setting-phone-enabled");
+        elements.settingPhoneUrl = document.getElementById("setting-phone-url");
+        elements.btnCopyPhoneUrl = document.getElementById("btn-copy-phone-url");
+        elements.btnOpenPhoneUrl = document.getElementById("btn-open-phone-url");
+        elements.settingPhonePort = document.getElementById("setting-phone-port");
+        elements.settingPhonePin = document.getElementById("setting-phone-pin");
 
         // Situational Interactive Modal elements
         elements.modalOverlay = document.getElementById("interactive-modal-overlay");
@@ -176,6 +182,17 @@
 
         if (elements.saveSettingsBtn) {
             elements.saveSettingsBtn.addEventListener("click", handleSaveSettings);
+        }
+
+        if (elements.btnCopyPhoneUrl && elements.settingPhoneUrl) {
+            elements.btnCopyPhoneUrl.addEventListener("click", () => {
+                const url = elements.settingPhoneUrl.value;
+                if (url) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        showSettingsStatus("Phone Calling URL copied to clipboard!", false);
+                    });
+                }
+            });
         }
 
         // Generic Category / Format / Stack Pill bindings
@@ -559,6 +576,11 @@
             if (elements.settingTtsFallback) elements.settingTtsFallback.checked = Boolean(cfg.tts_fallback);
             if (elements.settingKbPath) elements.settingKbPath.value = cfg.kb_path || "";
             if (elements.settingUserLocation) elements.settingUserLocation.value = cfg.user_location || "";
+            if (elements.settingPhoneEnabled) elements.settingPhoneEnabled.checked = Boolean(cfg.phone_bridge_enabled);
+            if (elements.settingPhoneUrl) elements.settingPhoneUrl.value = cfg.local_call_url || "http://localhost:5050/call";
+            if (elements.btnOpenPhoneUrl) elements.btnOpenPhoneUrl.href = cfg.local_call_url || "http://localhost:5050/call";
+            if (elements.settingPhonePort) elements.settingPhonePort.value = cfg.phone_bridge_port || 5050;
+            if (elements.settingPhonePin) elements.settingPhonePin.value = cfg.phone_bridge_pin || "";
         } catch (err) {
             console.error("[Settings] Failed to load settings:", err);
         }
@@ -581,6 +603,9 @@
             tts_fallback: elements.settingTtsFallback ? elements.settingTtsFallback.checked : true,
             kb_path: elements.settingKbPath ? elements.settingKbPath.value.trim() : "",
             user_location: elements.settingUserLocation ? elements.settingUserLocation.value.trim() : "",
+            phone_bridge_enabled: elements.settingPhoneEnabled ? elements.settingPhoneEnabled.checked : true,
+            phone_bridge_port: elements.settingPhonePort ? parseInt(elements.settingPhonePort.value) || 5050 : 5050,
+            phone_bridge_pin: elements.settingPhonePin ? elements.settingPhonePin.value.trim() : "",
         };
 
         if (elements.saveSettingsBtn) {

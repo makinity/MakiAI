@@ -302,6 +302,44 @@
                         </div>
                     </div>
 
+                    <div class="settings-group glass-subpanel">
+                        <h3 class="settings-group-title">
+                            <svg viewBox="0 0 24 24" class="group-icon"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/></svg>
+                            Mobile Web Phone Bridge
+                        </h3>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="setting-phone-enabled" checked>
+                            <label class="form-check-label" for="setting-phone-enabled">Enable Mobile Web Phone Bridge</label>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">Phone Calling URL</label>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="setting-phone-url" class="form-control font-monospace" readonly placeholder="http://192.168.x.x:5050/call" style="font-size: 0.85rem;">
+                                <button type="button" class="btn btn-stark-secondary" id="btn-copy-phone-url" title="Copy URL">
+                                    <svg viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem; fill: currentColor;"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1Zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2Zm0 16H8V7h11v14Z"/></svg>
+                                </button>
+                                <a href="http://localhost:5050/call" target="_blank" class="btn btn-stark-primary" id="btn-open-phone-url" title="Open Phone Web App">
+                                    <svg viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem; fill: currentColor;"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7ZM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7Z"/></svg>
+                                </a>
+                            </div>
+                            <small class="form-hint">Open this link on your phone (or add to home screen) to call MakiAI</small>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="form-item">
+                                    <label for="setting-phone-port" class="form-label">Port</label>
+                                    <input type="number" id="setting-phone-port" class="form-control" value="5050">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-item">
+                                    <label for="setting-phone-pin" class="form-label">Access PIN (Optional)</label>
+                                    <input type="text" id="setting-phone-pin" class="form-control" placeholder="e.g. 1234">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="settings-footer">
                         <div id="settings-status-msg" class="settings-status-msg" hidden></div>
                         <button type="button" class="btn action-btn send-btn w-100" id="save-settings-btn">
