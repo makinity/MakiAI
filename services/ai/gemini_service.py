@@ -298,7 +298,8 @@ CRITICAL RULES:
 - NEVER output meta-analysis, reasoning steps, translation notes, or third-person commentary about the user (e.g., 'Here's a thinking process: 1. Analyze User Input...').
 - Speak directly to sir in character as Maki immediately in natural English.
 - Do NOT output any <think> tags or reasoning steps."""
-        messages.append({"role": "system", "content": system_prompt})
+
+        messages = [{"role": "system", "content": system_prompt}]
 
         for turn in self._history[-(MAX_HISTORY_TURNS * 2):]:
             role = "user" if turn["role"] == "user" else "assistant"
