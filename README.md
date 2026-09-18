@@ -81,8 +81,8 @@ flowchart TB
     <td width="50%" valign="top">
       <h3>🎯 Dual-Niche Job Hunting</h3>
       <ul>
-        <li><b>AI Video Creator:</b> Dual Chrome Profiles (<code>juntillakingmaki</code> + <code>denjikun1031</code>: OnlineJobs, LinkedIn, ChatGPT, Gemini, Portfolio) + <code>C:\VA\Documents\Resume\AI Video</code>.</li>
-        <li><b>Social Media Manager:</b> Dual Profiles (<code>juntillakingmaki</code> + <code>markjuntillava</code>: OnlineJobs, LinkedIn, Indeed, Canva) + <code>C:\VA\Documents\Resume\SMM Resume</code>.</li>
+        <li><b>AI Video Creator:</b> Multi-Profile Chrome Launch (OnlineJobs, LinkedIn, ChatGPT, Gemini, Portfolio) + Resume folder.</li>
+        <li><b>Social Media Manager:</b> Multi-Profile Chrome Launch (OnlineJobs, LinkedIn, Indeed, Canva) + Resume folder.</li>
         <li><b>Interactive GUI Modal:</b> Rapid niche selection pills.</li>
       </ul>
     </td>

@@ -168,13 +168,13 @@ You can test these commands by:
 *Persistent memory stored in `data/memory.json`.*
 
 ### Sample Prompts to Test:
-- `"Remember that my secondary email is mark.dev@gmail.com"`
+- `"Remember that my secondary email is dev@example.com"`
 - `"What is my secondary email?"`
 - `"What do you remember about my secondary email?"`
 - `"Forget about my secondary email"`
 - `"Remember my dog's name is Cooper"`
 - `"What is my dog's name?"`
-- `"Who is Mark Vencent Juntilla?"`
+- `"What is my current career goal?"`
 - `"What tech stack do I use for NextJS projects?"`
 - `"Kamusta ka Maki?"`
 

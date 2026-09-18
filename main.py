@@ -80,6 +80,16 @@ def ensure_user_environment_initialized():
         except Exception as e:
             print(f"[Init] Routines init warning: {e}")
 
+    # 5. Initialize training.md if missing
+    training_file = project_root / "training.md"
+    training_example = project_root / "training.example.md"
+    if not training_file.exists() and training_example.exists():
+        try:
+            training_file.write_text(training_example.read_text(encoding="utf-8"), encoding="utf-8")
+            print(f"[Init] Initialized training.md from template.")
+        except Exception as e:
+            print(f"[Init] Training log init warning: {e}")
+
 
 def bootstrap_maki_services():
     """Initialize and wire all core MakiAI services."""

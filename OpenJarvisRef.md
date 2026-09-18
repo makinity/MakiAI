@@ -24,7 +24,7 @@ This document outlines high-value patterns, architectural concepts, and capabili
 ### A. Continuous Durable Fact & Preference Extraction (Auto Long-Term Memory)
 * **OpenJarvis Mechanism:** In the background, an async memory observer parses chat turns and extracts durable personal facts into a structured store (`memory_facts.jsonl` + SQLite):
   - *"User's preferred editor is VS Code."*
-  - *"User's primary email recipient is markjuntillava@gmail.com."*
+  - *"User's primary email recipient is client@example.com."*
   - *"User works on Python and React projects in `c:\development`."*
 * **How to Adapt for MakiAI:**
   1. Create a lightweight `FactExtractor` daemon that runs asynchronously after conversations.

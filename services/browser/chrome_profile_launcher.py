@@ -18,63 +18,63 @@ SITE_PROFILE_MAP = {
     "facebook": {
         "display_name": "Facebook",
         "url": "https://www.facebook.com",
-        "profile": "Profile 4",  # Mark Vencent (juntillakingmaki@gmail.com)
+        "profile": "Default",
         "profile_label": "personal",
         "aliases": ["facebook", "fb", "my facebook", "my fb"],
     },
     "github": {
         "display_name": "GitHub",
         "url": "https://github.com",
-        "profile": "Profile 4",  # Mark Vencent (juntillakingmaki@gmail.com)
+        "profile": "Default",
         "profile_label": "development",
         "aliases": ["github", "git", "my github", "github repo", "repos"],
     },
     "linkedin": {
         "display_name": "LinkedIn",
         "url": "https://www.linkedin.com",
-        "profile": "Profile 4",  # Mark Vencent (juntillakingmaki@gmail.com)
+        "profile": "Default",
         "profile_label": "personal",
         "aliases": ["linkedin", "my linkedin", "linked in"],
     },
     "tiktok": {
         "display_name": "TikTok",
         "url": "https://www.tiktok.com",
-        "profile": "Profile 4",  # Mark Vencent (juntillakingmaki@gmail.com)
+        "profile": "Default",
         "profile_label": "personal",
         "aliases": ["tiktok", "my tiktok", "tik tok"],
     },
     "youtube": {
         "display_name": "YouTube",
         "url": "https://www.youtube.com",
-        "profile": "Profile 4",  # Mark Vencent (juntillakingmaki@gmail.com)
+        "profile": "Default",
         "profile_label": "personal",
         "aliases": ["youtube", "yt", "my youtube"],
     },
     "canva": {
         "display_name": "Canva",
         "url": "https://www.canva.com",
-        "profile": "Profile 4",  # Mark Vencent (juntillakingmaki@gmail.com)
+        "profile": "Default",
         "profile_label": "design",
         "aliases": ["canva", "my canva", "canva designs"],
     },
     "gemini": {
         "display_name": "Gemini",
         "url": "https://gemini.google.com",
-        "profile": "Profile 4",  # Mark Vencent (juntillakingmaki@gmail.com)
+        "profile": "Default",
         "profile_label": "personal",
         "aliases": ["gemini", "google gemini", "ask gemini", "gemini ai"],
     },
     "google_flow": {
         "display_name": "Google Flow",
         "url": "https://flow.google.com",
-        "profile": "Profile 4",  # Mark Vencent (juntillakingmaki@gmail.com)
+        "profile": "Default",
         "profile_label": "workspace",
         "aliases": ["google flow", "flow", "google flows", "my flow"],
     },
     "classroom": {
         "display_name": "Google Classroom",
         "url": "https://classroom.google.com",
-        "profile": "Profile 4",  # Mark Vencent (juntillakingmaki@gmail.com)
+        "profile": "Default",
         "profile_label": "school",
         "aliases": ["google classroom", "classroom", "my classroom", "google class", "my class"],
     },
@@ -182,7 +182,7 @@ class ChromeProfileLauncher:
             return f"I don't have a profile configuration for '{service_key}', sir."
 
         url = url_override or (site_info["url"] if site_info else service_key)
-        target_profile = profile_override or (site_info["profile"] if site_info else "Profile 4")
+        target_profile = profile_override or (site_info["profile"] if site_info else "Default")
         display_name = site_info["display_name"] if site_info else service_key.title()
         profile_label = site_info.get("profile_label", target_profile) if site_info else target_profile
 

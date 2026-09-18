@@ -54,6 +54,8 @@ logs/
 # ─── Whisper Model Cache ─────────────────────────────────────────────────────
 models/
 
-# ─── Scratch / Temporary Scripts ─────────────────────────────────────────────
+# ─── Scratch & Training Logs ──────────────────────────────────────────────────
 scratch/
+training.md
+!training.example.md
 
