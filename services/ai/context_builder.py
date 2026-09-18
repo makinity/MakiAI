@@ -242,22 +242,32 @@ class ContextBuilder:
         Ensures Maki knows exact URLs, social media, capstone/school projects, active codebases,
         and current schedules on every query.
         """
+        import os
         import re
         from datetime import datetime
+        from services.settings.settings_service import SettingsService
 
         now = datetime.now()
         time_str = now.strftime("%I:%M %p")
         date_str = now.strftime("%A, %B %d, %Y")
 
+        settings = SettingsService()
+        app_name = settings.get_app_name()
+        user_name = settings.get_user_name()
+        kb_path = settings.get_kb_path()
+        storage_path = settings.get_maki_sync_path()
+
+        personality = build_maki_personality(app_name, user_name, kb_path, storage_path)
+
         parts = [
-            MAKI_PERSONALITY,
+            personality,
             f"\n## Real-Time System Clock\n- Current Time: {time_str} (Philippine Standard Time, UTC+8)\n- Current Date: {date_str}\n",
-            "## Mark's Core Knowledge Base",
+            f"## {user_name}'s Core Knowledge Base",
             "",
         ]
 
         loaded_files = set()
-        total_chars = len(MAKI_PERSONALITY)
+        total_chars = len(personality)
         MAX_TOTAL = 9000  # ~2,250 tokens — fits comfortably within Groq free-tier ITPM (7,000 limit)
 
         # 1. ALWAYS INJECTED CORE FILES (Concise summaries)
