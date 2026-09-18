@@ -61,6 +61,7 @@
         elements.settingElevenVoice = document.getElementById("setting-eleven-voice");
         elements.settingTtsFallback = document.getElementById("setting-tts-fallback");
         elements.settingKbPath = document.getElementById("setting-kb-path");
+        elements.settingUserLocation = document.getElementById("setting-user-location");
 
         // Situational Interactive Modal elements
         elements.modalOverlay = document.getElementById("interactive-modal-overlay");
@@ -557,6 +558,7 @@
             if (elements.settingElevenVoice) elements.settingElevenVoice.value = cfg.elevenlabs_voice_id || "";
             if (elements.settingTtsFallback) elements.settingTtsFallback.checked = Boolean(cfg.tts_fallback);
             if (elements.settingKbPath) elements.settingKbPath.value = cfg.kb_path || "";
+            if (elements.settingUserLocation) elements.settingUserLocation.value = cfg.user_location || "";
         } catch (err) {
             console.error("[Settings] Failed to load settings:", err);
         }
@@ -578,6 +580,7 @@
             elevenlabs_voice_id: elements.settingElevenVoice ? elements.settingElevenVoice.value.trim() : "",
             tts_fallback: elements.settingTtsFallback ? elements.settingTtsFallback.checked : true,
             kb_path: elements.settingKbPath ? elements.settingKbPath.value.trim() : "",
+            user_location: elements.settingUserLocation ? elements.settingUserLocation.value.trim() : "",
         };
 
         if (elements.saveSettingsBtn) {

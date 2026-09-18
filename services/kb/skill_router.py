@@ -199,6 +199,11 @@ class SkillRouter:
                 r"\b(add|schedule)\s+(an?\s+)?interview\s+schedule\b",
                 r"\b(open|trigger|show)\s+(the\s+)?(interview|routine)\s+(modal|form|card)\b",
             ]),
+            ("weather", [
+                r"\b(?:what(?:'s|\s+is)?\s+(?:the\s+)?|how(?:'s|\s+is)?\s+(?:the\s+)?|check\s+(?:the\s+)?|get\s+(?:the\s+)?)?(?:weather|temperature|temp|forecast|climate)\b",
+                r"\b(?:is\s+it\s+(?:going\s+to\s+)?rain|will\s+it\s+rain|rain\s+today|raining)\b",
+                r"\b(?:ano\s+(?:ang\s+)?(?:lagay\s+ng\s+)?panahon|kamusta\s+(?:ang\s+)?weather|uulan\s+ba|mainit\s+ba|malamig\s+ba)\b",
+            ]),
         ]
 
         self._triggers = []

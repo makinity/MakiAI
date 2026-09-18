@@ -233,6 +233,13 @@ class SettingsService:
     def get_maki_sync_path(self) -> str:
         return self.get_env("MAKI_SYNC_PATH", r"C:\MakiSync Storage")
 
+    def get_user_location(self) -> str:
+        return self.get_env("USER_LOCATION", "").strip()
+
+    def set_user_location(self, location: str) -> None:
+        self.set_env("USER_LOCATION", location.strip())
+        self.set("user_location", location.strip())
+
     def is_debug(self) -> bool:
         return self.get_env("DEBUG", "false").lower() == "true"
 

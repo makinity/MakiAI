@@ -722,6 +722,7 @@ class MakiUIApi:
             "elevenlabs_voice_id": self.settings.get_elevenlabs_voice_id(),
             "tts_fallback": self.settings.get("tts_fallback", True),
             "kb_path": self.settings.get_kb_path(),
+            "user_location": self.settings.get_user_location(),
             "debug": self.settings.is_debug(),
         }
 
@@ -791,6 +792,11 @@ class MakiUIApi:
                 kb_writer = getattr(self.orchestrator, "kb_writer", None)
                 if kb_writer:
                     kb_writer.kb_path = Path(kb_path)
+
+            # 7. Update User Location / City
+            if "user_location" in new_settings:
+                user_loc = str(new_settings["user_location"]).strip()
+                self.settings.set_user_location(user_loc)
 
             self.add_activity("system", "Settings saved and applied successfully.")
             return {"ok": True, "settings": self.get_settings()}

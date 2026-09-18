@@ -173,18 +173,30 @@ Constraints:
             else:
                 greeting = "Good evening"
 
+            weather_line = ""
+            try:
+                from skills.weather_skill import WeatherSkill
+                w_skill = WeatherSkill()
+                w_summary = w_skill.get_weather_summary()
+                if w_summary:
+                    weather_line = f"Live Local Weather in {w_summary['location']}: {w_summary['temperature_c']}°C with {w_summary['condition_phrase']}. High of {w_summary['high_c']}°C, {w_summary['rain_probability']}% chance of rain."
+            except Exception:
+                pass
+
             prompt = f"""
 The current real-time clock is {time_str} ({day_name}, {date_str}) Philippine Standard Time (UTC+8).
 The appropriate time-of-day greeting is "{greeting}".
 The user asked: "{text}"
+{weather_line}
 
 {day_schedule}
 
 Generate a warm, natural spoken briefing for sir:
 1. Start with the greeting ("{greeting}, sir.") and state the current time ({time_str} PHT).
-2. Using the schedule table above for {day_name}, accurately state his EXACT active activity block right now at {time_str} (e.g., if it is between 10:00 PM and 11:00 PM, state that it is his gaming/free time block).
-3. Mention what is coming up next (e.g., wind down at 11:00 PM, sleep at midnight).
-4. End warmly: "Is there anything you would like to add to your day, sir?"
+2. If weather information is provided above, briefly mention the current weather in one short phrase (e.g. "It is currently 28 degrees with light drizzle outside.").
+3. Using the schedule table above for {day_name}, accurately state his EXACT active activity block right now at {time_str}.
+4. Mention what is coming up next.
+5. End warmly: "Is there anything you would like to add to your day, sir?"
 
 Constraints:
 - Always respect the current live clock ({time_str}).

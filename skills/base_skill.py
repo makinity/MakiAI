@@ -81,10 +81,14 @@ class BaseSkill(ABC):
         Helper: send a prompt with this skill's KB context to Gemini/Groq.
         Returns a fallback message if response is empty.
         """
-        context = self.context_builder.build_skill_context(
-            self.SKILL_ID,
-            self.REQUIRED_FILES,
-        )
+        context = ""
+        if self.context_builder and hasattr(self.context_builder, "build_skill_context"):
+            context = self.context_builder.build_skill_context(
+                self.SKILL_ID,
+                self.REQUIRED_FILES,
+            )
+        if not self.gemini:
+            return ""
         response = self.gemini.send(prompt, context)
         if not response or not response.strip():
             print(f"[{self.SKILL_ID}] Empty response from AI — using fallback.")
