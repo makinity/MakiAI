@@ -338,6 +338,10 @@ class ComputerRouter:
         cleaned = re.sub(r"^(can you|could you|please|just|i want you to|i need you to|hey maki|maki)[,\s]+", "", lowered).strip()
         cleaned = re.sub(r"[?!.,]+$", "", cleaned).strip()
 
+        # Skip if this is a deletion or removal request
+        if re.search(r"\b(delete|remove|erase|destroy|unlink)\b", cleaned):
+            return None
+
         # 1. Detect if the user wants to reveal the folder location vs open the file
         reveal_indicators = [
             r"\b(?:open|show|find|reveal|locate|get)?\s*(?:the\s+)?(?:folder\s+path|folder\s+location|folder|directory|path|location)\s+(?:of|for|where)\b",
@@ -638,7 +642,7 @@ class ComputerRouter:
             return self.window_mgr.close_window("youtube")
 
         # 1. Play / Pause / Resume controls
-        if re.search(r"\b(play\s+pause|toggle\s+play|pause|resume(?:\s+(?:music|playback|song|video|audio))?|continue\s+(?:playback|music|song)|unpause)\b", lowered):
+        if not re.search(r"\b(?:files?|folder|search|find|locate|open|my)\s+(?:for\s+|my\s+)?resume\b", lowered) and re.search(r"\b(play\s+pause|toggle\s+play|pause|resume\s+(?:music|playback|song|video|audio|track)|continue\s+(?:playback|music|song)|unpause)\b|^(?:please\s+)?resume[.,?!]?$", lowered.strip()):
             return self.media.play_pause()
 
         # 2. Next / Skip
@@ -1012,7 +1016,17 @@ class ComputerRouter:
 
     def _handle_files(self, lowered: str, original: str) -> str | None:
         """Handle file management commands."""
-        # Organize folder
+        # 1. Delete / Remove file
+        del_match = re.search(
+            r"^(?:please\s+|can\s+you\s+)?(?:delete|remove|erase)\s+(?:the\s+)?(?:file\s+|document\s+)?['\"]?([a-zA-Z0-9_\-.]+\.[a-zA-Z0-9]{2,4}|[a-zA-Z0-9_\-\s]+)['\"]?(?:\s+for\s+me|\s+please)?$",
+            lowered.strip()
+        )
+        if del_match:
+            cand = del_match.group(1).strip()
+            if cand and cand not in ("this", "it", "memory", "fact", "note", "everything", "all"):
+                return self.files.delete_file(cand)
+
+        # 2. Organize folder
         org_match = re.search(
             r"(?:organize|clean\s+up|sort)\s+(?:my\s+)?(.+?)(?:\s+folder)?$",
             lowered.rstrip(".!?,")
@@ -1023,16 +1037,18 @@ class ComputerRouter:
                 return self._handle_tile(lowered)
             return self.files.organize(folder)
 
-        # Search files
+        # 3. Search files
         search_match = re.search(
-            r"(?:search|find|look\s+for)\s+(?:file\s+)?(?:called\s+)?['\"]?(.+?)['\"]?$",
-            lowered
+            r"(?:search|find|look\s+for)\s+(?:(?:my|the|in)\s+)?(?:files?\s+(?:for\s+|called\s+|named\s+)?|file\s+)?['\"]?(.+?)['\"]?$",
+            lowered.strip()
         )
         if search_match:
             query = search_match.group(1).strip()
-            return self.files.search(query)
+            query = re.sub(r"^(?:my\s+files\s+(?:for\s+)?|files?\s+(?:for\s+)?|file\s+)", "", query, flags=re.IGNORECASE).strip()
+            if query:
+                return self.files.search(query)
 
-        # Folder summary
+        # 4. Folder summary
         summary_match = re.search(
             r"(?:what'?s?\s+in|show|list)\s+(?:my\s+)?(.+?)(?:\s+folder)?$",
             lowered

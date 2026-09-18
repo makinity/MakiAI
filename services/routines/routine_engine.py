@@ -232,12 +232,12 @@ class RoutineEngine:
                 voice_msg = f"Launching your AI Video Creator job-hunting workspace, sir. I've opened your dual Chrome profiles with OnlineJobs.ph, LinkedIn, ChatGPT, your portfolio, and your AI Video resume folder."
             elif "smm" in name.lower() or "social media" in name.lower():
                 voice_msg = f"Launching your Social Media Manager job-hunting workspace, sir. I've opened your dual Chrome profiles with OnlineJobs.ph, LinkedIn, Indeed, ChatGPT, your Canva portfolio, and SMM resume folder."
+            elif category == "Interview" or "interview" in name.lower():
+                voice_msg = f"It's not your scheduled interview time yet, sir, but I have prepared your meeting platform and documents so you can review ahead of time."
             elif category == "Work" or "content" in name.lower() or "marketing" in name.lower():
                 voice_msg = f"Your client content upload block isn't scheduled until {formatted_time}, sir. But since you want to get ahead of your tasks, I've opened your client Chrome profile with Metricool and all your social dashboards."
             elif category == "Coding" or "coding" in name.lower() or "dev" in name.lower():
                 voice_msg = f"Starting your focused coding session ahead of time, sir. I've launched VS Code and loaded your development environment."
-            elif category == "Interview" or "interview" in name.lower():
-                voice_msg = f"It's not your scheduled interview time yet, sir, but I have prepared your meeting platform and documents so you can review ahead of time."
             else:
                 voice_msg = f"It is ahead of your scheduled time for {name}, sir, but since you want to start now, I've prepared your workspace."
 

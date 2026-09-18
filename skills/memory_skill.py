@@ -33,7 +33,7 @@ class MemorySkill(BaseSkill):
         r"\b(what\s+do\s+you\s+know(?:\s+about\s+me)?|show\s+what\s+you\s+know(?:\s+about\s+me)?|list\s+what\s+you\s+know)\b",
         r"\b(list|show|view|get|tell\s+me)\s+(all\s+)?(learned\s+facts|my\s+facts|facts|memories|memory|stored\s+facts)\b",
         r"\b(what\s+are|what'?s)\s+my\s+(learned\s+facts|preferences|facts|memories)\b",
-        r"\b(forget|delete|remove|clear)\s+(about|the|my|this|that|fact|memory)?\b",
+        r"\b(forget\s+(?:about|that|this|my|all)|forget\b|delete\s+(?:my\s+)?(?:memory|note|preference|fact)|remove\s+(?:my\s+)?(?:memory|note|preference|fact)|clear\s+(?:all\s+)?(?:memories|facts|memory))\b",
         r"\b(do\s+you\s+remember|do\s+you\s+recall|recall)\b",
         r"\b(tandaan\s+mo|naaalala\s+mo\s+ba)\b",
     ]
@@ -41,6 +41,10 @@ class MemorySkill(BaseSkill):
     def can_handle(self, text: str) -> bool:
         """Custom matcher for natural memory queries."""
         lowered = text.lower().strip()
+        # Never hijack filesystem operations or app management
+        if re.search(r"\b(?:file|document|folder|item|window|app|\w+\.\w{2,4})\b", lowered) and not re.search(r"\b(?:remember|tandaan|memory|fact)\b", lowered):
+            return False
+
         return any(kw in lowered for kw in [
             "show what you know", "what you know about me", "what do you know about me",
             "list learned facts", "show learned facts", "show my memory", "list memories",

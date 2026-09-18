@@ -87,8 +87,8 @@ class SkillRouter:
                 r"\bwhat\s+do\s+you\s+remember\b",
                 r"\bwhat\s+did\s+i\s+(say|tell\s+you)\b",
                 r"\b(do\s+you\s+)?recall\b",
-                r"\b(what\s+is|what'?s|ano\s+ang)\s+my\s+(secondary\s+email|wifi|password|birthday|secret|address|phone|saved\s+note|remembered)\b",
-                r"\b(forget|delete|remove|clear)\b",
+                r"\b(what\s+is|what'?s|ano\s+ang)\s+my\s+(secondary\s+email|wifi|password|birthday|secret|address|phone|saved\s+note|remembered|favorite\s+\w+)\b",
+                r"\b(forget\s+(?:that|this|my|all|about)|forget\b|delete\s+(?:my\s+)?(?:memory|note|preference|fact)|clear\s+(?:all\s+)?(?:memories|facts|memory))\b",
                 r"\btandaan\s+mo\b",
                 r"\bnaaalala\s+mo\s+ba\b",
             ]),
@@ -158,10 +158,20 @@ class SkillRouter:
                 r"\b(parse\s+csv|calculate\s+this\s+in\s+python|merge\s+pdf|resize\s+images?)\b",
                 r"\b(script|python\s+code|run\s+python)\b",
             ]),
+            ("research", [
+                r"https?://[^\s]+",
+                r"\bsearch\s+(the\s+web|online|google|duckduckgo|internet)\b",
+                r"\b(search|look\s+up|google|research)\b",
+                r"\bfind\s+(out\s+about|information\s+about)\b",
+                r"\b(read|check|summarize)\s+(this\s+)?(link|url|website|page|article)\b",
+                r"\bwhat\s+is\s+the\s+latest\s+on\b",
+                r"\bwho\s+won\s+the\b",
+                r"\b(mag\s*research|magsaliksik|hanapin\s+sa\s+internet)\b",
+            ]),
             ("composio", [
                 r"\b(google\s+(doc|docs|sheet|sheets|drive|slides)|gdoc|gsheet)\b",
                 r"\b(google\s+calendar|gcal|my\s+calendar|calendar\s+events?|check\s+(my\s+)?calendar)\b",
-                r"\b(check|see|read|get|fetch|list|view|open|search|find)\s+.*?\b(emails?|gmail|messages?|inbox|conversations?|posts?|notifications?|updates?|mail)\b",
+                r"\b(check|see|read|get|fetch|list|view|open|search|find)\s+.*?\b(emails?|gmail|messages?|inbox|conversations?|fb\s+posts?|social\s+posts?|mail)\b",
                 r"\b(recent|latest|unread|new|incoming|check)\s+(emails?|gmail|messages?|mail|inbox)\b",
                 r"\b(send|draft|compose|write)\s+.*?\b(email|emails|mail|message)\b",
                 r"\b(facebook|fb|messenger|makisync)\b",
@@ -188,16 +198,6 @@ class SkillRouter:
                 r"\b(set|schedule|add)\s+(an?\s+)?(interview|meeting\s+link|class\s+link)\b",
                 r"\b(add|schedule)\s+(an?\s+)?interview\s+schedule\b",
                 r"\b(open|trigger|show)\s+(the\s+)?(interview|routine)\s+(modal|form|card)\b",
-            ]),
-            ("research", [
-                r"https?://[^\s]+",
-                r"\b(search|look\s+up|google|research)\b",
-                r"\bsearch\s+(the\s+web|online|google)\b",
-                r"\bfind\s+(out\s+about|information\s+about)\b",
-                r"\b(read|check|summarize)\s+(this\s+)?(link|url|website|page|article)\b",
-                r"\bwhat\s+is\s+the\s+latest\s+on\b",
-                r"\bwho\s+won\s+the\b",
-                r"\b(mag\s*research|magsaliksik|hanapin\s+sa\s+internet)\b",
             ]),
         ]
 
@@ -262,7 +262,19 @@ class SkillRouter:
                 if skill_id == "research" and re.search(r"^(?:open|launch|start|run)\s+(?:google\s+)?(?:chrome|browser)\b", cleaned, re.IGNORECASE):
                     continue
 
-                # 3. Collision Shield: "open facebook", "open github", "launch notion", "open discord", "open spotify" -> let ComputerRouter handle it
+                # 3. Collision Shield: Local file search commands ("search my files for ...", "find in files") -> let ComputerRouter handle it
+                if skill_id == "research" and re.search(r"\b(?:my\s+files|local\s+files|in\s+files|files?\s+for|folder\s+for)\b", cleaned, re.IGNORECASE):
+                    continue
+
+                # 4. Collision Shield: Web search query -> prioritize ResearchSkill over Composio
+                if skill_id == "composio" and re.search(r"\b(?:the\s+web|online|google|duckduckgo|internet)\b", cleaned, re.IGNORECASE):
+                    continue
+
+                # 5. Collision Shield: File deletion commands ("delete file ...", "remove file ...") -> let ComputerRouter handle it
+                if skill_id == "memory" and re.search(r"\b(?:delete|remove|clear)\s+(?:file|document|folder|item|notes?\.txt|\w+\.\w{2,4})\b", cleaned, re.IGNORECASE):
+                    continue
+
+                # 6. Collision Shield: "open facebook", "open github", "launch notion", "open discord", "open spotify" -> let ComputerRouter handle it
                 if skill_id == "composio" and re.search(r"^(?:open|launch|start|go\s+to)\s+(?:facebook|fb|github|notion|discord|spotify|trello|gitlab)\b", cleaned, re.IGNORECASE):
                     continue
 

@@ -81,7 +81,43 @@ class DeadlineSkill(BaseSkill):
         now = datetime.now()
         due_date = (now + timedelta(days=2)).strftime("%Y-%m-%d")
 
-        if "today" in lowered:
+        months_map = {
+            "january": 1, "jan": 1, "february": 2, "feb": 2, "march": 3, "mar": 3,
+            "april": 4, "apr": 4, "may": 5, "june": 6, "jun": 6, "july": 7, "jul": 7,
+            "august": 8, "aug": 8, "september": 9, "sep": 9, "sept": 9,
+            "october": 10, "oct": 10, "november": 11, "nov": 11, "december": 12, "dec": 12
+        }
+        month_names_pat = "|".join(months_map.keys())
+
+        # Check explicit named month first (e.g. "October 15", "Oct 15th 2026", "15th of October")
+        m_match = re.search(rf"\b({month_names_pat})\s+(\d{{1,2}})(?:st|nd|rd|th)?(?:\s*,?\s*(\d{{4}}))?\b", lowered)
+        m_match_rev = re.search(rf"\b(\d{{1,2}})(?:st|nd|rd|th)?\s+(?:of\s+)?({month_names_pat})(?:\s*,?\s*(\d{{4}}))?\b", lowered)
+
+        if m_match:
+            m_name, d_str, y_str = m_match.group(1), m_match.group(2), m_match.group(3)
+            m_num = months_map.get(m_name, 1)
+            d_num = int(d_str)
+            y_num = int(y_str) if y_str else now.year
+            try:
+                cand = datetime(y_num, m_num, d_num)
+                if not y_str and cand < now - timedelta(days=1):
+                    cand = datetime(y_num + 1, m_num, d_num)
+                due_date = cand.strftime("%Y-%m-%d")
+            except Exception:
+                pass
+        elif m_match_rev:
+            d_str, m_name, y_str = m_match_rev.group(1), m_match_rev.group(2), m_match_rev.group(3)
+            m_num = months_map.get(m_name, 1)
+            d_num = int(d_str)
+            y_num = int(y_str) if y_str else now.year
+            try:
+                cand = datetime(y_num, m_num, d_num)
+                if not y_str and cand < now - timedelta(days=1):
+                    cand = datetime(y_num + 1, m_num, d_num)
+                due_date = cand.strftime("%Y-%m-%d")
+            except Exception:
+                pass
+        elif "today" in lowered:
             due_date = now.strftime("%Y-%m-%d")
         elif "tomorrow" in lowered:
             due_date = (now + timedelta(days=1)).strftime("%Y-%m-%d")
@@ -134,7 +170,7 @@ class DeadlineSkill(BaseSkill):
             "", title, flags=re.IGNORECASE
         ).strip()
         title = re.sub(
-            r"\s+(?:by|on|due|at|before)\s+(?:this\s+)?(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|today|tomorrow|\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?|\d{4}-\d{2}-\d{2}).*$",
+            rf"\s+(?:by|on|due\s+on|due\s+by|due|at|before)\s+(?:this\s+)?(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|today|tomorrow|{month_names_pat}|\d{{1,2}}(?:st|nd|rd|th)?|\d{{1,2}}(?:[:.]\d{{2}})?\s*(?:am|pm)?|\d{{4}}-\d{{2}}-\d{{2}}).*$",
             "", title, flags=re.IGNORECASE
         ).strip()
         title = title.strip(" .,!?")

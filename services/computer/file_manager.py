@@ -618,21 +618,26 @@ class FileManager:
         Returns:
             Formatted list of matching file paths.
         """
-        target = self._resolve_path(search_dir) or Path.home()
-        query_lower = query.lower()
+        query_lower = query.lower().strip()
         matches = []
         max_results = 10
 
-        try:
-            for item in target.rglob("*"):
-                if item.is_file() and query_lower in item.name.lower():
+        # If search_dir is default (~ or home), use indexed files for ultra-fast response
+        if search_dir in ("~", str(Path.home())):
+            indexed = self.get_indexed_files()
+            for item in indexed:
+                if query_lower in item.name.lower():
                     matches.append(str(item))
                     if len(matches) >= max_results:
                         break
-        except PermissionError:
-            pass
-        except Exception as e:
-            print(f"[FileManager] Search error: {e}")
+        else:
+            target = self._resolve_path(search_dir) or Path.home()
+            scanned = self._scan_directory_fast(target, max_depth=3)
+            for item in scanned:
+                if query_lower in item.name.lower():
+                    matches.append(str(item))
+                    if len(matches) >= max_results:
+                        break
 
         if not matches:
             return f"No files found matching '{query}', sir."
@@ -855,5 +860,22 @@ class FileManager:
             subprocess.Popen(f'explorer "{folder}"')
         except Exception as e:
             print(f"[FileManager] Explorer folder error: {e}")
+
+    def delete_file(self, filename_or_path: str) -> str:
+        """Find and delete a file from MakiSync Storage or user folders."""
+        found = self.find_file(filename_or_path)
+        if not found:
+            p = Path(filename_or_path)
+            if p.exists() and p.is_file():
+                found = p
+
+        if not found:
+            return f"I couldn't find a file matching '{filename_or_path}' to delete, sir."
+
+        try:
+            name = found.name
+            found.unlink()
+            return f"I've deleted '{name}' from your storage, sir."
         except Exception as e:
-            print(f"[FileManager] Could not open file: {e}")
+            return f"I couldn't delete '{found.name}': {e}"
+
