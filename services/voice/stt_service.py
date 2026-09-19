@@ -70,7 +70,7 @@ class STTService:
 
         recognizer = sr.Recognizer()
         recognizer.dynamic_energy_threshold = False
-        recognizer.energy_threshold = 200
+        recognizer.energy_threshold = 420
         recognizer.pause_threshold = 0.8
         recognizer.non_speaking_duration = 0.5
         recognizer.phrase_threshold = 0.1

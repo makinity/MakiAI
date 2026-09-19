@@ -56,9 +56,6 @@ DIRECT_COMMAND_PATTERNS = [
     r"^(?:can\s+you\s+)?(?:please\s+)?(?:check|read|fetch|get|open|view)\s+(?:my\s+)?(?:gmail|emails?|inbox|unread\s+emails?)\b",
     r"^(?:can\s+you\s+)?(?:please\s+)?(?:send|draft|compose)\s+(?:an?\s+)?(?:email|mail)\b",
     
-    # Pleasantries & Acknowledgments
-    r"^(?:thank\s+you|thanks|thanks\s+a\s+lot|thank\s+you\s+very\s+much|good\s+job)[.,?!]?$",
-    
     # Live Search & URL Reading
     r"^(?:search\s+(?:the\s+web\s+|google\s+|online\s+)?for|google|look\s+up|research)\s+[a-zA-Z0-9_\-\s]+",
     r"^(?:read|check|summarize)\s+(?:this\s+)?(?:link|url|website|page|article)\b",
@@ -162,17 +159,15 @@ class WakeWordService:
 
         # One shared recognizer for the loop
         recognizer = sr.Recognizer()
-        recognizer.dynamic_energy_threshold = True
-        recognizer.pause_threshold = 1.0
-        recognizer.non_speaking_duration = 0.6
+        recognizer.dynamic_energy_threshold = False
+        recognizer.pause_threshold = 0.8
+        recognizer.non_speaking_duration = 0.5
         recognizer.phrase_threshold = 0.1
-        recognizer.energy_threshold = 300
+        recognizer.energy_threshold = 420
 
         while self._running:
             try:
                 with sr.Microphone() as source:
-                    recognizer.adjust_for_ambient_noise(source, duration=AMBIENT_NOISE_SECONDS)
-
                     try:
                         audio = recognizer.listen(
                             source,

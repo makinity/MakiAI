@@ -64,9 +64,9 @@ class AudioTranscriber:
         self.groq_api_key = api_key
         self._init_groq()
 
-    def is_audio_silent(self, wav_bytes: bytes, min_rms: float = 160.0) -> bool:
+    def is_audio_silent(self, wav_bytes: bytes, min_rms: float = 340.0) -> bool:
         """Check if audio contains genuine human voice or just background silence/hiss."""
-        if not wav_bytes or len(wav_bytes) < 1000:
+        if not wav_bytes or len(wav_bytes) < 1600:
             return True
         try:
             # Parse 16-bit PCM samples from WAV
@@ -74,7 +74,7 @@ class AudioTranscriber:
             with wave.open(wav_buffer, "rb") as wf:
                 raw_frames = wf.readframes(wf.getnframes())
                 samples = np.frombuffer(raw_frames, dtype=np.int16)
-                if len(samples) < 800:
+                if len(samples) < 1200:
                     return True
                 rms = float(np.sqrt(np.mean(samples.astype(np.float64)**2)))
                 # If RMS is below ambient silence threshold, drop audio
@@ -83,17 +83,46 @@ class AudioTranscriber:
             return False
 
     def is_hallucination_loop(self, text: str) -> bool:
-        """Detect repetitive Whisper token hallucination loops."""
+        """Detect phantom Whisper hallucinations, subtitle artifacts, and repetition loops."""
         if not text:
-            return False
-        words = text.lower().split()
-        if len(words) >= 6:
-            # Check for excessive repetition of any single word
+            return True
+
+        clean = text.strip().lower()
+
+        # 1. Reject very short or punctuation-only strings
+        clean_words = re.findall(r"\b[a-z0-9']+\b", clean)
+        if len(clean_words) == 0:
+            return True
+
+        # Reject single isolated filler tokens on background noise
+        if len(clean_words) == 1 and clean_words[0] in {
+            "you", "the", "a", "i", "so", "yeah", "yes", "no", "uh", "um", "oh",
+            "bye", "hi", "ok", "hey", "foreign", "music", "thanks", "thank",
+            "apoio", "megatron", "shopee", "google", "zoom", "youtube", "facebook"
+        }:
+            return True
+
+        # 2. Known Whisper silence/noise hallucination blacklist
+        hallucination_patterns = [
+            "subtitles by", "amara.org", "thank you for watching", "thanks for watching",
+            "please subscribe", "like and subscribe", "translated by", "closed captions",
+            "english subtitles", "watching", "makispace", "apoio", "tim ste", "megatron",
+            "tos facebook", "[music]", "(music)", "[applause]", "[laughter]", "[silence]",
+            "captioned by", "transcribed by", "all rights reserved", "subscribe for more",
+            "taskmaster, munchbite", "munchbite, kiro", "taskmaster, munchbite, kiro"
+        ]
+        for pat in hallucination_patterns:
+            if pat in clean:
+                return True
+
+        # 3. Check for excessive token repetition (e.g. "word word word word")
+        if len(clean_words) >= 4:
             counts = {}
-            for w in words:
+            for w in clean_words:
                 counts[w] = counts.get(w, 0) + 1
-                if counts[w] >= 4:
+                if counts[w] >= 3 and (counts[w] / len(clean_words)) > 0.4:
                     return True
+
         return False
 
     def transcribe_wav_bytes(self, wav_bytes: bytes) -> tuple[str, str]:
@@ -106,24 +135,23 @@ class AudioTranscriber:
         if not wav_bytes or self.is_audio_silent(wav_bytes):
             return "", "silence"
 
-        # Tier 1: Try Groq Whisper (Ultra-fast ~150ms, high accuracy, vocabulary biased)
+        # Tier 1: Try Groq Whisper (Ultra-fast ~150ms, high accuracy)
         if self._groq_client:
             try:
                 response = self._groq_client.audio.transcriptions.create(
                     file=("audio.wav", wav_bytes, "audio/wav"),
                     model="whisper-large-v3-turbo",
-                    prompt=VOCABULARY_PROMPT,
                     response_format="text",
                     language="en",
                     temperature=0.0,
                 )
                 raw_text = str(response).strip()
                 if self.is_hallucination_loop(raw_text):
-                    print(f"[AudioTranscriber] Dropped Whisper hallucination loop: '{raw_text[:40]}...'")
+                    print(f"[AudioTranscriber] Dropped Whisper hallucination: '{raw_text[:50]}'")
                     return "", "hallucination_filtered"
 
                 cleaned_text = self.heal_phonetics(raw_text)
-                if cleaned_text:
+                if cleaned_text and not self.is_hallucination_loop(cleaned_text):
                     return cleaned_text, "groq-whisper"
             except Exception as e:
                 print(f"[AudioTranscriber] Groq Whisper error ({e}). Falling back to Google STT.")

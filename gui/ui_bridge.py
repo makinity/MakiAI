@@ -115,9 +115,9 @@ class MakiUIApi:
         self._start_active_session(clean)
 
     def _start_active_session(self, initial_command: str = "") -> None:
-        """Start or refresh the 45-second active conversation session."""
+        """Start or refresh the 15-second active conversation session."""
         self._session_active = True
-        self._session_expires_at = time.time() + 45.0
+        self._session_expires_at = time.time() + 15.0
         threading.Thread(
             target=self._session_worker,
             args=(initial_command,),
@@ -127,49 +127,63 @@ class MakiUIApi:
 
     def _session_worker(self, initial_command: str = "") -> None:
         """Runs the active listening session without requiring 'Hey Maki'."""
+        import re
+
         if initial_command:
             self._handle_voice_command_sync(initial_command)
-            self._session_expires_at = time.time() + 45.0
+            self._session_expires_at = time.time() + 15.0
 
         recognizer = sr.Recognizer()
         recognizer.dynamic_energy_threshold = False
-        recognizer.energy_threshold = 250
-        recognizer.pause_threshold = 0.45
-        recognizer.non_speaking_duration = 0.35
+        recognizer.energy_threshold = 420
+        recognizer.pause_threshold = 0.65
+        recognizer.non_speaking_duration = 0.45
 
         while self._session_active and self._auto_listen_enabled:
-            # Check timeout (45s of silence)
+            # Check timeout (15s of silence)
             if time.time() > self._session_expires_at:
                 print("[UIBridge] Active session timed out — returning to standby.")
                 self._exit_active_session()
                 return
 
-            # Wait while Maki is speaking or PTT is recording
-            if (self.tts_service and self.tts_service.is_speaking_or_recent(0.5)) or (self.ptt_service and self.ptt_service.is_recording):
-                time.sleep(0.1)
+            # Wait while Maki is speaking or PTT is recording + cooldown
+            if (self.tts_service and self.tts_service.is_speaking_or_recent(0.6)) or (self.ptt_service and self.ptt_service.is_recording):
+                time.sleep(0.15)
                 continue
 
             try:
                 self.state_manager.set_state(AppState.LISTENING)
                 with sr.Microphone() as source:
-                    audio = recognizer.listen(source, timeout=4, phrase_time_limit=10)
+                    audio = recognizer.listen(source, timeout=3.5, phrase_time_limit=8)
 
                 # Gate check: discard if TTS spoke or PTT recorded during listening
-                if (self.tts_service and self.tts_service.is_speaking_or_recent(0.5)) or (self.ptt_service and self.ptt_service.is_recording):
+                if (self.tts_service and self.tts_service.is_speaking_or_recent(0.6)) or (self.ptt_service and self.ptt_service.is_recording):
                     continue
 
                 self.state_manager.set_state(AppState.THINKING)
                 wav_bytes = audio.get_wav_data()
                 text, provider = self.stt_service._transcriber.transcribe_wav_bytes(wav_bytes)
 
-                if not text or len(text.strip()) < 2:
+                clean_text = (text or "").strip()
+                words = re.findall(r"\b[a-zA-Z0-9']+\b", clean_text)
+
+                # Discard noise / single random syllables
+                if len(words) == 0 or len(clean_text) < 3:
                     self.state_manager.set_state(AppState.IDLE)
                     continue
 
-                print(f"[ActiveSession] Heard ({provider}): '{text}'")
+                if len(words) == 1 and words[0].lower() not in {
+                    "weather", "time", "date", "status", "cancel", "stop", "sleep", "restart",
+                    "lock", "screenshot", "help", "hello", "hi", "mute", "unmute"
+                }:
+                    print(f"[ActiveSession] Discarded isolated noise token: '{clean_text}'")
+                    self.state_manager.set_state(AppState.IDLE)
+                    continue
 
-                # Check if user asked to sleep/standby (ensuring action commands like "remove the zoom meeting because it was cancelled" are not mistaken for standby)
-                clean_lower = text.strip().lower().rstrip(".!?,")
+                print(f"[ActiveSession] Heard ({provider}): '{clean_text}'")
+
+                # Check if user asked to sleep/standby
+                clean_lower = clean_text.lower().rstrip(".!?,")
                 standby_phrases = {
                     "go to sleep", "sleep", "goodbye", "good night", "stop listening",
                     "never mind", "dismiss", "that's all", "that is all", "standby", "go to standby"
@@ -189,9 +203,9 @@ class MakiUIApi:
                     return
 
                 # Execute command directly!
-                self._handle_voice_command_sync(text)
-                # Reset 45s activity timer so session stays open
-                self._session_expires_at = time.time() + 45.0
+                self._handle_voice_command_sync(clean_text)
+                # Reset 15s activity timer
+                self._session_expires_at = time.time() + 15.0
 
             except sr.WaitTimeoutError:
                 self.state_manager.set_state(AppState.IDLE)

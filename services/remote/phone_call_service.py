@@ -141,7 +141,7 @@ class PhoneCallService:
         pcm_buffer = bytearray()
         speaking = False
         silence_start: Optional[float] = None
-        VAD_ENERGY_THRESHOLD = 350
+        VAD_ENERGY_THRESHOLD = 420
         SILENCE_TIMEOUT_SECS = 0.85
 
         # Video streaming task tracker
@@ -282,7 +282,7 @@ class PhoneCallService:
 
     async def _process_spoken_turn(self, websocket: WebSocket, pcm_bytes: bytes) -> None:
         """Transcribe speech and handle intent with multimodal vision support."""
-        if len(pcm_bytes) < 3200:
+        if len(pcm_bytes) < 4800:
             return
 
         try:
@@ -301,7 +301,9 @@ class PhoneCallService:
                 user_text, _ = self.stt_service._transcriber.transcribe_wav_bytes(wav_bytes)
 
             clean_text = (user_text or "").strip()
-            if not clean_text or len(clean_text) < 2:
+            import re
+            words = re.findall(r"\b[a-zA-Z0-9']+\b", clean_text)
+            if not clean_text or len(words) == 0 or len(clean_text) < 3:
                 await websocket.send_text(json.dumps({"type": "state", "state": "idle"}))
                 return
 
