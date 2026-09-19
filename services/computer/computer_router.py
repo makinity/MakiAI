@@ -342,6 +342,17 @@ class ComputerRouter:
         if re.search(r"\b(delete|remove|erase|destroy|unlink)\b", cleaned):
             return None
 
+        # Check for contextual / anaphoric folder follow-up commands (e.g. "open its folder path", "open its folder", "show in explorer")
+        if re.search(r"^(?:please\s+)?(?:open|show|reveal|display|find|where\s+is)\s+(?:the\s+|its\s+|that\s+|this\s+)?(?:folder\s+path|folder|directory|location|containing\s+folder)\b", cleaned) or \
+           re.search(r"^(?:show|reveal)\s+(?:it\s+)?(?:in\s+explorer|in\s+file\s+explorer)$", cleaned):
+            last_file = self.files.last_accessed_file or self.files.last_created_file or self.files.get_last_file()
+            if last_file and last_file.exists():
+                return self.files.reveal_in_explorer(last_file)
+            else:
+                latest_any = self.files.find_latest_file("file")
+                if latest_any and latest_any.exists():
+                    return self.files.reveal_in_explorer(latest_any)
+
         # 1. Detect if the user wants to reveal the folder location vs open the file
         reveal_indicators = [
             r"\b(?:open|show|find|reveal|locate|get)?\s*(?:the\s+)?(?:folder\s+path|folder\s+location|folder|directory|path|location)\s+(?:of|for|where)\b",

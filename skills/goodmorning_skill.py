@@ -7,6 +7,7 @@ Reads: time-management.md, carryover.md, deadlines.md
 """
 
 import os
+import re
 from datetime import datetime, timedelta
 from skills.base_skill import BaseSkill
 

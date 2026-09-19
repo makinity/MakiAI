@@ -458,6 +458,7 @@ class PhoneCallService:
             port=self.port,
             log_level="warning",
             access_log=False,
+            install_signal_handlers=False,
         )
         self._server = uvicorn.Server(config)
 

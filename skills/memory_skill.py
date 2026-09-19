@@ -41,26 +41,38 @@ class MemorySkill(BaseSkill):
     def can_handle(self, text: str) -> bool:
         """Custom matcher for natural memory queries."""
         lowered = text.lower().strip()
-        # Never hijack filesystem operations or app management
+        # Never hijack schedule, weather, time, deadlines, filesystem, or routines
+        if any(kw in lowered for kw in [
+            "schedule", "agenda", "weather", "temperature", "forecast", "time", "clock",
+            "deadline", "deadlines", "routine", "routines", "interview", "homework", "assignment"
+        ]):
+            return False
+
         if re.search(r"\b(?:file|document|folder|item|window|app|\w+\.\w{2,4})\b", lowered) and not re.search(r"\b(?:remember|tandaan|memory|fact)\b", lowered):
             return False
 
         return any(kw in lowered for kw in [
             "show what you know", "what you know about me", "what do you know about me",
             "list learned facts", "show learned facts", "show my memory", "list memories",
-            "remember that", "remember this", "forget about"
-        ])
+            "remember that", "remember this", "forget about", "do you remember", "do you recall",
+            "who is my", "who's my", "what did i tell you", "what did i say"
+        ]) or (
+            any(kw in lowered for kw in ["what is my", "what's my", "what is the name of", "what's the name of", "name of my"]) and
+            any(kw in lowered for kw in ["dog", "sister", "brother", "friend", "email", "phone", "address", "secret", "favorite", "preference", "note", "password", "fact", "pet", "family"])
+        )
 
     def execute(self, text: str) -> str:
         """Route to remember, recall, or forget subcommand."""
-        lowered = text.lower()
+        lowered = text.lower().strip()
 
+        # Questions or retrieval queries go to recall
         if any(kw in lowered for kw in [
-            "what do you remember", "recall", "do you know", "what is my", "what's my", "ano ang",
+            "what do you remember", "recall", "do you know", "do you remember", "do you recall",
+            "what is my", "what's my", "who is my", "who's my", "what did i tell you", "what did i say",
             "show what you know", "what you know about me", "what do you know about me",
             "list learned facts", "show learned facts", "list memories", "show my memory",
             "show memories", "what are my preferences", "my facts"
-        ]):
+        ]) or (lowered.startswith(("what", "who", "do you", "can you remember", "is my")) and "?" in text):
             return self._recall(text)
         elif any(kw in lowered for kw in ["forget", "delete", "remove", "clear"]):
             return self._forget(text)
@@ -119,11 +131,11 @@ Return only the JSON — no explanation, no markdown fences.
                 })
 
             self._save(memories)
-            return f"Got it. I'll remember: {key} — {value}."
+            return f"Noted, sir. I'll remember that {value}."
 
         except Exception as e:
             print(f"[MemorySkill] Remember error: {e}")
-            return "I had trouble storing that memory. Could you rephrase it?"
+            return "I had trouble storing that memory. Could you rephrase it, sir?"
 
     def _recall(self, text: str) -> str:
         """Search stored memories and auto-extracted facts, returning matching ones."""

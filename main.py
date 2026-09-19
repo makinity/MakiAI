@@ -327,6 +327,17 @@ def main() -> None:
         sys.exit(app.exec())
         return
 
+    # Keep CPU & Network awake 24/7 so remote calls, Discord, Telegram, and ngrok tunnels don't drop when user walks away
+    try:
+        if sys.platform == "win32":
+            import ctypes
+            ES_CONTINUOUS = 0x80000000
+            ES_SYSTEM_REQUIRED = 0x00000001
+            ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED)
+            print("[SystemPower] ⚡ Windows sleep prevention active (CPU & Network stay awake for remote calls/tunnels).")
+    except Exception as e:
+        print(f"[SystemPower] Sleep prevention warning: {e}")
+
     # Modern Web UI with PyWebView
     import webview
 
