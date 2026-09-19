@@ -55,10 +55,11 @@ class MemorySkill(BaseSkill):
             "show what you know", "what you know about me", "what do you know about me",
             "list learned facts", "show learned facts", "show my memory", "list memories",
             "remember that", "remember this", "forget about", "do you remember", "do you recall",
-            "who is my", "who's my", "what did i tell you", "what did i say"
+            "who is my", "who's my", "what did i tell you", "what did i say",
+            "preferred ide", "preferred ides", "favorite drink", "favorite color", "programming language"
         ]) or (
-            any(kw in lowered for kw in ["what is my", "what's my", "what is the name of", "what's the name of", "name of my"]) and
-            any(kw in lowered for kw in ["dog", "sister", "brother", "friend", "email", "phone", "address", "secret", "favorite", "preference", "note", "password", "fact", "pet", "family"])
+            any(kw in lowered for kw in ["what is my", "what's my", "what are my", "what are the", "what is the name of", "what's the name of", "name of my"]) and
+            any(kw in lowered for kw in ["dog", "sister", "brother", "friend", "email", "phone", "address", "secret", "favorite", "preference", "preferences", "note", "password", "fact", "pet", "family", "ide", "ides", "language", "languages", "drink", "drinks", "color", "colors"])
         )
 
     def execute(self, text: str) -> str:
@@ -109,7 +110,6 @@ Return only the JSON — no explanation, no markdown fences.
             value = parsed.get("value", text).strip()
 
             memories = self._load()
-            # Check if key already exists — update instead of duplicate
             updated = False
             for mem in memories:
                 if mem.get("key", "").lower() == key.lower():
@@ -128,6 +128,13 @@ Return only the JSON — no explanation, no markdown fences.
                 })
 
             self._save(memories)
+            # Sync to SQLite FactStore
+            try:
+                from services.memory.fact_store import FactStore
+                FactStore().save_fact(f"{key}: {value}", category="preference" if "favorite" in key.lower() or "preferred" in key.lower() else "personal")
+            except Exception:
+                pass
+
             return f"Noted, sir. I'll remember that {value}."
 
         except Exception as e:
@@ -137,13 +144,44 @@ Return only the JSON — no explanation, no markdown fences.
     def _recall(self, text: str) -> str:
         """Search stored memories and auto-extracted facts, returning matching ones."""
         from services.memory.fact_store import FactStore
+        from services.memory.memory_service import MemoryService
+
+        lowered = text.lower().strip()
+        clean_query = re.sub(r"^(?:what\s+(?:is|are|was|were|'s)?\s+(?:the\s+)?(?:name\s+of\s+)?(?:my\s+)?|who\s+(?:is|was|'s)?\s+(?:my\s+)?|do\s+you\s+(?:know|remember)\s+(?:my\s+)?)\s*", "", lowered).strip("?!. ")
+
+        # 1. Fast sub-millisecond local SQLite FTS5 / JSON match
+        mem_service = MemoryService()
+        direct_matches = mem_service.recall(clean_query) if clean_query else []
+        if direct_matches:
+            top = direct_matches[0]
+            val = top.get("value", "")
+            if ":" in val and ("favorite" in val.lower() or "preferred" in val.lower() or "name" in val.lower()):
+                val = val.split(":", 1)[1].strip()
+
+            if "sister" in lowered:
+                clean_name = val.replace("Mark's sister's name is", "").replace("User's sister's name is", "").strip(" .")
+                return f"Your sister's name is {clean_name}, sir."
+            elif "dog" in lowered or "pet" in lowered:
+                clean_name = val.replace("User's dog's name is", "").replace("Mark's dog's name is", "").strip(" .")
+                return f"Your dog's name is {clean_name}, sir."
+            elif "ide" in lowered:
+                return f"Your preferred IDEs are {val.strip(' .')}, sir."
+            elif "drink" in lowered:
+                return f"Your favorite drink is {val.strip(' .')}, sir."
+            elif "language" in lowered:
+                return f"Your favorite programming languages are {val.strip(' .')}, sir."
+            elif "color" in lowered:
+                return f"Your favorite color is {val.strip(' .')}, sir."
+            elif val:
+                return f"{val.strip(' .')}, sir."
+
+        # 2. LLM Fallback if no exact direct hit
         memories = self._load()
         facts = FactStore().get_all_facts()
 
         if not memories and not facts:
             return "I don't have any memories or learned facts stored yet, sir."
 
-        # Build memory + fact summary for Gemini to search
         summary_lines = []
         if memories:
             summary_lines.append("Explicit Notes & Memories:")
@@ -155,7 +193,6 @@ Return only the JSON — no explanation, no markdown fences.
                 summary_lines.append(f"- [{f.get('category', 'general')}]: {f.get('fact')}")
 
         all_text = "\n".join(summary_lines)
-
         prompt = f"""
 The user asked: "{text}"
 
@@ -163,7 +200,7 @@ Here is everything currently in memory and learned facts:
 {all_text}
 
 Find and answer the user's question accurately in a natural, spoken tone.
-Keep the answer concise (1 to 3 sentences).
+Keep the answer concise (1 to 2 sentences).
 If nothing is relevant, say "I don't have anything stored about that, sir."
 """.strip()
 
