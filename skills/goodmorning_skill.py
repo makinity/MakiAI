@@ -85,15 +85,14 @@ class GoodMorningSkill(BaseSkill):
         if day_schedule:
             for line in day_schedule.splitlines():
                 if line.startswith("- "):
-                    # Robust regex match for time formats like "9:00-10:00", "09:00 - 10:00 AM", "12:00 PM"
-                    match = re.match(r"^-\s*(\d{1,2}:\d{2}(?:\s*[-–]\s*\d{1,2}:\d{2})?(?:\s*[AaPp][Mm])?|\d{1,2}\s*[AaPp][Mm]):?\s*(.*)$", line)
-                    if match:
-                        t_slot = match.group(1).strip()
-                        act = match.group(2).strip()
+                    clean_line = line.lstrip("- *").strip()
+                    parts = clean_line.split(":", 1)
+                    if len(parts) == 2:
+                        t_slot = parts[0].strip()
+                        act = parts[1].strip()
                     else:
-                        parts = line[2:].split(":", 1)
-                        t_slot = parts[0].strip() if len(parts) > 1 else "--:--"
-                        act = parts[1].strip() if len(parts) > 1 else line[2:].strip()
+                        t_slot = "--:--"
+                        act = clean_line
 
                     routine_id = ""
                     if "bat" in act.lower():

@@ -19,37 +19,31 @@ MEMORY_FILE = Path(__file__).resolve().parents[2] / "data" / "memory.json"
 class MemoryService:
     """
     Long-term memory store for MakiAI.
-
-    Memories are simple key-value pairs — the user tells Maki to remember
-    something and Maki can recall it in any future session.
-
-    Usage:
-        mem = MemoryService()
-        mem.remember("exam date", "Monday September 14")
-        mem.recall("exam")          → "exam date: Monday September 14"
-        mem.forget("exam date")
-        mem.get_all()               → list of all memory dicts
-        mem.as_context_string()     → formatted string for Gemini prompt
+    Unified with FactStore (SQLite FTS5) for fast retrieval and persistence.
     """
 
     def __init__(self):
         MEMORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            from services.memory.fact_store import FactStore
+            self.fact_store = FactStore()
+        except Exception:
+            self.fact_store = None
 
     # ─── Public API ──────────────────────────────────────────────────────────
 
     def remember(self, key: str, value: str) -> bool:
         """
         Store or update a memory.
-
-        Args:
-            key:   Short topic label (e.g. "exam date").
-            value: Full detail to remember.
-
-        Returns:
-            True on success.
         """
         memories = self._load()
         now = datetime.now().isoformat()
+
+        # Sync to SQLite FactStore
+        if self.fact_store:
+            cat = "contact" if any(w in (key + " " + value).lower() for w in ["sister", "dog", "brother", "friend", "family", "pet"]) else "preference" if any(w in (key + " " + value).lower() for w in ["favorite", "preferred", "ide", "drink", "language"]) else "personal"
+            fact_text = f"{key}: {value}" if key and value and not value.lower().startswith(key.lower()) else value or key
+            self.fact_store.save_fact(fact_text, category=cat, confidence=1.0, source="explicit_remember")
 
         # Update existing key if found
         for mem in memories:
@@ -74,35 +68,40 @@ class MemoryService:
 
     def recall(self, query: str) -> list[dict]:
         """
-        Find memories matching a query string.
-
-        Args:
-            query: Search term to match against key or value.
-
-        Returns:
-            List of matching memory dicts.
+        Find memories matching a query string using both JSON and SQLite FTS5 search.
         """
         memories = self._load()
         query_lower = query.lower()
-        return [
+        matched = [
             m for m in memories
             if query_lower in m.get("key", "").lower()
             or query_lower in m.get("value", "").lower()
         ]
 
+        # Augment with SQLite FactStore results
+        if self.fact_store and not matched:
+            fts_matches = self.fact_store.search_facts(query, limit=5)
+            for f in fts_matches:
+                matched.append({
+                    "id": str(f.get("id", uuid.uuid4())),
+                    "key": f.get("category", "fact"),
+                    "value": f.get("fact", ""),
+                    "created_at": f.get("created_at", ""),
+                    "updated_at": f.get("updated_at", ""),
+                })
+
+        return matched
+
     def forget(self, key: str) -> bool:
         """
         Delete a memory by key.
-
-        Args:
-            key: The memory key to delete.
-
-        Returns:
-            True if found and deleted, False otherwise.
         """
         memories = self._load()
         original_len = len(memories)
         memories = [m for m in memories if m.get("key", "").lower() != key.lower()]
+
+        if self.fact_store:
+            self.fact_store.delete_fact(keyword=key)
 
         if len(memories) < original_len:
             self._save(memories)

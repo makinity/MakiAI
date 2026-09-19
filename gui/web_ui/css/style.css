@@ -1067,6 +1067,21 @@ select.form-control:focus {
     align-items: center;
 }
 
+.text-light {
+    color: #fff4e6 !important;
+}
+
+.text-muted {
+    color: #a89482 !important;
+}
+
+.timeline-container {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 153, 0, 0.3) transparent;
+}
+
 .timeline-badge {
     background: rgba(255, 149, 0, 0.16);
     color: var(--accent-warm);

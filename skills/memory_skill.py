@@ -65,19 +65,16 @@ class MemorySkill(BaseSkill):
         """Route to remember, recall, or forget subcommand."""
         lowered = text.lower().strip()
 
-        # Questions or retrieval queries go to recall
-        if any(kw in lowered for kw in [
-            "what do you remember", "recall", "do you know", "do you remember", "do you recall",
-            "what is my", "what's my", "who is my", "who's my", "what did i tell you", "what did i say",
-            "show what you know", "what you know about me", "what do you know about me",
-            "list learned facts", "show learned facts", "list memories", "show my memory",
-            "show memories", "what are my preferences", "my facts"
-        ]) or (lowered.startswith(("what", "who", "do you", "can you remember", "is my")) and "?" in text):
-            return self._recall(text)
-        elif any(kw in lowered for kw in ["forget", "delete", "remove", "clear"]):
+        # 1. Forget / delete commands
+        if any(kw in lowered for kw in ["forget", "delete", "remove", "clear"]):
             return self._forget(text)
-        else:
+
+        # 2. Explicit store commands (must have explicit remember / note intent)
+        if re.search(r"\b(remember\s+(?:that|this|my|our)?|tandaan\s+mo|don'?t\s+forget|note\s+that|save\s+(?:this\s+)?memory)\b", lowered):
             return self._remember(text)
+
+        # 3. Default: All other memory queries are questions / retrievals!
+        return self._recall(text)
 
     # ─── Subcommands ─────────────────────────────────────────────────────────
 
