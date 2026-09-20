@@ -69,6 +69,13 @@
         elements.settingPhonePort = document.getElementById("setting-phone-port");
         elements.settingPhonePin = document.getElementById("setting-phone-pin");
 
+        // Twilio Live Calling Settings
+        elements.settingTwilioEnabled = document.getElementById("setting-twilio-enabled");
+        elements.settingTwilioSid = document.getElementById("setting-twilio-sid");
+        elements.settingTwilioToken = document.getElementById("setting-twilio-token");
+        elements.settingTwilioPhone = document.getElementById("setting-twilio-phone");
+        elements.settingTwilioCaller = document.getElementById("setting-twilio-caller");
+
         // Situational Interactive Modal elements
         elements.modalOverlay = document.getElementById("interactive-modal-overlay");
         elements.modalHeading = document.getElementById("modal-heading");
@@ -581,6 +588,11 @@
             if (elements.btnOpenPhoneUrl) elements.btnOpenPhoneUrl.href = cfg.local_call_url || "http://localhost:5050/call";
             if (elements.settingPhonePort) elements.settingPhonePort.value = cfg.phone_bridge_port || 5050;
             if (elements.settingPhonePin) elements.settingPhonePin.value = cfg.phone_bridge_pin || "";
+            if (elements.settingTwilioEnabled) elements.settingTwilioEnabled.checked = Boolean(cfg.twilio_enabled);
+            if (elements.settingTwilioSid) elements.settingTwilioSid.value = cfg.twilio_account_sid || "";
+            if (elements.settingTwilioToken) elements.settingTwilioToken.value = cfg.twilio_auth_token || "";
+            if (elements.settingTwilioPhone) elements.settingTwilioPhone.value = cfg.twilio_phone_number || "";
+            if (elements.settingTwilioCaller) elements.settingTwilioCaller.value = cfg.twilio_authorized_caller || "";
         } catch (err) {
             console.error("[Settings] Failed to load settings:", err);
         }
@@ -606,6 +618,11 @@
             phone_bridge_enabled: elements.settingPhoneEnabled ? elements.settingPhoneEnabled.checked : true,
             phone_bridge_port: elements.settingPhonePort ? parseInt(elements.settingPhonePort.value) || 5050 : 5050,
             phone_bridge_pin: elements.settingPhonePin ? elements.settingPhonePin.value.trim() : "",
+            twilio_enabled: elements.settingTwilioEnabled ? elements.settingTwilioEnabled.checked : false,
+            twilio_account_sid: elements.settingTwilioSid ? elements.settingTwilioSid.value.trim() : "",
+            twilio_auth_token: elements.settingTwilioToken ? elements.settingTwilioToken.value.trim() : "",
+            twilio_phone_number: elements.settingTwilioPhone ? elements.settingTwilioPhone.value.trim() : "",
+            twilio_authorized_caller: elements.settingTwilioCaller ? elements.settingTwilioCaller.value.trim() : "",
         };
 
         if (elements.saveSettingsBtn) {

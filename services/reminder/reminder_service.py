@@ -68,18 +68,27 @@ class ReminderService:
     def add(self, text: str, dt: datetime, reminder_id: str | None = None) -> str:
         """
         Schedule a new reminder.
-
-        Args:
-            text:        The reminder message to speak aloud.
-            dt:          When to fire the reminder.
-            reminder_id: Optional existing ID (for restoring from disk).
-
-        Returns:
-            The reminder ID string.
+        Prevents duplicate pending reminders with the same text and trigger time.
         """
         if dt <= datetime.now():
             print(f"[ReminderService] Reminder time is in the past: {dt}")
             return ""
+
+        # Check for existing duplicate pending reminder
+        reminders = self._load_all()
+        for r in reminders:
+            if r.get("status") == "pending" and r.get("text") == text and r.get("datetime") == dt.isoformat():
+                rid = r.get("id")
+                # Ensure APScheduler job exists
+                self._scheduler.add_job(
+                    func=self._fire,
+                    trigger=DateTrigger(run_date=dt),
+                    args=[rid, text],
+                    id=rid,
+                    replace_existing=True,
+                    misfire_grace_time=60,
+                )
+                return rid
 
         rid = reminder_id or str(uuid.uuid4())
 
@@ -166,28 +175,54 @@ class ReminderService:
     # ─── Restore ─────────────────────────────────────────────────────────────
 
     def _restore_pending(self) -> None:
-        """Re-schedule all pending reminders from disk on startup."""
-        pending = self.list_pending()
+        """Re-schedule all pending reminders from disk on startup with deduplication."""
+        all_reminders = self._load_all()
+        seen_keys = set()
+        cleaned_reminders = []
         restored = 0
+        now = datetime.now()
 
-        for reminder in pending:
+        for reminder in all_reminders:
+            rid = reminder.get("id")
+            text = reminder.get("text", "")
+            status = reminder.get("status", "pending")
+            dt_str = reminder.get("datetime", "")
+
+            if status != "pending":
+                cleaned_reminders.append(reminder)
+                continue
+
             try:
-                dt = datetime.fromisoformat(reminder["datetime"])
-                if dt > datetime.now():
-                    self.add(
-                        text=reminder["text"],
-                        dt=dt,
-                        reminder_id=reminder["id"],
-                    )
-                    restored += 1
-                else:
-                    # Past reminder — mark as missed
-                    self._update_status(reminder["id"], "missed")
-            except Exception as e:
-                print(f"[ReminderService] Failed to restore reminder: {e}")
+                dt = datetime.fromisoformat(dt_str)
+                if dt <= now:
+                    reminder["status"] = "missed"
+                    cleaned_reminders.append(reminder)
+                    continue
 
+                dedup_key = (text, dt_str)
+                if dedup_key in seen_keys:
+                    # Duplicate pending reminder — discard
+                    continue
+                seen_keys.add(dedup_key)
+
+                # Schedule in APScheduler
+                self._scheduler.add_job(
+                    func=self._fire,
+                    trigger=DateTrigger(run_date=dt),
+                    args=[rid, text],
+                    id=rid,
+                    replace_existing=True,
+                    misfire_grace_time=60,
+                )
+                cleaned_reminders.append(reminder)
+                restored += 1
+            except Exception as e:
+                print(f"[ReminderService] Failed to parse reminder {rid}: {e}")
+                cleaned_reminders.append(reminder)
+
+        self._write(cleaned_reminders)
         if restored:
-            print(f"[ReminderService] Restored {restored} pending reminder(s).")
+            print(f"[ReminderService] Restored {restored} unique pending reminder(s).")
 
     # ─── Storage ─────────────────────────────────────────────────────────────
 

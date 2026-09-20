@@ -340,6 +340,45 @@
                         </div>
                     </div>
 
+                    <div class="settings-group glass-subpanel">
+                        <h3 class="settings-group-title">
+                            <svg viewBox="0 0 24 24" class="group-icon"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.44-5.15-3.75-6.59-6.59l1.97-1.57c.28-.28.36-.67.25-1.02A11.36 11.36 0 0 1 8.97 4c0-.55-.45-1-1-1H4.5c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1zM19 12h2a9 9 0 0 0-9-9v2c3.87 0 7 3.13 7 7zm-4 0h2c0-2.76-2.24-5-5-5v2c1.66 0 3 1.34 3 3z"/></svg>
+                            Twilio Live Phone Bridge
+                        </h3>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="setting-twilio-enabled">
+                            <label class="form-check-label" for="setting-twilio-enabled">Enable Twilio Live Phone Calling</label>
+                        </div>
+                        <div class="form-item">
+                            <label for="setting-twilio-sid" class="form-label">Twilio Account SID</label>
+                            <input type="text" id="setting-twilio-sid" class="form-control font-monospace" placeholder="AC...">
+                        </div>
+                        <div class="form-item">
+                            <label for="setting-twilio-token" class="form-label">Twilio Auth Token</label>
+                            <div class="password-input-wrap">
+                                <input type="password" id="setting-twilio-token" class="form-control" placeholder="Auth Token...">
+                                <button type="button" class="btn-toggle-vis" data-target="setting-twilio-token" title="Toggle visibility">
+                                    <svg viewBox="0 0 24 24" class="vis-icon" aria-hidden="true" style="width: 1.1rem; height: 1.1rem; fill: currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5ZM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5Zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3Z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="form-item">
+                                    <label for="setting-twilio-phone" class="form-label">Twilio Virtual Number</label>
+                                    <input type="text" id="setting-twilio-phone" class="form-control font-monospace" placeholder="+1...">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-item">
+                                    <label for="setting-twilio-caller" class="form-label">Authorized Caller (Your #)</label>
+                                    <input type="text" id="setting-twilio-caller" class="form-control font-monospace" placeholder="+639...">
+                                </div>
+                            </div>
+                        </div>
+                        <small class="form-hint mt-2 d-block">Webhook URL: <code>https://&lt;your-tunnel-url&gt;/voice/incoming</code> (HTTP POST)</small>
+                    </div>
+
                     <div class="settings-footer">
                         <div id="settings-status-msg" class="settings-status-msg" hidden></div>
                         <button type="button" class="btn action-btn send-btn w-100" id="save-settings-btn">

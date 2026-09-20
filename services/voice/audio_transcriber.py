@@ -15,6 +15,9 @@ import speech_recognition as sr
 from typing import Optional
 
 
+from services.ai.key_rotator import key_rotator, KeyRotator
+
+
 # Natural conversational vocabulary prompt to bias Whisper without triggering repetition loops
 VOCABULARY_PROMPT = (
     "MakiAI desktop assistant. Topics: Kiro, MakiSync, TaskMaster, MunchBite, Next.js, "
@@ -38,30 +41,39 @@ PHONETIC_REPLACEMENTS = [
 
 class AudioTranscriber:
     """
-    High-performance, dual-tier voice transcriber with Groq Whisper, RMS silence gating, and Google STT.
+    High-performance, multi-key voice transcriber with Groq Whisper, RMS silence gating, and Google STT.
     """
 
     def __init__(self, groq_api_key: str = ""):
-        self.groq_api_key = groq_api_key or os.getenv("GROQ_API_KEY", "")
-        self._groq_client = None
+        self._groq_clients: dict = {}
         self._recognizer = sr.Recognizer()
-
         self._init_groq()
 
-    def _init_groq(self) -> None:
-        """Initialize Groq client if key is valid."""
-        if self.groq_api_key and self.groq_api_key not in ("", "your_groq_api_key_here"):
+    def _get_groq_client(self, api_key: Optional[str] = None):
+        key = api_key or key_rotator.get_active_key("groq")
+        if not key:
+            return None, None
+        if key not in self._groq_clients:
             try:
                 from groq import Groq
-                self._groq_client = Groq(api_key=self.groq_api_key)
-                print("[AudioTranscriber] Groq Whisper (whisper-large-v3-turbo) initialized with vocabulary biasing.")
+                self._groq_clients[key] = Groq(api_key=key)
             except Exception as e:
-                print(f"[AudioTranscriber] Groq init failed: {e}. Using Google STT.")
-                self._groq_client = None
+                print(f"[AudioTranscriber] Groq client creation failed for {KeyRotator._mask_key(key)}: {e}")
+                return None, None
+        return self._groq_clients[key], key
+
+    def _init_groq(self) -> None:
+        """Initialize Groq client pool."""
+        client, key = self._get_groq_client()
+        if client:
+            print(f"[AudioTranscriber] Groq Whisper (whisper-large-v3-turbo) initialized with KeyRotator ({KeyRotator._mask_key(key)}).")
+        else:
+            print("[AudioTranscriber] No Groq keys available. Running Google STT fallback.")
 
     def update_groq_key(self, api_key: str) -> None:
         """Hot-swap Groq API key."""
-        self.groq_api_key = api_key
+        os.environ["GROQ_API_KEY"] = api_key
+        key_rotator.reload_keys_from_env()
         self._init_groq()
 
     def is_audio_silent(self, wav_bytes: bytes, min_rms: float = 340.0) -> bool:
@@ -102,6 +114,15 @@ class AudioTranscriber:
         }:
             return True
 
+        # Reject isolated silence politeness hallucinations (e.g. "Thank you.", "Thank you very much.")
+        clean_no_punc = re.sub(r"[^\w\s]", "", clean).strip()
+        if clean_no_punc in {
+            "thank you", "thank you very much", "thanks", "thanks a lot",
+            "you're welcome", "your welcome", "bye bye", "goodbye", "hello",
+            "subtitles by", "watching", "amara org"
+        }:
+            return True
+
         # 2. Known Whisper silence/noise hallucination blacklist
         hallucination_patterns = [
             "subtitles by", "amara.org", "thank you for watching", "thanks for watching",
@@ -127,7 +148,7 @@ class AudioTranscriber:
 
     def transcribe_wav_bytes(self, wav_bytes: bytes) -> tuple[str, str]:
         """
-        Transcribe raw WAV audio bytes with RMS silence gating.
+        Transcribe raw WAV audio bytes with multi-key Groq Whisper rotation.
 
         Returns:
             (transcribed_text, provider_used)
@@ -135,10 +156,15 @@ class AudioTranscriber:
         if not wav_bytes or self.is_audio_silent(wav_bytes):
             return "", "silence"
 
-        # Tier 1: Try Groq Whisper (Ultra-fast ~150ms, high accuracy)
-        if self._groq_client:
+        # Tier 1: Try Groq Whisper with KeyRotator
+        max_attempts = max(1, len(key_rotator._pools.get("groq", [])))
+        for _ in range(max_attempts):
+            client, active_key = self._get_groq_client()
+            if not client:
+                break
+
             try:
-                response = self._groq_client.audio.transcriptions.create(
+                response = client.audio.transcriptions.create(
                     file=("audio.wav", wav_bytes, "audio/wav"),
                     model="whisper-large-v3-turbo",
                     response_format="text",
@@ -152,9 +178,15 @@ class AudioTranscriber:
 
                 cleaned_text = self.heal_phonetics(raw_text)
                 if cleaned_text and not self.is_hallucination_loop(cleaned_text):
+                    key_rotator.report_success("groq", active_key)
                     return cleaned_text, "groq-whisper"
             except Exception as e:
-                print(f"[AudioTranscriber] Groq Whisper error ({e}). Falling back to Google STT.")
+                err_str = str(e).lower()
+                print(f"[AudioTranscriber] Groq Whisper error on key {KeyRotator._mask_key(active_key)}: {e}")
+                if "429" in err_str or "rate limit" in err_str or "quota" in err_str or "resource" in err_str:
+                    key_rotator.report_rate_limit("groq", active_key, str(e))
+                    continue # Retry on next key in pool
+                break
 
         # Tier 2: Fallback to Google STT
         try:

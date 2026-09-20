@@ -131,6 +131,14 @@ def bootstrap_maki_services():
     orchestrator = Orchestrator(state_manager)
 
     # 2. AI & KB Services
+    from services.ai.key_rotator import key_rotator
+    try:
+        print("[MakiAI] 🔍 Probing Key Rotator pool health & quotas...")
+        key_rotator.scan_pool_health()
+        print(key_rotator.get_status_summary())
+    except Exception as e:
+        print(f"[MakiAI] Key pool scan notice: {e}")
+
     gemini = GeminiService(
         api_key=settings.get_gemini_api_key(),
         groq_api_key=settings.get_groq_api_key(),
