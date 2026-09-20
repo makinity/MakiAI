@@ -32,6 +32,7 @@ class WeatherSkill(BaseSkill):
     _weather_cache: Dict[str, Tuple[float, Dict[str, Any]]] = {}
     _local_ip_geo: Optional[Tuple[float, float, str, str]] = None
     _local_ip_geo_time: float = 0.0
+    _summary_cache: Optional[Tuple[float, Dict[str, Any]]] = None
 
     WMO_CODES = {
         0: ("Clear Sky", "☀️", "clear skies"),
@@ -358,6 +359,12 @@ class WeatherSkill(BaseSkill):
 
     def get_weather_summary(self, city_name: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """Public helper to get weather data for internal use by GoodMorningSkill or Routines."""
+        now = time.time()
+        if not city_name and WeatherSkill._summary_cache:
+            cache_t, cache_data = WeatherSkill._summary_cache
+            if now - cache_t < 900:  # 15 min cache
+                return cache_data
+
         if city_name:
             geo = self._geocode_city(city_name)
             if geo:
@@ -365,7 +372,10 @@ class WeatherSkill(BaseSkill):
                 return self.fetch_weather_data(lat, lon, name, country)
 
         lat, lon, name, country = self._get_local_location()
-        return self.fetch_weather_data(lat, lon, name, country)
+        data = self.fetch_weather_data(lat, lon, name, country)
+        if data and not city_name:
+            WeatherSkill._summary_cache = (now, data)
+        return data
 
     # ─── Main Execution ───────────────────────────────────────────────────────
 

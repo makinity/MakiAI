@@ -9,6 +9,7 @@ Reads: time-management.md, carryover.md, deadlines.md
 import os
 import re
 from datetime import datetime, timedelta
+from typing import Optional
 from skills.base_skill import BaseSkill
 
 
@@ -127,8 +128,43 @@ class GoodMorningSkill(BaseSkill):
         }
         self.ui_bridge.show_morning_mission(mission_data)
 
+    def _find_current_and_next_blocks(self, day_schedule: str, current_time: datetime) -> tuple[Optional[str], Optional[str]]:
+        """Find the exact active block and next upcoming block from day_schedule."""
+        if not day_schedule:
+            return None, None
+
+        curr_mins = current_time.hour * 60 + current_time.minute
+        parsed_slots = []
+
+        for line in day_schedule.strip().splitlines():
+            match = re.search(r"(\d{1,2}):(\d{2})\s*[-–—to]+\s*(\d{1,2}):(\d{2})\s*:\s*(.+)", line)
+            if match:
+                h1, m1, h2, m2, title = int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)), match.group(5).strip()
+                start = h1 * 60 + m1
+                end = h2 * 60 + m2
+                start_label = datetime(2000, 1, 1, h1, m1).strftime("%I:%M %p").lstrip("0")
+                end_label = datetime(2000, 1, 1, h2, m2).strftime("%I:%M %p").lstrip("0")
+                time_label = f"{start_label} to {end_label}"
+                parsed_slots.append((start, end, time_label, start_label, title))
+
+        active_str = None
+        next_str = None
+
+        for idx, (start, end, time_label, start_label, title) in enumerate(parsed_slots):
+            if start <= curr_mins < end:
+                active_str = f"{title} ({time_label})"
+                if idx + 1 < len(parsed_slots):
+                    n_start_label = parsed_slots[idx + 1][3]
+                    n_title = parsed_slots[idx + 1][4]
+                    next_str = f"{n_title} at {n_start_label}"
+                break
+            elif curr_mins < start and not next_str:
+                next_str = f"{title} at {start_label}"
+
+        return active_str, next_str
+
     def execute(self, text: str) -> str:
-        """Generate the time-aware schedule briefing from KB workflow files."""
+        """Generate the time-aware schedule briefing with zero latency."""
         now = datetime.now()
         lowered = text.lower()
         is_tomorrow = any(k in lowered for k in ["tomorrow", "bukas"])
@@ -140,28 +176,16 @@ class GoodMorningSkill(BaseSkill):
             day_schedule = self._get_day_schedule(day_name)
             self._trigger_mission_modal_if_available(day_name, date_str, day_schedule)
 
-            prompt = f"""
-The current real-time clock is {now.strftime("%I:%M %p")} on {now.strftime("%A, %B %d, %Y")}.
-The user asked for TOMORROW'S schedule: "{text}"
-Target Date for tomorrow: {day_name}, {date_str}.
-
-{day_schedule}
-
-Generate a warm, clear spoken schedule briefing for tomorrow for sir:
-1. Greet sir and state that this is the schedule overview for tomorrow ({day_name}, {date_str}).
-2. Summarize the key routine blocks planned for {day_name} (e.g. morning routine, classes/work, coding/study, exercise, evening leisure).
-3. Check for any upcoming deadlines or active calendar appointments on {day_name} from the Knowledge Base or mention if the day looks open.
-4. End warmly: "Let me know if you would like to prepare anything for tomorrow, sir."
-
-Constraints:
-- Focus on tomorrow ({day_name}, {date_str}). Do NOT confuse it with today's live time block.
-- Speak in natural flowing conversational sentences suitable for TTS (no markdown asterisks, no bullets, no headers).
-- Keep total response concise (under 120 words).
-""".strip()
+            # Instant briefing for tomorrow
+            return (
+                f"Here is your schedule overview for tomorrow, {day_name}, {date_str}, sir. "
+                f"I have displayed your complete operating timeline and upcoming items on screen. "
+                f"Let me know if you would like to make any adjustments."
+            )
         else:
             day_name = now.strftime("%A")
             date_str = now.strftime("%B %d, %Y")
-            time_str = now.strftime("%I:%M %p")
+            time_str = now.strftime("%I:%M %p").lstrip("0")
             hour = now.hour
             day_schedule = self._get_day_schedule(day_name)
             self._trigger_mission_modal_if_available(day_name, date_str, day_schedule)
@@ -173,40 +197,26 @@ Constraints:
             else:
                 greeting = "Good evening"
 
-            weather_line = ""
+            active_block, next_block = self._find_current_and_next_blocks(day_schedule, now)
+
+            # Fast weather summary if cached or fast-responding
+            weather_snippet = ""
             try:
                 from skills.weather_skill import WeatherSkill
                 w_skill = WeatherSkill()
                 w_summary = w_skill.get_weather_summary()
-                if w_summary:
-                    weather_line = f"Live Local Weather in {w_summary['location']}: {w_summary['temperature_c']}°C with {w_summary['condition_phrase']}. High of {w_summary['high_c']}°C, {w_summary['rain_probability']}% chance of rain."
+                if w_summary and "location" in w_summary:
+                    weather_snippet = f" It is {w_summary['temperature_c']} degrees in {w_summary['location']} with {w_summary['condition_phrase']}."
             except Exception:
                 pass
 
-            prompt = f"""
-The current real-time clock is {time_str} ({day_name}, {date_str}) Philippine Standard Time (UTC+8).
-The appropriate time-of-day greeting is "{greeting}".
-The user asked: "{text}"
-{weather_line}
+            # Build natural, high-precision spoken response
+            if active_block:
+                spoken = f"{greeting}, sir. The time is {time_str}.{weather_snippet} According to your schedule for {day_name}, you are currently in your planned {active_block}."
+                if next_block:
+                    spoken += f" Up next is {next_block}."
+                spoken += " I have opened your daily mission and timeline on screen."
+            else:
+                spoken = f"{greeting}, sir. The time is {time_str}.{weather_snippet} Here is your complete operating schedule and deadlines for {day_name} on screen. Is there anything you would like to prepare?"
 
-{day_schedule}
-
-Generate a warm, natural spoken briefing for sir:
-1. Start with the greeting ("{greeting}, sir.") and state the current time ({time_str} PHT).
-2. If weather information is provided above, briefly mention the current weather in one short phrase (e.g. "It is currently 28 degrees with light drizzle outside.").
-3. Using the schedule table above for {day_name}, accurately state his EXACT active activity block right now at {time_str}.
-4. Mention what is coming up next.
-5. End warmly: "Is there anything you would like to add to your day, sir?"
-
-Constraints:
-- Always respect the current live clock ({time_str}).
-- Speak in natural flowing conversational sentences suitable for TTS (no markdown asterisks, no bullets, no headers).
-- Keep total response concise (under 120 words).
-""".strip()
-
-        resp = self._ask_gemini(prompt)
-        if not resp or "I had trouble thinking" in resp:
-            if is_tomorrow:
-                return f"Here is your schedule overview for tomorrow, {day_name}, {date_str}, sir. You have your standard routine and planned activities scheduled. Let me know if you would like to prepare anything for tomorrow, sir."
-            return f"{greeting}, sir. The current time is {time_str}. According to your schedule, you are currently in your scheduled focus block for {day_name}. Is there anything you would like to add to your day, sir?"
-        return resp
+            return spoken
