@@ -386,6 +386,13 @@ class TTSService:
                 pygame.time.wait(50)
 
         except Exception as e:
-            print(f"[TTSService] Playback error: {e}")
-            # Try reinitializing pygame on failure
+            print(f"[TTSService] Playback notice: {e}")
+            # Try reinitializing pygame and retrying playback once
             self._init_pygame()
+            try:
+                pygame.mixer.music.load(file_path)
+                pygame.mixer.music.play()
+                while pygame.mixer.music.get_busy():
+                    pygame.time.wait(50)
+            except Exception as retry_err:
+                print(f"[TTSService] Playback retry error: {retry_err}")

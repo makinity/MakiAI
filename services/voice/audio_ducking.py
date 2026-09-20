@@ -19,21 +19,29 @@ except Exception:
 
 class AudioDuckingService:
     """
-    Manages Windows audio attenuation (ducking) during speech synthesis.
-    Ducks master volume down to ~30% when TTS starts, and restores original volume when TTS finishes.
+    Manages optional Windows audio attenuation (ducking) during speech synthesis.
+    Disabled by default to keep master PC volume untouched.
     """
 
-    def __init__(self, duck_ratio: float = 0.30):
+    def __init__(self, duck_ratio: float = 0.30, enabled: Optional[bool] = None):
         """
         Args:
             duck_ratio: Fraction of current volume to keep while ducked (e.g., 0.30 = 30%).
+            enabled:    Explicit boolean or reads AUDIO_DUCKING from .env (default: False).
         """
+        import os
+        if enabled is not None:
+            self.enabled = bool(enabled)
+        else:
+            self.enabled = os.getenv("AUDIO_DUCKING", "false").lower() in ("true", "1", "yes")
+
         self.duck_ratio = max(0.05, min(0.9, duck_ratio))
         self._original_volume: Optional[float] = None
         self._is_ducked = False
         self._lock = threading.Lock()
         self._volume_interface = None
-        self._init_endpoint()
+        if self.enabled:
+            self._init_endpoint()
 
     def _init_endpoint(self) -> None:
         """Initialize default audio speaker endpoint interface."""
@@ -50,6 +58,9 @@ class AudioDuckingService:
 
     def duck(self) -> None:
         """Attenuate master speaker volume down during speech."""
+        if not self.enabled:
+            return
+
         with self._lock:
             if self._is_ducked:
                 return
@@ -70,6 +81,9 @@ class AudioDuckingService:
 
     def unduck(self) -> None:
         """Restore master speaker volume back to pre-speech level."""
+        if not self.enabled:
+            return
+
         with self._lock:
             if not self._is_ducked or self._original_volume is None:
                 return
